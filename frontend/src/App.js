@@ -1,6 +1,6 @@
 
 import './App.css';
-import Nav from './Nav';
+import Nav from './Components/Nav';
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import UsageMonitor from './pages/UsageMonitor';
