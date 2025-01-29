@@ -75,7 +75,7 @@ export default function Nav() {
         {/* Logout */}
         <button
           className="mt-auto flex items-center p-3 rounded-lg hover:bg-red-700 transition-all duration-500 ease-in-out transform hover:scale-105"
-          onClick={() => console.log("Logout clicked")} // Add your logout functionality here
+          onClick={() => console.log("Logout clicked")} 
         >
           <LogoutIcon className={`w-6 h-6 transition-all duration-500 ease-in-out ${collapsed ? "mx-auto" : "mr-3"}`} />
           <span
@@ -109,7 +109,7 @@ export default function Nav() {
 
         {/* Main Content Area */}
         <main className="p-6 bg-gray-100 flex-1">
-          <Outlet /> {/* This will render child components based on the route */}
+          <Outlet /> {}
         </main>
       </div>
     </div>
