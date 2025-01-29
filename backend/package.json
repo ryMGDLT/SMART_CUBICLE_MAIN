@@ -1,0 +1,21 @@
+{
+  "name": "smart_cubicle_main",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "RYMGDLT",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@testing-library/react": "^16.2.0",
+    "express": "^4.21.2",
+    "g": "^2.0.1",
+    "mongoose": "^8.9.5",
+    "nodemon": "^3.1.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "web-vitals": "^4.2.4"
+  }
+}
