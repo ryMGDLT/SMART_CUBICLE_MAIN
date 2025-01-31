@@ -11,6 +11,7 @@ import Settings from './pages/Views/Settings';
 import Users from './pages/Views/Users';
 import Login from './pages/Auth/Login';
 import Profile from './pages/Views/Profile';
+import Signup from './pages/Auth/Signup';
 function App() {
   return (
     <BrowserRouter>
@@ -18,6 +19,7 @@ function App() {
         <div className='App'>
           <Routes>
             <Route path="/login" element={<Login/>} />
+            <Route path="/signup" element={<Signup/>}/>
               <Route element={<PrivateRoute />}>
                 <Route path="/" element={<Nav />}>
                 <Route path="dashboard" element={<Dashboard />} />
