@@ -1,32 +1,41 @@
-
-import './App.css';
+import './styles/App.css';
 import Nav from './Components/Nav';
-import { BrowserRouter, Routes, Route} from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import UsageMonitor from './pages/UsageMonitor';
-import Janitors from './pages/Janitors';
-import Resources from './pages/Resources';
-import Settings from './pages/Settings';
-import Users from './pages/Users';
-
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./Components/Controller/AuthController";
+import PrivateRoute from "./pages/Auth/PrivateRoute";
+import Dashboard from './pages/Views/Dashboard';
+import UsageMonitor from './pages/Views/UsageMonitor';
+import Janitors from './pages/Views/Janitors';
+import Resources from './pages/Views/Resources';
+import Settings from './pages/Views/Settings';
+import Users from './pages/Views/Users';
+import Login from './pages/Auth/Login';
+import Profile from './pages/Views/Profile';
+import Signup from './pages/Auth/Signup';
 function App() {
   return (
-    <div className='App'>
-      <BrowserRouter>
-        <Routes>
-        {/* Parent Route (Layout) */}
-        <Route path="/" element={<Nav />}>
-          {/* Child Routes (Rendered in Outlet) */}
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="usage-monitor" element={<UsageMonitor />} />
-          <Route path="janitors" element={<Janitors />} />
-          <Route path="resources" element={<Resources />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="users" element={<Users />} />
-        </Route>
-      </Routes>
+    <BrowserRouter>
+      <AuthProvider> 
+        <div className='App'>
+          <Routes>
+            <Route path="/login" element={<Login/>} />
+            <Route path="/signup" element={<Signup/>}/>
+              <Route element={<PrivateRoute />}>
+                <Route path="/" element={<Nav />}>
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="usage-monitor" element={<UsageMonitor />} />
+                <Route path="janitors" element={<Janitors />} />
+                <Route path="resources" element={<Resources />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="users" element={<Users />} />
+                <Route path="user_profile" element={<Profile/>}/>
+              </Route>
+            </Route>
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </div>
+      </AuthProvider>
     </BrowserRouter>
-    </div>
   );
 }
 
