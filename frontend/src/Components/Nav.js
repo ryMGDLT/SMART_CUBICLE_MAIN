@@ -36,6 +36,10 @@ export default function Nav() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDropdownVisible]);
 
+    const ProfileClick = () => {
+      setActive("");
+    }
+
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
@@ -158,7 +162,7 @@ export default function Nav() {
 
             {/* User Profile */}
             <div className="flex items-center">
-              <Link to="/user_profile" className="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-300">
+              <Link to="/user_profile" className="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-300" onClick={ProfileClick}>
                 {/*<img className="w-8 h-8 rounded-full border object-cover transition-transform duration-300 hover:scale-110" src="/images/bongbong.jpg" alt="User Avatar" />*/}
                 <img className="w-8 h-8 rounded-full border object-cover transition-transform duration-300" src="/images/bongbong.jpg" alt="User"/> 
                 <span className="ml-2 mr-8 font-medium hidden sm:block">@BongBongBOBO</span>
