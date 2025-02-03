@@ -3,6 +3,7 @@ import Nav from "./Components/Nav";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./Components/Controller/AuthController";
 import PrivateRoute from "./pages/Auth/PrivateRoute";
+<<<<<<< HEAD
 
 // Responsive Views
 // Auth
@@ -20,12 +21,24 @@ import UsersDesktop from "./pages/Views/desktop/Users";
 import ProfileDesktop from "./pages/Views/desktop/Profile";
 
 
+=======
+import Dashboard from "./pages/Views/Dashboard";
+import UsageMonitor from "./pages/Views/UsageMonitor";
+import Janitors from "./pages/Views/Janitors";
+import Resources from "./pages/Views/Resources";
+import Settings from "./pages/Views/Settings";
+import Users from "./pages/Views/Users";
+import Login from "./pages/Auth/Login";
+import Profile from "./pages/Views/Profile";
+import Signup from "./pages/Auth/Signup";
+>>>>>>> main
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <div className="App">
           <Routes>
+<<<<<<< HEAD
             <Route path="/login" element={<ResponsiveLogin />} />
             <Route path="/signup" element={<ResponsiveSignup />} />
             <Route element={<PrivateRoute />}>
@@ -37,6 +50,19 @@ function App() {
                 <Route path="settings" element={<SettingsDesktop />} />
                 <Route path="users" element={<UsersDesktop />} />
                 <Route path="user_profile" element={<ProfileDesktop />} />
+=======
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route element={<PrivateRoute />}>
+              <Route path="/" element={<Nav />}>
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="usage-monitor" element={<UsageMonitor />} />
+                <Route path="janitors" element={<Janitors />} />
+                <Route path="resources" element={<Resources />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="users" element={<Users />} />
+                <Route path="user_profile" element={<Profile />} />
+>>>>>>> main
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/login" replace />} />
