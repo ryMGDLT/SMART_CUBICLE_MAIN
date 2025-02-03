@@ -3,6 +3,23 @@ import { Trash, Pencil, Printer } from "heroicons-react";
 
 export default function Janitors() {
   const [activeTab, setActiveTab] = useState("Basic Details");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < 4) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   return (
     <div className="h-full shadow-md bg-white rounded-lg p-6">
@@ -128,8 +145,45 @@ export default function Janitors() {
             </thead>
 
             <tbody className="divide-y divide-gray-200">
-              {[1, 2, 3, 4].map((item) => (
-                <tr key={item}>
+              {[
+                {
+                  name: "Maria Santos",
+                  employeeId: "TUPM-21-0001",
+                  email: "maria.santos@tup.edu.ph",
+                  contact: "+639123456789",
+                },
+                {
+                  name: "Juan Dela Cruz",
+                  employeeId: "TUPM-21-0002",
+                  email: "juan.delacruz@tup.edu.ph",
+                  contact: "+639234567890",
+                },
+                {
+                  name: "Ana Reyes",
+                  employeeId: "TUPM-21-0003",
+                  email: "ana.reyes@tup.edu.ph",
+                  contact: "+639345678901",
+                },
+                {
+                  name: "Pedro Garcia",
+                  employeeId: "TUPM-21-0004",
+                  email: "pedro.garcia@tup.edu.ph",
+                  contact: "+639456789012",
+                },
+                {
+                  name: "Sofia Luna",
+                  employeeId: "TUPM-21-0005",
+                  email: "sofia.luna@tup.edu.ph",
+                  contact: "+639567890123",
+                },
+                {
+                  name: "Miguel Torres",
+                  employeeId: "TUPM-21-0006",
+                  email: "miguel.torres@tup.edu.ph",
+                  contact: "+639678901234",
+                },
+              ].map((janitor) => (
+                <tr key={janitor.employeeId}>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <img
@@ -138,15 +192,15 @@ export default function Janitors() {
                         className="h-10 w-10 rounded-full object-cover"
                       />
                       <span className="font-medium text-gray-900">
-                        Jane Doe
+                        {janitor.name}
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-gray-700">TUPM-21-0000</td>
                   <td className="px-4 py-4 text-gray-700">
-                    jane.doe@tup.edu.ph
+                    {janitor.employeeId}
                   </td>
-                  <td className="px-4 py-4 text-gray-700">+639999999999</td>
+                  <td className="px-4 py-4 text-gray-700">{janitor.email}</td>
+                  <td className="px-4 py-4 text-gray-700">{janitor.contact}</td>
                   <td className="px-4 py-4">
                     <div className="flex gap-2">
                       <button className="rounded-lg px-3 py-1 text-xs font-medium">
@@ -166,7 +220,11 @@ export default function Janitors() {
         <div className="rounded-b-lg border-t border-gray-200 px-4 py-2">
           <ol className="flex justify-center gap-1 text-xs font-medium">
             <li>
-              <button className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180">
+              <button
+                onClick={handlePrevPage}
+                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                disabled={currentPage === 1}
+              >
                 <span className="sr-only">Prev Page</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -186,10 +244,11 @@ export default function Janitors() {
             {[1, 2, 3, 4].map((page) => (
               <li key={page}>
                 <button
+                  onClick={() => handlePageChange(page)}
                   className={`h-8 w-8 rounded border ${
-                    page === 1
+                    currentPage === page
                       ? "border-Icpetgreen bg-Icpetgreen text-white"
-                      : "border-gray-100 bg-white text-gray-900"
+                      : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
                   } text-center leading-8`}
                 >
                   {page}
@@ -198,7 +257,11 @@ export default function Janitors() {
             ))}
 
             <li>
-              <button className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180">
+              <button
+                onClick={handleNextPage}
+                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                disabled={currentPage === 4}
+              >
                 <span className="sr-only">Next Page</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
