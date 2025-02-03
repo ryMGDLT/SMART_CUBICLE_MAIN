@@ -13,8 +13,8 @@ export default function LoginPage() {
     login(username, password);
   };
 
- // const togglePassword = () => {
-   // setShowPassword((prevState) => !prevState);
+  // const togglePassword = () => {
+  // setShowPassword((prevState) => !prevState);
   //};
 
   return (
@@ -26,18 +26,19 @@ export default function LoginPage() {
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#23897D] to-white opacity-90 z-10"></div>
 
-
       <div className="relative p-8 w-full max-w-md z-20">
         <div className="flex justify-center mb-1 mt-[-60px]">
-        <img 
-          src="/images/ICPET.png" 
-          alt="Logo" 
-          className="w-[250px] h-[250px] object-contain"
-        />
+          <img
+            src="/images/ICPET.png"
+            alt="Logo"
+            className="w-[250px] h-[250px] object-contain"
+          />
         </div>
         <form className="mt-2" onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-white text-sm mb-2">Email/Username</label>
+            <label className="block text-white text-sm mb-2">
+              Email/Username
+            </label>
             <input
               type="text"
               placeholder="Email/Username"
@@ -46,7 +47,6 @@ export default function LoginPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
             />
-            
           </div>
 
           <div className="mb-4">
@@ -63,7 +63,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-             {/* {password && ( 
+              {/* {password && ( 
                 <button
                   type="button"
                   onClick={togglePassword}
@@ -76,7 +76,9 @@ export default function LoginPage() {
           </div>
 
           <div className="text-left mb-2">
-            <a href="" className="text-sm text-Icpetgreen hover:underline">Forgot Password?</a>
+            <a href="" className="text-sm text-Icpetgreen hover:underline">
+              Forgot Password?
+            </a>
           </div>
 
           <button
@@ -89,7 +91,12 @@ export default function LoginPage() {
 
         <div className="text-center mt-4">
           <p className="text-sm">
-            <Link to="/signup" className="text-Icpetgreen text-lg hover:underline">Sign Up</Link>
+            <Link
+              to="/signup"
+              className="text-Icpetgreen text-lg hover:underline"
+            >
+              Sign Up
+            </Link>
           </p>
         </div>
       </div>
