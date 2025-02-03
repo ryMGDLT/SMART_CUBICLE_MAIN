@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Card } from "../../Components/ui/card";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import { Card } from "../../../Components/ui/card";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -15,7 +15,7 @@ import {
   PointElement,
   Filler,
 } from "chart.js";
-import "../../styles/Calendar.css";
+import "../../../styles/Calendar.css";
 
 // Register Chart.js components
 ChartJS.register(
