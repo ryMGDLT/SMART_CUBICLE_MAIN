@@ -1,0 +1,70 @@
+.fc-theme-standard td, 
+.fc-theme-standard th {
+  border: none !important;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border: none !important;
+}
+
+.fc-daygrid-day-frame {
+  padding: 2px !important;
+  height: 35px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fc-daygrid-day-number {
+  font-size: 12px !important; /* Adjusted font size for smaller cards */
+  white-space: nowrap;
+  text-align: center;
+  width: 100%;
+}
+
+/* Ensures prev/next buttons don't have borders and have better UX */
+.fc-prev-button, .fc-next-button {
+  background-color: white !important;
+  border: none !important;
+  color: black !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.fc-prev-button:hover, .fc-next-button:hover {
+  background-color: #f3f3f3 !important;
+}
+
+.fc-prev-button:focus, .fc-next-button:focus,
+.fc-prev-button:active, .fc-next-button:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Style today's date */
+.fc-day-today {
+  background-color: #f3f3f3 !important; 
+  border-radius: 5px; 
+}
+
+/* Ensure calendar takes full width of the card */
+.fc .fc-view-harness {
+  width: 100% !important;
+  min-width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Adjust the toolbar to wrap properly */
+.fc .fc-toolbar {
+  flex-wrap: wrap;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1rem; /* Adjusted font size for smaller cards */
+}
+
+.fc .fc-button {
+  font-size: 0.75rem; /* Adjusted font size for smaller cards */
+}
