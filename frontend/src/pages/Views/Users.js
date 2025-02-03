@@ -2,6 +2,23 @@ import React, { useState } from "react";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < 4) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   return (
     <div className="h-full shadow-md bg-white rounded-lg p-6">
@@ -121,8 +138,57 @@ export default function Users() {
             </thead>
 
             <tbody className="divide-y divide-gray-200">
-              {[1, 2, 3].map((item) => (
-                <tr key={item}>
+              {[
+                {
+                  name: "Isabella Cruz",
+                  employeeId: "TUPM-22-0001",
+                  email: "isabella.cruz@tup.edu.ph",
+                  contact: "+639111222333",
+                  position: "Janitor",
+                  priority: true,
+                },
+                {
+                  name: "Rafael Mendoza",
+                  employeeId: "TUPM-22-0002",
+                  email: "rafael.mendoza@tup.edu.ph",
+                  contact: "+639222333444",
+                  position: "Maintenance",
+                  priority: false,
+                },
+                {
+                  name: "Carmen Ramos",
+                  employeeId: "TUPM-22-0003",
+                  email: "carmen.ramos@tup.edu.ph",
+                  contact: "+639333444555",
+                  position: "Janitor",
+                  priority: true,
+                },
+                {
+                  name: "Antonio Santos",
+                  employeeId: "TUPM-22-0004",
+                  email: "antonio.santos@tup.edu.ph",
+                  contact: "+639444555666",
+                  position: "Security",
+                  priority: false,
+                },
+                {
+                  name: "Beatriz Luna",
+                  employeeId: "TUPM-22-0005",
+                  email: "beatriz.luna@tup.edu.ph",
+                  contact: "+639555666777",
+                  position: "Janitor",
+                  priority: true,
+                },
+                {
+                  name: "Gabriel Reyes",
+                  employeeId: "TUPM-22-0006",
+                  email: "gabriel.reyes@tup.edu.ph",
+                  contact: "+639666777888",
+                  position: "Maintenance",
+                  priority: false,
+                },
+              ].map((user) => (
+                <tr key={user.employeeId}>
                   <td className="px-4 py-4">
                     <input
                       type="checkbox"
@@ -130,7 +196,7 @@ export default function Users() {
                     />
                   </td>
                   <td className="px-4 py-4">
-                    <span className="text-red-500">!</span>
+                    {user.priority && <span className="text-red-500">!</span>}
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
@@ -140,16 +206,14 @@ export default function Users() {
                         className="h-10 w-10 rounded-full object-cover"
                       />
                       <span className="font-medium text-gray-900">
-                        Jane Doe
+                        {user.name}
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-gray-700">TUPM-21-0000</td>
-                  <td className="px-4 py-4 text-gray-700">
-                    jane.doe@tup.edu.ph
-                  </td>
-                  <td className="px-4 py-4 text-gray-700">+639999999999</td>
-                  <td className="px-4 py-4 text-gray-700">Janitor</td>
+                  <td className="px-4 py-4 text-gray-700">{user.employeeId}</td>
+                  <td className="px-4 py-4 text-gray-700">{user.email}</td>
+                  <td className="px-4 py-4 text-gray-700">{user.contact}</td>
+                  <td className="px-4 py-4 text-gray-700">{user.position}</td>
                   <td className="px-4 py-4">
                     <div className="flex gap-2">
                       <button className="rounded-lg bg-Icpetgreen px-4 py-2 text-xs font-medium text-white hover:bg-gray-700">
@@ -169,7 +233,11 @@ export default function Users() {
         <div className="rounded-b-lg border-t border-gray-200 px-4 py-2">
           <ol className="flex justify-center gap-1 text-xs font-medium">
             <li>
-              <button className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180">
+              <button
+                onClick={handlePrevPage}
+                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                disabled={currentPage === 1}
+              >
                 <span className="sr-only">Prev Page</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -189,10 +257,11 @@ export default function Users() {
             {[1, 2, 3, 4].map((page) => (
               <li key={page}>
                 <button
+                  onClick={() => handlePageChange(page)}
                   className={`h-8 w-8 rounded border ${
-                    page === 2
+                    currentPage === page
                       ? "border-Icpetgreen bg-Icpetgreen text-white"
-                      : "border-gray-100 bg-white text-gray-900"
+                      : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
                   } text-center leading-8`}
                 >
                   {page}
@@ -201,7 +270,11 @@ export default function Users() {
             ))}
 
             <li>
-              <button className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180">
+              <button
+                onClick={handleNextPage}
+                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                disabled={currentPage === 4}
+              >
                 <span className="sr-only">Next Page</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
