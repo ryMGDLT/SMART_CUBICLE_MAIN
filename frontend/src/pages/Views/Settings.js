@@ -1,5 +1,6 @@
 import React from "react";
 
+
 export default function Settings() {
   return (
     <div className="h-full shadow-md bg-white rounded-lg p-6">
