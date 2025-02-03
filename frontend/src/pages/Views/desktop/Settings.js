@@ -4,7 +4,7 @@ export default function Settings() {
   return (
     <div className="h-full shadow-md bg-white rounded-lg p-6">
       {/* Notification Section */}
-      <div className="w-full mx-auto mt-8 shadow-md bg-white rounded-lg p-6">
+      <div className="w-full mx-auto shadow-md bg-white rounded-lg p-6">
         <h2 className="text-2xl font-medium">Notification</h2>
         <label className="text-sm text-gray-500">
           You can customize your notification settings
@@ -57,9 +57,13 @@ export default function Settings() {
       </div>
 
       {/* Change Password Section */}
-      <div className="w-full mx-auto mt-8 shadow-md bg-white rounded-lg p-6">
+      <div className="w-full mx-auto mt-4 shadow-md bg-white rounded-lg p-6">
+        <h2 className="text-2xl font-medium">Change Password</h2>
+        <label className="text-sm text-gray-500">
+          You can change your password here
+        </label>
         {/* Change Password - Horizontal 3 inputs positions*/}
-        <div className="flex flex-row gap-6 mb-6">
+        <div className="flex flex-row gap-6 mb-6 mt-4">
           <div className="flex flex-col flex-1">
             <label className="mb-2">Current Password</label>
             <input
