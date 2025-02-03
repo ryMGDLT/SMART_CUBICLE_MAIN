@@ -12,7 +12,7 @@ export default function Janitors() {
     {
       name: "Maria Santos",
       employeeId: "TUPM-21-0001",
-      email: "maria.santos@tup.edu.ph", 
+      email: "maria.santos@tup.edu.ph",
       contact: "+639123456789",
     },
     {

@@ -5,6 +5,8 @@ export default function Users() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 9; // Set to show 9 items per page
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   // Sample data for Users
   const USERS_DATA = [
@@ -15,6 +17,7 @@ export default function Users() {
       contact: "+639111222333",
       position: "Janitor",
       priority: true,
+      status: "Pending",
     },
     {
       name: "Rafael Mendoza",
@@ -23,6 +26,7 @@ export default function Users() {
       contact: "+639222333444",
       position: "Maintenance",
       priority: false,
+      status: "Declined",
     },
     {
       name: "Carmen Ramos",
@@ -31,6 +35,7 @@ export default function Users() {
       contact: "+639333444555",
       position: "Janitor",
       priority: true,
+      status: "Accepted",
     },
     {
       name: "Antonio Santos",
@@ -39,6 +44,7 @@ export default function Users() {
       contact: "+639444555666",
       position: "Security",
       priority: false,
+      status: "Pending",
     },
     {
       name: "Beatriz Luna",
@@ -47,6 +53,7 @@ export default function Users() {
       contact: "+639555666777",
       position: "Janitor",
       priority: true,
+      status: "Pending",
     },
     {
       name: "Gabriel Reyes",
@@ -55,6 +62,7 @@ export default function Users() {
       contact: "+639666777888",
       position: "Maintenance",
       priority: false,
+      status: "Pending",
     },
     {
       name: "Maria Gonzales",
@@ -63,6 +71,7 @@ export default function Users() {
       contact: "+639777888999",
       position: "Security",
       priority: false,
+      status: "Accepted",
     },
     {
       name: "Juan dela Cruz",
@@ -71,6 +80,7 @@ export default function Users() {
       contact: "+639111222333",
       position: "Janitor",
       priority: true,
+      status: "Accepted",
     },
     {
       name: "Isabella Cruz",
@@ -79,6 +89,7 @@ export default function Users() {
       contact: "+639888999000",
       position: "Security",
       priority: false,
+      status: "Accepted",
     },
     {
       name: "Roberto Santos",
@@ -87,6 +98,7 @@ export default function Users() {
       contact: "+639888999000",
       position: "Maintenance",
       priority: true,
+      status: "Accepted",
     },
     {
       name: "Teresa Luna",
@@ -95,6 +107,7 @@ export default function Users() {
       contact: "+639999000111",
       position: "Janitor",
       priority: false,
+      status: "Accepted",
     },
     {
       name: "Carlos Reyes",
@@ -103,6 +116,7 @@ export default function Users() {
       contact: "+639000111222",
       position: "Security",
       priority: true,
+      status: "Accepted",
     },
     {
       name: "Beatriz Garcia",
@@ -111,6 +125,7 @@ export default function Users() {
       contact: "+639111222333",
       position: "Maintenance",
       priority: false,
+      status: "Pending",
     },
     {
       name: "Manuel Torres",
@@ -119,6 +134,7 @@ export default function Users() {
       contact: "+639222333444",
       position: "Janitor",
       priority: true,
+      status: "Accepted",
     },
     {
       name: "Lucia Mendoza",
@@ -127,6 +143,7 @@ export default function Users() {
       contact: "+639333444555",
       position: "Security",
       priority: false,
+      status: "Pending",
     },
     {
       name: "Felipe Cruz",
@@ -135,6 +152,7 @@ export default function Users() {
       contact: "+639444555666",
       position: "Maintenance",
       priority: true,
+      status: "Pending",
     },
     {
       name: "Rosa Santos",
@@ -143,6 +161,7 @@ export default function Users() {
       contact: "+639555666777",
       position: "Janitor",
       priority: false,
+      status: "Declined",
     },
   ];
 
@@ -211,7 +230,22 @@ export default function Users() {
     return distance <= threshold;
   };
 
-  const filteredUsers = searchUsers(USERS_DATA, searchTerm);
+  // Filter users based on active tab and search term
+  const filterUsersByTab = (users) => {
+    switch (activeTab) {
+      case "Requests":
+        return users.filter((user) => user.status === "Pending");
+      case "Accepted":
+        return users.filter((user) => user.status === "Accepted");
+      case "Declined":
+        return users.filter((user) => user.status === "Declined");
+      default: // "All" tab
+        return users;
+    }
+  };
+
+  // Apply both search and tab filters
+  const filteredUsers = filterUsersByTab(searchUsers(USERS_DATA, searchTerm));
 
   // Calculate pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -243,18 +277,72 @@ export default function Users() {
     }
   };
 
+  const handleAccept = (employeeId) => {
+    // Update user status logic here
+    console.log(`Accepted user ${employeeId}`);
+  };
+
+  const handleDecline = (employeeId) => {
+    // Update user status logic here
+    console.log(`Declined user ${employeeId}`);
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = (e) => {
+    setSelectAll(e.target.checked);
+    if (e.target.checked) {
+      // Select all items currently visible on the page
+      const currentIds = currentItems.map((user) => user.employeeId);
+      setSelectedItems(currentIds);
+    } else {
+      // Deselect all items
+      setSelectedItems([]);
+    }
+  };
+
+  // Handle individual item selection
+  const handleSelectItem = (employeeId) => {
+    setSelectedItems((prev) => {
+      if (prev.includes(employeeId)) {
+        // Remove item if already selected
+        const newSelected = prev.filter((id) => id !== employeeId);
+        // Update selectAll state
+        setSelectAll(newSelected.length === currentItems.length);
+        return newSelected;
+      } else {
+        // Add item if not selected
+        const newSelected = [...prev, employeeId];
+        // Update selectAll state
+        setSelectAll(newSelected.length === currentItems.length);
+        return newSelected;
+      }
+    });
+  };
+
+  // Reset pagination when changing tabs
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setCurrentPage(1); // Reset to first page when changing tabs
+    setSelectedItems([]); // Clear selected items
+    setSelectAll(false); // Reset select all checkbox
+  };
+
   return (
     <div className="h-full shadow-md bg-white rounded-lg p-6">
       {/* Header - Navigation and Search Bar */}
       <div className="flex flex-row justify-between">
-        {/* Tab Navigation - All, Requests, Accepted, Declined */}
+        {/* Tab Navigation */}
         <div>
           <div className="sm:hidden">
             <label htmlFor="userTab" className="sr-only">
               User Tab
             </label>
-
-            <select id="userTab" className="w-full rounded-md border-gray-200">
+            <select
+              id="userTab"
+              className="w-full rounded-md border-gray-200"
+              value={activeTab}
+              onChange={(e) => handleTabChange(e.target.value)}
+            >
               <option>All</option>
               <option>Requests</option>
               <option>Accepted</option>
@@ -264,23 +352,21 @@ export default function Users() {
 
           <div className="hidden sm:block">
             <nav className="flex gap-6" aria-label="Tabs">
-              {["All", "Requests", "Accepted", "Declined"].map((tab) => {
-                return (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setActiveTab(tab)}
-                    className={`shrink-0 rounded-lg w-24 p-2 text-sm font-medium text-center ${
-                      activeTab === tab
-                        ? "bg-Icpetgreen text-white"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                    }`}
-                    aria-current={activeTab === tab ? "page" : undefined}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
+              {["All", "Requests", "Accepted", "Declined"].map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => handleTabChange(tab)}
+                  className={`shrink-0 rounded-lg w-24 p-2 text-sm font-medium text-center ${
+                    activeTab === tab
+                      ? "bg-Icpetgreen text-white"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  }`}
+                  aria-current={activeTab === tab ? "page" : undefined}
+                >
+                  {tab}
+                </button>
+              ))}
             </nav>
           </div>
         </div>
@@ -334,7 +420,9 @@ export default function Users() {
                   <label className="sr-only">Select All</label>
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4 rounded border-gray-300 text-Icpetgreen focus:ring-Icpetgreen"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
                   />
                 </th>
                 <th className="w-12 px-4 py-4">
@@ -369,6 +457,8 @@ export default function Users() {
                       <input
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-Icpetgreen focus:ring-Icpetgreen"
+                        checked={selectedItems.includes(user.employeeId)}
+                        onChange={() => handleSelectItem(user.employeeId)}
                       />
                     </td>
                     <td className="px-4 py-4">
@@ -394,12 +484,34 @@ export default function Users() {
                     <td className="px-4 py-4 text-gray-700">{user.position}</td>
                     <td className="px-4 py-4">
                       <div className="flex gap-2">
-                        <button className="rounded-lg bg-Icpetgreen px-4 py-2 text-xs font-medium text-white hover:bg-gray-700">
-                          Accept
-                        </button>
-                        <button className="rounded-lg border border-red-500 px-4 py-2 text-xs font-medium text-red-500 hover:bg-red-500 hover:text-white">
-                          Decline
-                        </button>
+                        {user.status === "Pending" ? (
+                          // Show Accept/Decline buttons for Pending status
+                          <>
+                            <button
+                              className="rounded-lg bg-Icpetgreen px-4 py-2 text-xs font-medium text-white hover:bg-gray-700"
+                              onClick={() => handleAccept(user.employeeId)}
+                            >
+                              Accept
+                            </button>
+                            <button
+                              className="rounded-lg border border-red-500 px-4 py-2 text-xs font-medium text-red-500 hover:bg-red-500 hover:text-white"
+                              onClick={() => handleDecline(user.employeeId)}
+                            >
+                              Decline
+                            </button>
+                          </>
+                        ) : (
+                          // Show status indicator for Accepted/Declined
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              user.status === "Accepted"
+                                ? "text-Icpetgreen bg-green-50"
+                                : "text-red-500 bg-red-50"
+                            }`}
+                          >
+                            {user.status}
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>
