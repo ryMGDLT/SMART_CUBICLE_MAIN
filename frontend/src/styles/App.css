@@ -33,3 +33,60 @@
   }
 }
 
+/* Custom Calendar Container */
+.custom-calendar {
+  border: 1px solid #e2e8f0; /* Light gray border */
+  border-radius: 0.75rem; /* Rounded corners */
+  padding: 1rem;
+  background-color: #ffffff; /* White background */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Subtle shadow */
+}
+
+/* Navigation Arrows */
+.react-calendar__navigation button {
+  color: #4a5568; /* Dark gray text */
+  font-size: 1.25rem; /* Larger font size */
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.react-calendar__navigation button:hover {
+  color: #3182ce; /* Blue on hover */
+}
+
+/* Month/Year Label */
+.react-calendar__navigation__label {
+  font-weight: 600; /* Bold text */
+  font-size: 1.125rem; /* Slightly larger font size */
+}
+
+/* Calendar Tiles */
+.custom-tile {
+  color: #2d3748; /* Dark gray text */
+  font-weight: 500; /* Medium font weight */
+  padding: 0.75rem;
+  border-radius: 0.5rem; /* Rounded corners */
+  transition: background-color 0.2s ease;
+}
+
+.custom-tile:hover {
+  background-color: #ebf8ff; /* Light blue background on hover */
+}
+
+/* Active (Selected) Date */
+.react-calendar__tile--active {
+  background-color: #3182ce; /* Blue background */
+  color: #ffffff; /* White text */
+}
+
+.react-calendar__tile--active:hover {
+  background-color: #2c5282; /* Darker blue on hover */
+}
+
+/* Disabled Dates */
+.react-calendar__tile--disabled {
+  color: #cbd5e0; /* Light gray text */
+  background-color: #f7fafc; /* Light gray background */
+}
