@@ -3,6 +3,229 @@ import React, { useState } from "react";
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemsPerPage = 9; // Set to show 9 items per page
+
+  // Sample data for Users
+  const USERS_DATA = [
+    {
+      name: "Isabella Cruz",
+      employeeId: "TUPM-22-0001",
+      email: "isabella.cruz@tup.edu.ph",
+      contact: "+639111222333",
+      position: "Janitor",
+      priority: true,
+    },
+    {
+      name: "Rafael Mendoza",
+      employeeId: "TUPM-22-0002",
+      email: "rafael.mendoza@tup.edu.ph",
+      contact: "+639222333444",
+      position: "Maintenance",
+      priority: false,
+    },
+    {
+      name: "Carmen Ramos",
+      employeeId: "TUPM-22-0003",
+      email: "carmen.ramos@tup.edu.ph",
+      contact: "+639333444555",
+      position: "Janitor",
+      priority: true,
+    },
+    {
+      name: "Antonio Santos",
+      employeeId: "TUPM-22-0004",
+      email: "antonio.santos@tup.edu.ph",
+      contact: "+639444555666",
+      position: "Security",
+      priority: false,
+    },
+    {
+      name: "Beatriz Luna",
+      employeeId: "TUPM-22-0005",
+      email: "beatriz.luna@tup.edu.ph",
+      contact: "+639555666777",
+      position: "Janitor",
+      priority: true,
+    },
+    {
+      name: "Gabriel Reyes",
+      employeeId: "TUPM-22-0006",
+      email: "gabriel.reyes@tup.edu.ph",
+      contact: "+639666777888",
+      position: "Maintenance",
+      priority: false,
+    },
+    {
+      name: "Maria Gonzales",
+      employeeId: "TUPM-21-0007",
+      email: "maria.gonzales@tup.edu.ph",
+      contact: "+639777888999",
+      position: "Security",
+      priority: false,
+    },
+    {
+      name: "Juan dela Cruz",
+      employeeId: "TUPM-21-0001",
+      email: "juan.delacruz@tup.edu.ph",
+      contact: "+639111222333",
+      position: "Janitor",
+      priority: true,
+    },
+    {
+      name: "Isabella Cruz",
+      employeeId: "TUPM-21-0008",
+      email: "isabella.cruz@tup.edu.ph",
+      contact: "+639888999000",
+      position: "Security",
+      priority: false,
+    },
+    {
+      name: "Roberto Santos",
+      employeeId: "TUPM-22-0008",
+      email: "roberto.santos@tup.edu.ph",
+      contact: "+639888999000",
+      position: "Maintenance",
+      priority: true,
+    },
+    {
+      name: "Teresa Luna",
+      employeeId: "TUPM-22-0009",
+      email: "teresa.luna@tup.edu.ph",
+      contact: "+639999000111",
+      position: "Janitor",
+      priority: false,
+    },
+    {
+      name: "Carlos Reyes",
+      employeeId: "TUPM-22-0010",
+      email: "carlos.reyes@tup.edu.ph",
+      contact: "+639000111222",
+      position: "Security",
+      priority: true,
+    },
+    {
+      name: "Beatriz Garcia",
+      employeeId: "TUPM-22-0011",
+      email: "beatriz.garcia@tup.edu.ph",
+      contact: "+639111222333",
+      position: "Maintenance",
+      priority: false,
+    },
+    {
+      name: "Manuel Torres",
+      employeeId: "TUPM-22-0012",
+      email: "manuel.torres@tup.edu.ph",
+      contact: "+639222333444",
+      position: "Janitor",
+      priority: true,
+    },
+    {
+      name: "Lucia Mendoza",
+      employeeId: "TUPM-22-0013",
+      email: "lucia.mendoza@tup.edu.ph",
+      contact: "+639333444555",
+      position: "Security",
+      priority: false,
+    },
+    {
+      name: "Felipe Cruz",
+      employeeId: "TUPM-22-0014",
+      email: "felipe.cruz@tup.edu.ph",
+      contact: "+639444555666",
+      position: "Maintenance",
+      priority: true,
+    },
+    {
+      name: "Rosa Santos",
+      employeeId: "TUPM-22-0015",
+      email: "rosa.santos@tup.edu.ph",
+      contact: "+639555666777",
+      position: "Janitor",
+      priority: false,
+    },
+  ];
+
+  // Improved search function with fuzzy matching
+  const searchUsers = (data, term) => {
+    if (!term.trim()) return data;
+
+    const searchValue = term.toLowerCase();
+
+    return data.filter((user) => {
+      // Check each field individually for better matching
+      const nameMatch = fuzzyMatch(user.name.toLowerCase(), searchValue);
+      const idMatch = user.employeeId.toLowerCase().includes(searchValue);
+      const emailMatch = user.email.toLowerCase().includes(searchValue);
+      const contactMatch = user.contact.includes(searchValue);
+      const positionMatch = user.position.toLowerCase().includes(searchValue);
+
+      // Return true if any field matches
+      return (
+        nameMatch || idMatch || emailMatch || contactMatch || positionMatch
+      );
+    });
+  };
+
+  // Improved fuzzy matching function
+  const fuzzyMatch = (str, pattern) => {
+    // Exact match check
+    if (str.includes(pattern)) return true;
+
+    // Convert strings to arrays for manipulation
+    const strArr = str.split("");
+    const patternArr = pattern.split("");
+
+    // Initialize matrix for dynamic programming
+    const matrix = Array(patternArr.length + 1)
+      .fill()
+      .map(() => Array(strArr.length + 1).fill(0));
+
+    // Initialize first row and column
+    for (let i = 0; i <= strArr.length; i++) {
+      matrix[0][i] = i;
+    }
+    for (let i = 0; i <= patternArr.length; i++) {
+      matrix[i][0] = i;
+    }
+
+    // Fill matrix
+    for (let i = 1; i <= patternArr.length; i++) {
+      for (let j = 1; j <= strArr.length; j++) {
+        const cost = strArr[j - 1] === patternArr[i - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1, // deletion
+          matrix[i][j - 1] + 1, // insertion
+          matrix[i - 1][j - 1] + cost // substitution
+        );
+      }
+    }
+
+    // Get the minimum edit distance
+    const distance = matrix[patternArr.length][strArr.length];
+
+    // Calculate threshold based on pattern length
+    const threshold = Math.floor(pattern.length * 0.4); // 40% tolerance
+
+    // Return true if distance is within threshold
+    return distance <= threshold;
+  };
+
+  const filteredUsers = searchUsers(USERS_DATA, searchTerm);
+
+  // Calculate pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  // Generate page numbers array dynamically
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -15,7 +238,7 @@ export default function Users() {
   };
 
   const handleNextPage = () => {
-    if (currentPage < 4) {
+    if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -70,7 +293,9 @@ export default function Users() {
           <input
             type="text"
             id="Search"
-            placeholder="Search"
+            value={searchTerm}
+            onChange={handleSearch}
+            placeholder="Search name, ID, position, etc."
             className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
           />
 
@@ -80,7 +305,6 @@ export default function Users() {
               className="text-Icpetgreen hover:text-gray-700"
             >
               <span className="sr-only">Search</span>
-
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -101,7 +325,7 @@ export default function Users() {
       </div>
 
       {/* User Table */}
-      <div className="mt-6 rounded-lg border border-gray-200">
+      <div className="mt-3 rounded-lg border border-gray-200">
         <div className="overflow-x-auto rounded-t-lg">
           <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
             <thead>
@@ -138,94 +362,58 @@ export default function Users() {
             </thead>
 
             <tbody className="divide-y divide-gray-200">
-              {[
-                {
-                  name: "Isabella Cruz",
-                  employeeId: "TUPM-22-0001",
-                  email: "isabella.cruz@tup.edu.ph",
-                  contact: "+639111222333",
-                  position: "Janitor",
-                  priority: true,
-                },
-                {
-                  name: "Rafael Mendoza",
-                  employeeId: "TUPM-22-0002",
-                  email: "rafael.mendoza@tup.edu.ph",
-                  contact: "+639222333444",
-                  position: "Maintenance",
-                  priority: false,
-                },
-                {
-                  name: "Carmen Ramos",
-                  employeeId: "TUPM-22-0003",
-                  email: "carmen.ramos@tup.edu.ph",
-                  contact: "+639333444555",
-                  position: "Janitor",
-                  priority: true,
-                },
-                {
-                  name: "Antonio Santos",
-                  employeeId: "TUPM-22-0004",
-                  email: "antonio.santos@tup.edu.ph",
-                  contact: "+639444555666",
-                  position: "Security",
-                  priority: false,
-                },
-                {
-                  name: "Beatriz Luna",
-                  employeeId: "TUPM-22-0005",
-                  email: "beatriz.luna@tup.edu.ph",
-                  contact: "+639555666777",
-                  position: "Janitor",
-                  priority: true,
-                },
-                {
-                  name: "Gabriel Reyes",
-                  employeeId: "TUPM-22-0006",
-                  email: "gabriel.reyes@tup.edu.ph",
-                  contact: "+639666777888",
-                  position: "Maintenance",
-                  priority: false,
-                },
-              ].map((user) => (
-                <tr key={user.employeeId}>
-                  <td className="px-4 py-4">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-Icpetgreen focus:ring-Icpetgreen"
-                    />
-                  </td>
-                  <td className="px-4 py-4">
-                    {user.priority && <span className="text-red-500">!</span>}
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src="/images/sadGato.jpg"
-                        alt="User"
-                        className="h-10 w-10 rounded-full object-cover"
+              {currentItems.length > 0 ? (
+                currentItems.map((user) => (
+                  <tr key={user.employeeId}>
+                    <td className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-Icpetgreen focus:ring-Icpetgreen"
                       />
-                      <span className="font-medium text-gray-900">
-                        {user.name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-gray-700">{user.employeeId}</td>
-                  <td className="px-4 py-4 text-gray-700">{user.email}</td>
-                  <td className="px-4 py-4 text-gray-700">{user.contact}</td>
-                  <td className="px-4 py-4 text-gray-700">{user.position}</td>
-                  <td className="px-4 py-4">
-                    <div className="flex gap-2">
-                      <button className="rounded-lg bg-Icpetgreen px-4 py-2 text-xs font-medium text-white hover:bg-gray-700">
-                        Accept
-                      </button>
-                      <button className="rounded-lg border border-red-500 px-4 py-2 text-xs font-medium text-red-500 hover:bg-red-500 hover:text-white">
-                        Decline
-                      </button>
-                    </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      {user.priority && <span className="text-red-500">!</span>}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src="/images/sadGato.jpg"
+                          alt="User"
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                        <span className="font-medium text-gray-900">
+                          {user.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-gray-700">
+                      {user.employeeId}
+                    </td>
+                    <td className="px-4 py-4 text-gray-700">{user.email}</td>
+                    <td className="px-4 py-4 text-gray-700">{user.contact}</td>
+                    <td className="px-4 py-4 text-gray-700">{user.position}</td>
+                    <td className="px-4 py-4">
+                      <div className="flex gap-2">
+                        <button className="rounded-lg bg-Icpetgreen px-4 py-2 text-xs font-medium text-white hover:bg-gray-700">
+                          Accept
+                        </button>
+                        <button className="rounded-lg border border-red-500 px-4 py-2 text-xs font-medium text-red-500 hover:bg-red-500 hover:text-white">
+                          Decline
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="8"
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    No results found. Please try a different search term.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -254,7 +442,7 @@ export default function Users() {
               </button>
             </li>
 
-            {[1, 2, 3, 4].map((page) => (
+            {pageNumbers.map((page) => (
               <li key={page}>
                 <button
                   onClick={() => handlePageChange(page)}
@@ -273,7 +461,7 @@ export default function Users() {
               <button
                 onClick={handleNextPage}
                 className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
-                disabled={currentPage === 4}
+                disabled={currentPage === totalPages}
               >
                 <span className="sr-only">Next Page</span>
                 <svg
