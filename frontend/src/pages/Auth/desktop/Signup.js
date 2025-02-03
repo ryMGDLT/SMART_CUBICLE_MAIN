@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../Components/Controller/AuthController";
+import { useAuth } from "../../../Components/Controller/AuthController";
 import { Link } from "react-router-dom";
 
 export default function LoginPage() {
@@ -15,7 +15,7 @@ export default function LoginPage() {
   };
 
   //const togglePassword = () => {
-    //setShowPassword((prevState) => !prevState);
+  //setShowPassword((prevState) => !prevState);
   //};
 
   return (
@@ -29,14 +29,13 @@ export default function LoginPage() {
 
       <div className="relative p-8 w-full max-w-3xl z-20">
         <div className="flex justify-center mb-2 mt-[-60px]">
-          <img 
-            src="/images/ICPET.png" 
-            alt="Logo" 
+          <img
+            src="/images/ICPET.png"
+            alt="Logo"
             className="w-[250px] h-[250px] object-contain"
           />
         </div>
         <form className="mt-2" onSubmit={handleSubmit}>
-
           {/*full name*/}
           <div className="mb-4 flex space-x-4">
             <div className="w-1/2">
@@ -52,7 +51,9 @@ export default function LoginPage() {
             </div>
             {/*Employee ID*/}
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">Employee ID</label>
+              <label className="block text-white text-sm mb-2">
+                Employee ID
+              </label>
               <input
                 type="text"
                 placeholder="Employee ID"
@@ -65,7 +66,9 @@ export default function LoginPage() {
           {/*username*/}
           <div className="mb-4 flex space-x-4">
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">Email/Username</label>
+              <label className="block text-white text-sm mb-2">
+                Email/Username
+              </label>
               <input
                 type="text"
                 placeholder="Email/Username"
@@ -77,7 +80,9 @@ export default function LoginPage() {
             </div>
             {/*number*/}
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">Contact Number</label>
+              <label className="block text-white text-sm mb-2">
+                Contact Number
+              </label>
               <input
                 type="text"
                 placeholder="+63"
@@ -117,7 +122,9 @@ export default function LoginPage() {
             </div>
             {/*confirm password*/}
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">Confirm Password</label>
+              <label className="block text-white text-sm mb-2">
+                Confirm Password
+              </label>
               <div className="relative">
                 <input
                   id="password"
@@ -144,13 +151,20 @@ export default function LoginPage() {
           </div>
           <div className="text-center mt-2">
             <p className="text-sm">
-              <Link to="/login" className="text-Icpetgreen text-lg py-2 rounded-lg hover:underline transition duration-300">
-              Log In</Link>
+              <Link
+                to="/login"
+                className="text-Icpetgreen text-lg py-2 rounded-lg hover:underline transition duration-300"
+              >
+                Log In
+              </Link>
             </p>
           </div>
         </form>
 
-        <button type="submit" className="text-white w-1/2 mx-auto block mt-4 bg-Icpetgreen py-2 rounded-lg hover:bg-gray-800 transition duration-300">
+        <button
+          type="submit"
+          className="text-white w-1/2 mx-auto block mt-4 bg-Icpetgreen py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+        >
           Sign Up
         </button>
       </div>
