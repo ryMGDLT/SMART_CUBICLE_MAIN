@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import DesktopDashboard from "../desktop/Dashboard";
-import MobileDashboard from "../mobile/Dashboard";
 
-function ResponsiveDashboard() {
+function ResponsiveView({ desktopComponent: DesktopComponent, mobileComponent: MobileComponent }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -14,7 +12,7 @@ function ResponsiveDashboard() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  return isMobile ? <MobileDashboard /> : <DesktopDashboard />;
+  return isMobile ? <MobileComponent /> : <DesktopComponent />;
 }
 
-export default ResponsiveDashboard;
+export default ResponsiveView;
