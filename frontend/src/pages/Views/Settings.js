@@ -16,11 +16,7 @@ export default function Settings() {
             htmlFor="notifStatus"
             className="relative inline-block h-6 w-12 cursor-pointer rounded-full bg-gray-300 transition [-webkit-tap-highlight-color:_transparent] has-[:checked]:bg-Icpetgreen"
           >
-            <input
-              type="checkbox"
-              id="notifStatus"
-              className="peer sr-only"
-            />
+            <input type="checkbox" id="notifStatus" className="peer sr-only" />
             <span className="absolute inset-y-0 start-0 m-1 size-4 rounded-full bg-white transition-all peer-checked:start-6"></span>
           </label>
         </div>
@@ -93,7 +89,7 @@ export default function Settings() {
         <div className="flex justify-end">
           <button
             type="button"
-            className="bg-Icpetgreen text-white px-32 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+            className="bg-Icpetgreen text-white px-16 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
           >
             Save
           </button>
