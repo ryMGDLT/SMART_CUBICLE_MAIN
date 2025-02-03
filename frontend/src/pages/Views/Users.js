@@ -167,7 +167,7 @@ export default function Users() {
         </div>
 
         <div className="rounded-b-lg border-t border-gray-200 px-4 py-2">
-          <ol className="flex justify-end gap-1 text-xs font-medium">
+          <ol className="flex justify-center gap-1 text-xs font-medium">
             <li>
               <button className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180">
                 <span className="sr-only">Prev Page</span>
