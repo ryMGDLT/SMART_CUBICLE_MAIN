@@ -11,12 +11,16 @@ import {
 import { useAuth } from "./Controller/AuthController";
 
 export default function Nav() {
-  const [active, setActive] = useState("Dashboard");
-  const [collapsed, setCollapsed] = useState(window.innerWidth < 768);
+  const [active, setActive] = useState(() => {
+    return localStorage.getItem("activeItem") || "Dashboard";
+  });
+  const [collapsed, setCollapsed] = useState(() => {
+    return JSON.parse(localStorage.getItem("sidebarCollapsed")) || (window.innerWidth < 768);
+  });
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [isSidebarVisible, setIsSidebarVisible] = useState(
-    window.innerWidth >= 768
-  );
+  const [isSidebarVisible, setIsSidebarVisible] = useState(() => {
+    return JSON.parse(localStorage.getItem("sidebarVisible")) || (window.innerWidth >= 768);
+  });
   const dropdownRef = useRef(null);
   const { logout } = useAuth();
 
@@ -47,6 +51,12 @@ export default function Nav() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDropdownVisible]);
 
+  useEffect(() => {
+    localStorage.setItem("activeItem", active);
+    localStorage.setItem("sidebarCollapsed", JSON.stringify(collapsed));
+    localStorage.setItem("sidebarVisible", JSON.stringify(isSidebarVisible));
+  }, [active, collapsed, isSidebarVisible]);
+
   const ProfileClick = () => {
     setActive("");
   };
@@ -55,7 +65,21 @@ export default function Nav() {
     if (window.innerWidth < 768) {
       setCollapsed(false);
     }
-    setIsSidebarVisible(!isSidebarVisible);
+    setIsSidebarVisible((prev) => !prev);
+    
+    setTimeout(() => {
+      document.body.style.overflow = 'hidden'; 
+      setTimeout(() => {
+        document.body.style.overflow = ''; 
+      }, 300); 
+    }, 0);
+  };
+
+  const handleSidebarCollapse = () => {
+    setCollapsed((prev) => !prev);
+    setTimeout(() => {
+      window.location.reload(); 
+    }, 300); // animation duration
   };
 
   const handleSidebarItemClick = () => {
@@ -96,7 +120,7 @@ export default function Nav() {
           className={`absolute top-12 right-[-12px] p-1 bg-Icpetgreen text-white rounded-full hover:bg-red-700 transition-all duration-300 ease-in-out shadow-lg ${
             window.innerWidth < 768 ? "hidden" : ""
           }`}
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={handleSidebarCollapse}
         >
           {collapsed ? (
             <ChevronRightIcon className="w-5 h-5" />
