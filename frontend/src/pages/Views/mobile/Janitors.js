@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Pencil, Trash, Printer } from 'heroicons-react';
 import { JANITORS_DATA, DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
-import { ChevronRight, ChevronLeft } from 'heroicons-react';
 
 export default function Janitors() {
   const [currentPage, setCurrentPage] = useState(1);
