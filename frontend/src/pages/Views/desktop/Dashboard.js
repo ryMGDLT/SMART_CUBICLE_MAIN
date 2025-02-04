@@ -324,50 +324,56 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row mt-[-5px] ml-[-15px] mr-[-15px]">
-      <aside className="w-full md:w-1/4 h-screen p-4">
-        <Card className="bg-white shadow-lg p-4 h-full">
+    <div className="flex flex-col md:flex-row mt-[-15px] ml-[-15px] mx-auto">
+      <aside className="w-full md:w-1/4 h-auto md:h-screen p-4 flex flex-col justify-center overflow-hidden">
+        <Card className="bg-white shadow-lg p-4 h-full overflow-y-auto">
           {/* Calendar */}
-          <div className="w-full min-w-[300px]">
-            <FullCalendar
-              plugins={[dayGridPlugin]}
-              initialView="dayGridMonth"
-              height="auto"
-              width="auto"
-              contentHeight="auto"
-              fixedWeekCount={false}
-              headerToolbar={{
-                start: "title",
-                center: "",
-                end: "prev,next",
-              }}
-              buttonIcons={{
-                prev: "chevron-left",
-                next: "chevron-right",
-              }}
-              buttonText={{
-                prev: "",
-                next: "",
-              }}
-              dayCellContent={(arg) => (
-                <div className="flex justify-center items-center w-full h-full text-xs md:text-sm lg:text-base">
-                  {arg.dayNumberText.trim()}
-                </div>
-              )}
-              aspectRatio={1.5}
-              titleFormat={{
-                year: "numeric",
-                month: "long",
-              }}
-              titleRangeSeparator=""
-              viewDidMount={(view) => {
-                const titleEl = document.querySelector(".fc-toolbar-title");
-                if (titleEl) {
-                  titleEl.style.fontWeight = "bold";
-                  titleEl.style.fontSize = "1.2rem";
-                }
-              }}
-            />
+          <div className="flex justify-center items-center">
+            <div className="w-full min-w-[300px] max-w-full">
+              <FullCalendar
+                plugins={[dayGridPlugin]}
+                initialView="dayGridMonth"
+                height="auto"
+                width="100%" 
+                contentHeight="auto"
+                fixedWeekCount={false}
+                headerToolbar={{
+                  start: "title",
+                  center: "",
+                  end: "prev,next",
+                }}
+                buttonIcons={{
+                  prev: "chevron-left",
+                  next: "chevron-right",
+                }}
+                buttonText={{
+                  prev: "",
+                  next: "",
+                }}
+                dayCellContent={(arg) => (
+                  <div className="flex justify-center items-center w-full h-full text-xs md:text-sm lg:text-base text-center"> 
+                    {arg.dayNumberText.trim()}
+                  </div>
+                )}
+                aspectRatio={1.5}
+                titleFormat={{
+                  year: "numeric",
+                  month: "long",
+                }}
+                titleRangeSeparator=""
+                viewDidMount={(view) => {
+                  const titleEl = document.querySelector(".fc-toolbar-title");
+                  if (titleEl) {
+                    titleEl.style.fontWeight = "bold";
+                    titleEl.style.fontSize = "1.2rem";
+                  }
+                }}
+               
+                eventDidMount={(info) => {
+                
+                }}
+              />
+            </div>
           </div>
           <hr className="w-full border-t border-gray-200 my-4 mt-5" />
           {/* Reminders */}
@@ -500,6 +506,7 @@ export default function Dashboard() {
             </div>
           </div>
         </Card>
+        <div className="border-t border-gray-200 mt-4"></div>
       </aside>
 
       {/* Summarized Report */}
@@ -786,7 +793,7 @@ export default function Dashboard() {
           {/* Usage Monitoring */}
           <Card className="bg-white shadow-lg p-4">
             <div className="flex flex-col mb-4">
-              <h2 className="text-xl font-bold">Usage Monitoring</h2>
+              <h2 className="text-xl font-bold mb-5">Usage Monitoring</h2>
               <div className="h-[300px] md:h-[400px]">
                 <Line
                   data={usageData}
