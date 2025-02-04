@@ -1,123 +1,12 @@
 import React, { useState } from "react";
 import { Trash, Pencil, Printer } from "heroicons-react";
+import { JANITORS_DATA, DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 
 export default function Janitors() {
   const [activeTab, setActiveTab] = useState("Basic Details");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 8; // Fixed number of items per page
-
-  // Placeholder data, replace with actual data
-  const JANITORS_DATA = [
-    {
-      name: "Maria Santos",
-      employeeId: "TUPM-21-0001",
-      email: "maria.santos@tup.edu.ph",
-      contact: "+639123456789",
-    },
-    {
-      name: "Juan dela Cruz",
-      employeeId: "TUPM-21-0002",
-      email: "juan.delacruz@tup.edu.ph",
-      contact: "+639234567890",
-    },
-    {
-      name: "Ana Reyes",
-      employeeId: "TUPM-21-0003",
-      email: "ana.reyes@tup.edu.ph",
-      contact: "+639345678901",
-    },
-    {
-      name: "Pedro Mendoza",
-      employeeId: "TUPM-21-0004",
-      email: "pedro.mendoza@tup.edu.ph",
-      contact: "+639456789012",
-    },
-    {
-      name: "Sofia Garcia",
-      employeeId: "TUPM-21-0005",
-      email: "sofia.garcia@tup.edu.ph",
-      contact: "+639567890123",
-    },
-    {
-      name: "Miguel Torres",
-      employeeId: "TUPM-21-0006",
-      email: "miguel.torres@tup.edu.ph",
-      contact: "+639678901234",
-    },
-    {
-      name: "Carmen Ramos",
-      employeeId: "TUPM-21-0007",
-      email: "carmen.ramos@tup.edu.ph",
-      contact: "+639789012345",
-    },
-    {
-      name: "Luis Santos",
-      employeeId: "TUPM-21-0008",
-      email: "luis.santos@tup.edu.ph",
-      contact: "+639890123456",
-    },
-    {
-      name: "Isabella Cruz",
-      employeeId: "TUPM-21-0009",
-      email: "isabella.cruz@tup.edu.ph",
-      contact: "+639901234567",
-    },
-    {
-      name: "Gabriel Lim",
-      employeeId: "TUPM-21-0010",
-      email: "gabriel.lim@tup.edu.ph",
-      contact: "+639012345678",
-    },
-    {
-      name: "Patricia Tan",
-      employeeId: "TUPM-21-0011",
-      email: "patricia.tan@tup.edu.ph",
-      contact: "+639123456780",
-    },
-    {
-      name: "Ricardo Reyes",
-      employeeId: "TUPM-21-0012",
-      email: "ricardo.reyes@tup.edu.ph",
-      contact: "+639234567801",
-    },
-    {
-      name: "Victoria Santos",
-      employeeId: "TUPM-21-0013",
-      email: "victoria.santos@tup.edu.ph",
-      contact: "+639345678012",
-    },
-    {
-      name: "Fernando Lopez",
-      employeeId: "TUPM-21-0014",
-      email: "fernando.lopez@tup.edu.ph",
-      contact: "+639456780123",
-    },
-    {
-      name: "Diana Garcia",
-      employeeId: "TUPM-21-0015",
-      email: "diana.garcia@tup.edu.ph",
-      contact: "+639567801234",
-    },
-    {
-      name: "Marco Bautista",
-      employeeId: "TUPM-21-0016",
-      email: "marco.bautista@tup.edu.ph",
-      contact: "+639678012345",
-    },
-    {
-      name: "Elena Torres",
-      employeeId: "TUPM-21-0017",
-      email: "elena.torres@tup.edu.ph",
-      contact: "+639780123456",
-    },
-    {
-      name: "Ramon Gonzales",
-      employeeId: "TUPM-21-0018",
-      email: "ramon.gonzales@tup.edu.ph",
-      contact: "+639801234567",
-    },
-  ];
 
   // Improved search function with better fuzzy matching
   const searchJanitors = (data, term) => {
@@ -221,7 +110,7 @@ export default function Janitors() {
       {/* Header - Search Bar and Generate Report Button */}
       <div className="flex flex-row justify-between">
         {/* Search Bar */}
-        <div className="relative w-64">
+        <div className="relative w-1/2">
           <label htmlFor="Search" className="sr-only">
             Search
           </label>
@@ -347,8 +236,8 @@ export default function Janitors() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src="/images/sadGato.jpg"
-                          alt="User"
+                          src={janitor.image || DEFAULT_PROFILE_IMAGE}
+                          alt={`${janitor.name}'s profile`}
                           className="h-10 w-10 rounded-full object-cover"
                         />
                         <span className="font-medium text-gray-900">

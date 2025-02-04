@@ -2,8 +2,19 @@ import "./styles/App.css";
 import "./styles/Calendar.css";
 import Nav from "./Components/Nav";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./Components/Controller/AuthController";
 import PrivateRoute from "./pages/Auth/PrivateRoute";
+
+// Context Providers
+import { AuthProvider } from "./Components/Controller/AuthController";
+import ViewController from "./Components/Controller/ViewController";
+
+// Authentication Pages
+import LoginDesktop from "./pages/Auth/desktop/Login";
+import SignupDesktop from "./pages/Auth/desktop/Signup";
+import LoginMobile from "./pages/Auth/mobile/Login";
+import SignupMobile from "./pages/Auth/mobile/Signup";
+
+// View Pages
 import DashboardDesktop from "./pages/Views/desktop/Dashboard";
 import UsageMonitorDesktop from "./pages/Views/desktop/UsageMonitor";
 import JanitorsDesktop from "./pages/Views/desktop/Janitors";
@@ -18,13 +29,6 @@ import ResourcesMobile from "./pages/Views/mobile/Resources";
 import SettingsMobile from "./pages/Views/mobile/Settings";
 import UsersMobile from "./pages/Views/mobile/Users";
 import ProfileMobile from "./pages/Views/mobile/Profile";
-import ViewController from "./Components/Controller/ViewController"; 
-
-// Authentication Pages
-import LoginDesktop from "./pages/Auth/desktop/Login";
-import SignupDesktop from "./pages/Auth/desktop/Signup";
-import LoginMobile from "./pages/Auth/mobile/Login";
-import SignupMobile from "./pages/Auth/mobile/Signup";
 
 function App() {
   return (
