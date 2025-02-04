@@ -1,7 +1,10 @@
 import React from "react";
 import { Camera } from "heroicons-react";
+import { PROFILE_DATA, DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 
 export default function Profile() {
+  const profileData = PROFILE_DATA[0]; // Using the first profile data
+
   return (
     <div className="h-full shadow-md bg-white rounded-lg p-6">
       <div className="mx-auto shadow-md bg-white rounded-lg p-6">
@@ -10,7 +13,7 @@ export default function Profile() {
           <div className="relative">
             <div className="relative">
               <img
-                src="/images/sadGato.jpg"
+                src={DEFAULT_PROFILE_IMAGE}
                 alt="Profile Picture"
                 className="w-40 h-40 rounded-full object-cover border-4 border-white shadow-lg"
               />
@@ -30,7 +33,7 @@ export default function Profile() {
                 <label className="text-sm text-gray-600 mb-1">Full Name</label>
                 <input
                   type="text"
-                  value="John Doe"
+                  value={profileData.name}
                   className="w-full px-4 py-2 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
                 />
               </div>
@@ -38,7 +41,7 @@ export default function Profile() {
                 <label className="text-sm text-gray-600 mb-1">Email</label>
                 <input
                   type="email"
-                  value="john.doe@tup.edu.ph"
+                  value={profileData.email}
                   className="w-full px-4 py-2 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
                 />
               </div>
@@ -51,7 +54,7 @@ export default function Profile() {
                 </label>
                 <input
                   type="text"
-                  value="TUPM-21-0000"
+                  value={profileData.employeeId}
                   className="w-full px-4 py-2 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
                 />
               </div>
@@ -59,7 +62,7 @@ export default function Profile() {
                 <label className="text-sm text-gray-600 mb-1">Position</label>
                 <input
                   type="text"
-                  value="Admin"
+                  value={profileData.position}
                   className="w-full px-4 py-2 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
                 />
               </div>
