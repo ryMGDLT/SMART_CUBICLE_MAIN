@@ -5,7 +5,7 @@ export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 9; // Set to show 9 items per page
+  const itemsPerPage = 10; // Set to show 10 items per page
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -172,9 +172,9 @@ export default function Users() {
   };
 
   return (
-    <div className="h-full shadow-md bg-white rounded-lg p-6">
-      {/* Header - Navigation and Search Bar */}
-      <div className="flex flex-row justify-between">
+    <div className="h-full flex flex-col shadow-md bg-white rounded-lg p-6">
+      {/* Header Section */}
+      <div className="flex flex-row justify-between items-center shrink-0">
         {/* Tab Navigation */}
         <div>
           <div className="sm:hidden">
@@ -254,13 +254,14 @@ export default function Users() {
         </div>
       </div>
 
-      {/* User Table */}
-      <div className="mt-3 rounded-lg border border-gray-200">
-        <div className="overflow-x-auto rounded-t-lg">
-          <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="w-12 px-4 py-4">
+      {/* User Table Container */}
+      <div className="mt-3 flex-1 flex flex-col h-full rounded-lg border border-gray-200 overflow-hidden">
+        {/* Table Container with fixed layout */}
+        <div className="flex-1 overflow-y-auto">
+          <table className="min-w-full table-fixed divide-y divide-gray-200 bg-white text-sm">
+            <thead className="bg-gray-50">
+              <tr className="border-b-2 border-gray-200">
+                <th className="w-12 py-4 text-center">
                   <label className="sr-only">Select All</label>
                   <input
                     type="checkbox"
@@ -269,35 +270,37 @@ export default function Users() {
                     onChange={handleSelectAll}
                   />
                 </th>
-                <th className="w-12 px-4 py-4">
+                <th className="w-12 py-4 text-center">
                   <span className="sr-only">Priority</span>
                 </th>
-                <th className="w-48 px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-16 py-4 text-center font-medium text-gray-900">
+                  Profile
+                </th>
+                <th className="w-48 py-4 text-center font-medium text-gray-900">
                   Name
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-48 py-4 text-center font-medium text-gray-900">
                   Employee ID
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-72 py-4 text-center font-medium text-gray-900">
                   Employee Email
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-48 py-4 text-center font-medium text-gray-900">
                   Contact Information
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-32 py-4 text-center font-medium text-gray-900">
                   Position
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-40 py-4 text-center font-medium text-gray-900">
                   Action
                 </th>
               </tr>
             </thead>
-
             <tbody className="divide-y divide-gray-200">
               {currentItems.length > 0 ? (
                 currentItems.map((user) => (
                   <tr key={user.employeeId}>
-                    <td className="px-4 py-4">
+                    <td className="w-12 py-4 text-center">
                       <input
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-Icpetgreen focus:ring-Icpetgreen"
@@ -305,31 +308,38 @@ export default function Users() {
                         onChange={() => handleSelectItem(user.employeeId)}
                       />
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="w-12 py-4 text-center">
                       {user.priority && <span className="text-red-500">!</span>}
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
+                    <td className="w-16 py-4">
+                      <div className="flex justify-center">
                         <img
                           src="/images/sadGato.jpg"
                           alt="User"
                           className="h-10 w-10 rounded-full object-cover"
                         />
-                        <span className="font-medium text-gray-900">
-                          {user.name}
-                        </span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-gray-700">
+                    <td className="w-48 py-4 text-center text-gray-700">
+                      <span className="font-medium text-gray-900">
+                        {user.name}
+                      </span>
+                    </td>
+                    <td className="w-48 py-4 text-center text-gray-700">
                       {user.employeeId}
                     </td>
-                    <td className="px-4 py-4 text-gray-700">{user.email}</td>
-                    <td className="px-4 py-4 text-gray-700">{user.contact}</td>
-                    <td className="px-4 py-4 text-gray-700">{user.position}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex gap-2">
+                    <td className="w-72 py-4 text-center text-gray-700">
+                      {user.email}
+                    </td>
+                    <td className="w-48 py-4 text-center text-gray-700">
+                      {user.contact}
+                    </td>
+                    <td className="w-32 py-4 text-center text-gray-700">
+                      {user.position}
+                    </td>
+                    <td className="w-40 py-4">
+                      <div className="flex justify-center gap-2">
                         {user.status === "Pending" ? (
-                          // Show Accept/Decline buttons for Pending status
                           <>
                             <button
                               className="rounded-lg bg-Icpetgreen px-4 py-2 text-xs font-medium text-white hover:bg-gray-700"
@@ -345,7 +355,6 @@ export default function Users() {
                             </button>
                           </>
                         ) : (
-                          // Show status indicator for Accepted/Declined
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-medium ${
                               user.status === "Accepted"
@@ -374,7 +383,8 @@ export default function Users() {
           </table>
         </div>
 
-        <div className="rounded-b-lg border-t border-gray-200 px-4 py-2">
+        {/* Pagination - Fixed at bottom */}
+        <div className="shrink-0 rounded-b-lg border-t border-gray-200 px-4 py-2 bg-white">
           <ol className="flex justify-center gap-1 text-xs font-medium">
             <li>
               <button

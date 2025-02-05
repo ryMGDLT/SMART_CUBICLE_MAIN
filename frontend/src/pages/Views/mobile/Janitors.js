@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Pencil, Trash, Printer } from 'heroicons-react';
+import { Pencil, Trash, Printer, Adjustments } from 'heroicons-react';
 import { JANITORS_DATA, DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
+import { Container, Button, Link } from 'react-floating-action-button'
 
 export default function Janitors() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +36,14 @@ export default function Janitors() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handlePrint = () => {
+    // Add print functionality here
+  };
+
+  const handleGenerate = () => {
+    // Add generate report functionality here
   };
 
   return (
@@ -225,14 +234,41 @@ export default function Janitors() {
         </ol>
       </div>
 
-      {/* Floating Generate Report Button */}
-      <button
-        type="button"
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-Icpetgreen text-white shadow-lg hover:bg-gray-800 transition duration-300 flex items-center justify-center"
-        aria-label="Generate Report"
-      >
-        <Printer className="w-6 h-6" />
-      </button>
+      {/* Floating Action Buttons */}
+      <Container>
+        <Link
+          tooltip="Print Report"
+          className="fab-item btn btn-link btn-lg text-white"
+          onClick={() => handlePrint()}
+          styles={{backgroundColor: '#23897D'}}
+        >
+          <Printer className="w-5 h-5" />
+        </Link>
+        <Link
+          tooltip="Generate Report"
+          className="fab-item btn btn-link btn-lg text-white"
+          onClick={() => handleGenerate()}
+          styles={{backgroundColor: '#23897D'}}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </Link>
+        <Button
+          tooltip="Actions"
+          styles={{
+            backgroundColor: '#23897D',
+            width: '48px',
+            height: '48px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          icon="none"
+        >
+          <Adjustments className="w-5 h-5 text-white" />
+        </Button>
+      </Container>
     </div>
   );
 }

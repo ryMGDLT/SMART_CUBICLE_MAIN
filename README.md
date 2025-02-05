@@ -77,8 +77,52 @@ A smart facility management system designed to optimize cubicle maintenance and 
   - Theme Selection: Toggle between light and dark modes
   - Password Management: Secure password update functionality
 
+## Recent Updates and Improvements
+
+### Mobile Optimization
+- **Mobile-First Components**: Optimized UI components for mobile devices
+  - Users Component: Responsive card-based layout with touch-friendly interactions
+  - Janitors Component: Mobile-optimized view with floating action buttons
+  - Profile Component: Streamlined mobile interface with full-width inputs
+
+### Data Management
+- **Centralized Data Store**: New `placeholderData.js` for improved data organization (This is only for temporary use, waiting for backend implementation)
+  - Users data: Comprehensive user information including status and priorities
+  - Janitors data: Employee profiles with contact information
+  - Profile data: User profile information and settings
+
+### UI/UX Improvements
+- **Enhanced User Interface**
+  - Improved search functionality with fuzzy matching
+  - Touch-optimized buttons and input fields
+  - Consistent styling with Icpetgreen theme
+  - Responsive pagination controls
+  - Tab navigation for better mobile experience
+
+### Component Updates
+- **Users Management**
+  - New mobile-friendly card layout
+  - Status indicators (Pending, Accepted, Declined)
+  - Priority user flagging
+  - Batch selection capabilities
+  - Advanced search and filtering
+
+- **Janitors Management**
+  - Floating action button for report generation
+  - Improved mobile search interface
+  - Enhanced tab navigation
+  - Optimized list view for mobile devices
+
+- **Profile Management**
+  - Centralized profile data storage
+  - Profile picture management
+  - Responsive form layout
+  - Touch-friendly input fields
 
 ## Installation
 1. Clone the repository
-2. Run `npm install`
-3. Run `npm run dev`
+2. Make sure to locate the proper directory which is the `.\frontend` directory
+3. Run `npm install`
+4. Run `npm start`
+5. Wait for the app to load in the browser
+6. Enjoy!
