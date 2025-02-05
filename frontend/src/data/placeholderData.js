@@ -401,3 +401,122 @@ export const RESOURCES_DATA = [
     status: "Sufficient",
   }
 ];
+
+// Sample data for Janitor Schedule
+export const JANITOR_SCHEDULE_DATA = [
+  {
+    janitor: "Maria Santos",
+    lastCleaning: "8:00 AM", 
+    scheduled: "8:00 AM",
+    status: "Done"
+  },
+  {
+    janitor: "John Smith",
+    lastCleaning: "9:15 AM",
+    scheduled: "9:00 AM", 
+    status: "Done"
+  },
+  {
+    janitor: "David Chen",
+    lastCleaning: "10:30 AM",
+    scheduled: "10:00 AM",
+    status: "Done"
+  },
+  {
+    janitor: "Sarah Johnson",
+    lastCleaning: "11:45 AM", 
+    scheduled: "11:30 AM",
+    status: "Done"
+  },
+  {
+    janitor: "Michael Brown",
+    lastCleaning: "-",
+    scheduled: "1:00 PM",
+    status: "Pending"
+  },
+  {
+    janitor: "Lisa Garcia",
+    lastCleaning: "-",
+    scheduled: "2:00 PM",
+    status: "Pending"
+  },
+  {
+    janitor: "James Wilson",
+    lastCleaning: "-",
+    scheduled: "3:00 PM", 
+    status: "Pending"
+  },
+  {
+    janitor: "Emily Taylor",
+    lastCleaning: "11:00 AM",
+    scheduled: "10:00 AM",
+    status: "Overdue"
+  },
+  {
+    janitor: "Robert Martinez",
+    lastCleaning: "1:30 PM",
+    scheduled: "12:00 PM",
+    status: "Overdue"
+  },
+  {
+    janitor: "Jennifer Lee",
+    lastCleaning: "3:45 PM",
+    scheduled: "2:00 PM",
+    status: "Overdue"
+  }
+]
+
+// Sample data for usage card report
+export const USAGE_CARD_REPORT_DATA = [
+  {
+    title: "Today",
+    count: 110,
+    isLive: true,
+  },
+  {
+    title: "Yesterday", 
+    count: 95,
+    isLive: false,
+  },
+  {
+    title: "Last Week",
+    count: 82,
+    isLive: false,
+  },
+  {
+    title: "Last Month",
+    count: 1250,
+    isLive: false,
+  },
+  {
+    title: "Last Quarter",
+    count: 3500,
+    isLive: false,
+  },
+  {
+    title: "Peak Hours",
+    count: 150,
+    isLive: false,
+  },
+  {
+    title: "Off-Peak Hours",
+    count: 45,
+    isLive: false,
+  },
+  {
+    title: "Weekends",
+    count: 175,
+    isLive: false,
+  },
+  {
+    title: "Weekdays",
+    count: 98,
+    isLive: false,
+  },
+  {
+    title: "Year to Date",
+    count: 12500,
+    isLive: false,
+  }
+]
+
