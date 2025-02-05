@@ -79,7 +79,7 @@ export default function Nav() {
     setCollapsed((prev) => !prev);
     setTimeout(() => {
       window.location.reload(); 
-    }, 300); // animation duration
+    }, 300); 
   };
 
   const handleSidebarItemClick = () => {
@@ -239,9 +239,8 @@ export default function Nav() {
       >
         {/* Navbar */}
         <header
-          className="bg-fafbfe p-4 flex justify-between items-center w-full md:px-6"
-          style={{ borderBottom: "5px solid #EFF0F1" }}
-        >
+          className="bg-fafbfe p-4 flex justify-between items-center w-full md:px-6 shadow-md relative z-10 mb-3"
+        > 
           {/* Menu Mobile */}
           <button
             className="md:hidden p-2 text-gray-600 hover:text-gray-800 transition-colors duration-300"
