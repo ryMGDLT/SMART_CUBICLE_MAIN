@@ -18,7 +18,6 @@ import {
 } from "chart.js";
 import "../../../styles/Calendar.css";
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -868,10 +867,11 @@ export default function Dashboard() {
               />
             </svg>
           </button>
-          <div className="flex flex-col flex-grow mt-5 mr-5 ml-5">
+          <div className="flex flex-col flex-grow mt-10 mb-5 mr-5 ml-5 dboardCalendar">
             <div className="h-full">
               <CalendarComponent />
             </div>
+
 
           </div>
         </Card>
