@@ -140,7 +140,7 @@
 }
 
 .custom-calendar .fc-event-main::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -171,13 +171,13 @@
 .dboardCalendar .fc-button:hover {
   background-color: lightgray !important;
   scale: 1.05;
-  box-shadow: none !important; 
+  box-shadow: none !important;
 }
 
 .dboardCalendar .fc-button.fc-button-active {
-  background-color: #31AB9F !important;
-  color: white !important; 
-  box-shadow: none !important; 
+  background-color: #31ab9f !important;
+  color: white !important;
+  box-shadow: none !important;
 }
 
 .dboardCalendar .fc-button-group .fc-button:not(:last-child) {
@@ -189,12 +189,12 @@
   overflow: hidden;
   display: inline-flex;
   border-radius: 10px;
-  background-color: white; 
+  background-color: white;
 }
 
 .dboardCalendar .fc-button.no-border {
   border: none !important;
-  box-shadow: none !important; 
+  box-shadow: none !important;
 }
 
 .dboardCalendar .fc .fc-toolbar-title {
@@ -264,15 +264,15 @@
 }
 
 .dboardCalendar .fc-theme-standard .fc-list-day-cushion {
-  background-color: #23897D;
+  background-color: #23897d;
   border: none;
   border-radius: 5px;
-  text-align: center; 
+  text-align: center;
   color: white;
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  padding: 10px 0; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
 }
 
 .dboardCalendar .fc-theme-standard .fc-list {
@@ -312,7 +312,7 @@
 }
 
 .dboardCalendar .fc-theme-standard .fc-list-day-cushion {
-  background-color: #23897D;
+  background-color: #23897d;
   border-radius: 5px !important;
   text-align: center !important;
 }
@@ -333,9 +333,298 @@
 }
 
 .dboardCalendar .fc-timeGridDay-view .fc-day-today {
-  background-color: transparent !important; 
+  background-color: transparent !important;
 }
 
 .dboardCalendar .fc-timeGridDay-view .fc-daygrid-day-frame {
   background-color: transparent !important;
+}
+
+.dboardCalendar .fc-event {
+  background-color: #f0f4fd !important;
+  border-left: 4px solid #0044cc !important;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-radius: 4px;
+  padding: 6px;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  margin-bottom: 2px !important;
+  font-size: 12px;
+}
+
+.dboardCalendar .fc-event.blue-event-style .event-assigned-name {
+  color: #0044cc !important;
+  font-size: 16px;
+  font-weight: bold;
+}
+.dboardCalendar .fc-event.blue-event-style .event-time {
+  color: #0044cc !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.dboardCalendar .fc-event.blue-event-style .event-title {
+  color: #0044cc !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dboardCalendar .fc-event.blue-event-style {
+  line-height: 1.2;
+  color: #0044cc;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  font-size: 12px;
+}
+.dboardCalendar .fc-event.black-event-style .event-assigned-name {
+  color: #1a141f !important;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.dboardCalendar .fc-event.black-event-style .event-time {
+  color: #1a141f !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* Style for the event title */
+.dboardCalendar .fc-event.black-event-style .event-title {
+  color: #1a141f !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dboardCalendar .fc-event.black-event-style {
+  background-color: #eff0f1 !important;
+  border-left: 4px solid #1a141f !important;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.dboardCalendar .fc-event.red-event-style {
+  background-color: #faeee4 !important;
+  border-left: 4px solid #c41d39 !important;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+
+  font-size: 12px;
+}
+.dboardCalendar .fc-event.red-event-style .event-title {
+  color: #c41d39 !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dboardCalendar .fc-event.red-event-style .event-assigned-name {
+  color: #c41d39 !important;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.dboardCalendar .fc-event.red-event-style .event-time {
+  color: #c41d39 !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.dboardCalendar .fc-timegrid-slot-label-frame {
+  height: 5px;
+}
+
+.dboardCalendar .fc-timegrid-event-harness {
+  margin-top: -1px;
+}
+
+.dboardCalendar .fc-timegrid-event {
+  border-radius: 4px;
+  background-color: #f0f8ff;
+  border: 1px solid #d3d3d3;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+td.fc-list-event-time {
+  display: none;
+}
+td.fc-list-event-graphic {
+  display: none;
+}
+
+.dboardCalendar .fc-event.red-event-style .list-event-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 0;
+  background-color: #faeee4 !important;
+  border-left: 4px solid #c41d39 !important;
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+  margin-left: -15px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.dboardCalendar .fc-event.red-event-style .list-event-time {
+  width: 200px; 
+  color: #c41d39 !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-left: 20px;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.dboardCalendar .fc-event .red-event-style .list-event-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.dboardCalendar .fc-event.red-event-style .list-event-title {
+  color: #c41d39 !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 50px;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.dboardCalendar .fc-event.red-event-style .list-event-assigned {
+  color: #c41d39 !important;
+  font-size: 25px;
+  font-weight: bold;
+  margin-left: 50px;
+}
+
+.dboardCalendar .fc-event.blue-event-style .list-event-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 0;
+  background-color: #f0f4fd !important;
+  border-left: 4px solid #0044cc !important;
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: flex-start;
+  margin-left: 10px;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+  margin-left: -15px;
+}
+
+.dboardCalendar .fc-event.blue-event-style .list-event-time {
+  width: 200px; 
+  color: #0044cc !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+.dboardCalendar .fc-event .blue-event-style .list-event-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.dboardCalendar .fc-event.blue-event-style .list-event-title {
+  color: #0044cc !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 50px;
+}
+
+.dboardCalendar .fc-event.blue-event-style .list-event-assigned {
+  color: #0044cc !important;
+  font-size: 25px;
+  font-weight: bold;
+  margin-left: 50px;
+}
+
+.dboardCalendar .fc-event.black-event-style .list-event-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 0;
+  background-color: #eff0f1 !important;
+  border-left: 4px solid #1a141f !important;
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: flex-start;
+  margin-left: 10px;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+  margin-left: -15px;
+}
+
+.dboardCalendar .fc-event.black-event-style .list-event-time {
+  width: 200px; 
+  color: #1a141f !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+.dboardCalendar .fc-event.black-event-style .list-event-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.dboardCalendar .fc-event.black-event-style .list-event-title {
+  color: #1a141f !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 50px;
+}
+
+.dboardCalendar .fc-event.black-event-style .list-event-assigned {
+  color: #1a141f !important;
+  font-size: 25px;
+  font-weight: bold;
+  margin-left: 50px;
+  flex-wrap: wrap;
 }
