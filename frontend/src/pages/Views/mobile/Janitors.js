@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import { Pencil, Trash, Printer } from 'heroicons-react';
-import { JANITORS_DATA, DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
+import React, { useState } from "react";
+import { Pencil, Trash, Printer } from "heroicons-react";
+import {
+  JANITORS_DATA,
+  DEFAULT_PROFILE_IMAGE,
+} from "../../../data/placeholderData";
 
 export default function Janitors() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('Basic Details');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("Basic Details");
   const itemsPerPage = 6;
 
   // Pagination calculation
-  const filteredData = JANITORS_DATA.filter(janitor =>
-    Object.values(janitor).some(value =>
+  const filteredData = JANITORS_DATA.filter((janitor) =>
+    Object.values(janitor).some((value) =>
       value.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
@@ -26,65 +29,99 @@ export default function Janitors() {
 
   // Pagination handlers
   const handlePrevPage = () => {
-    setCurrentPage(p => Math.max(1, p - 1));
+    setCurrentPage((p) => Math.max(1, p - 1));
   };
 
   const handleNextPage = () => {
-    setCurrentPage(p => Math.min(totalPages, p + 1));
+    setCurrentPage((p) => Math.min(totalPages, p + 1));
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
+  const handlePrint = () => {
+    // Add print functionality here
+  };
+
+  const handleGenerate = () => {
+    // Add generate report functionality here
+  };
+
   return (
-    <div className="h-full flex flex-col p-2 gap-3 overflow-y-auto relative">
-      {/* Search Bar */}
-      <div className="relative w-full shadow-md bg-white rounded-lg">
-        <label htmlFor="Search" className="sr-only">
-          Search
-        </label>
+    <div className="h-full flex flex-col">
+      {/* Fixed Header Section */}
+      <div className="bg-gray-50 p-2">
+        {/* Search Bar */}
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-bold">Janitors</h2>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleGenerate}
+                className="bg-Icpetgreen text-white px-3 py-1.5 rounded-lg text-sm hover:bg-opacity-90 flex items-center gap-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Generate
+              </button>
+              <button
+                onClick={handlePrint}
+                className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
+              >
+                <Printer className="w-5 h-5 text-Icpetgreen" />
+              </button>
+            </div>
+          </div>
 
-        <input
-          type="text"
-          id="Search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search name, ID, email, or contact"
-          className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
-        />
+          <div className="relative">
+            <input
+              type="text"
+              id="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search name, ID, email, or contact"
+              className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
+            />
+            <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
+              <button
+                type="button"
+                className="text-Icpetgreen hover:text-gray-700"
+              >
+                <span className="sr-only">Search</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+              </button>
+            </span>
+          </div>
+        </div>
 
-        <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
-          <button
-            type="button"
-            className="text-Icpetgreen hover:text-gray-700"
-          >
-            <span className="sr-only">Search</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="h-4 w-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
-            </svg>
-          </button>
-        </span>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="w-full">
-        <div className="block">
-          <label htmlFor="userTab" className="sr-only">
-            User Tab
-          </label>
-
+        {/* Tab Navigation */}
+        <div className="mt-2">
           <select
             id="userTab"
             className="w-full rounded-md border-gray-200 py-2 text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
@@ -98,71 +135,49 @@ export default function Janitors() {
             <option>Logs and Report</option>
           </select>
         </div>
-
-        <div className="hidden">
-          <nav className="flex gap-2 overflow-x-auto py-2" aria-label="Tabs">
-            {[
-              "Basic Details",
-              "Schedule",
-              "Performance Task",
-              "Resource Usage",
-              "Logs and Report",
-            ].map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`shrink-0 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap ${
-                  activeTab === tab
-                    ? "bg-Icpetgreen text-white"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                }`}
-                aria-current={activeTab === tab ? "page" : undefined}
-              >
-                {tab}
-              </button>
-            ))}
-          </nav>
-        </div>
       </div>
 
-      {/* Janitors List */}
-      <div className="flex flex-col gap-3">
-        {currentItems.map((janitor, index) => (
-          <div key={index} className="bg-white p-4 rounded-lg shadow">
-            <div className="flex gap-4">
-              <img
-                src={janitor.image || DEFAULT_PROFILE_IMAGE}
-                alt={`${janitor.name}'s profile`}
-                className="h-12 w-12 rounded-full object-cover"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-base font-medium">{janitor.name}</h3>
-                    <p className="text-xs text-gray-500">{janitor.employeeId}</p>
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto p-2">
+        <div className="flex flex-col gap-3 pb-16">
+          {currentItems.map((janitor, index) => (
+            <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+              <div className="flex gap-4">
+                <img
+                  src={janitor.image || DEFAULT_PROFILE_IMAGE}
+                  alt={`${janitor.name}'s profile`}
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-base font-medium">{janitor.name}</h3>
+                      <p className="text-xs text-gray-500">
+                        {janitor.employeeId}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="text-Icpetgreen p-1 hover:bg-gray-100 rounded">
+                        <Pencil size={18} />
+                      </button>
+                      <button className="text-red-500 p-1 hover:bg-gray-100 rounded">
+                        <Trash size={18} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button className="text-Icpetgreen p-1 hover:bg-gray-100 rounded">
-                      <Pencil size={18} />
-                    </button>
-                    <button className="text-red-500 p-1 hover:bg-gray-100 rounded">
-                      <Trash size={18} />
-                    </button>
+                  <div className="text-sm">
+                    <p className="text-gray-600">{janitor.email}</p>
+                    <p className="text-gray-600">{janitor.contact}</p>
                   </div>
-                </div>
-                <div className="text-sm">
-                  <p className="text-gray-600">{janitor.email}</p>
-                  <p className="text-gray-600">{janitor.contact}</p>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Pagination */}
-      <div className="rounded-b-lg border-t border-gray-200 px-4 py-2 bg-white">
+      {/* Fixed Footer - Pagination */}
+      <div className="bg-white border-t border-gray-200 p-2 shadow-sm">
         <ol className="flex justify-center gap-1 text-xs font-medium">
           <li>
             <button
@@ -224,15 +239,6 @@ export default function Janitors() {
           </li>
         </ol>
       </div>
-
-      {/* Floating Generate Report Button */}
-      <button
-        type="button"
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-Icpetgreen text-white shadow-lg hover:bg-gray-800 transition duration-300 flex items-center justify-center"
-        aria-label="Generate Report"
-      >
-        <Printer className="w-6 h-6" />
-      </button>
     </div>
   );
 }

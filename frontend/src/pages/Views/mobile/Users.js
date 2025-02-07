@@ -1,263 +1,178 @@
-import React, { useState } from 'react';
-import { USERS_DATA, DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
+import React, { useState } from "react";
+import { Pencil, Trash, Printer } from "heroicons-react";
+import {
+  USERS_DATA,
+  DEFAULT_PROFILE_IMAGE,
+} from "../../../data/placeholderData";
 
 export default function Users() {
-  const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 6; // Reduced for mobile view
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
+  const [activeTab, setActiveTab] = useState("Basic Details");
+  const itemsPerPage = 6;
 
-  // Improved search function with fuzzy matching
-  const searchUsers = (data, term) => {
-    if (!term.trim()) return data;
-    const searchValue = term.toLowerCase();
-    return data.filter((user) => {
-      const nameMatch = fuzzyMatch(user.name.toLowerCase(), searchValue);
-      const idMatch = user.employeeId.toLowerCase().includes(searchValue);
-      const emailMatch = user.email.toLowerCase().includes(searchValue);
-      const contactMatch = user.contact.includes(searchValue);
-      const positionMatch = user.position.toLowerCase().includes(searchValue);
-      return nameMatch || idMatch || emailMatch || contactMatch || positionMatch;
-    });
-  };
+  // Pagination calculation
+  const filteredData = USERS_DATA.filter((user) =>
+    Object.values(user).some((value) =>
+      value.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
 
-  // Fuzzy matching function
-  const fuzzyMatch = (str, pattern) => {
-    if (str.includes(pattern)) return true;
-    const strArr = str.split("");
-    const patternArr = pattern.split("");
-    const matrix = Array(patternArr.length + 1)
-      .fill()
-      .map(() => Array(strArr.length + 1).fill(0));
-    for (let i = 0; i <= strArr.length; i++) matrix[0][i] = i;
-    for (let i = 0; i <= patternArr.length; i++) matrix[i][0] = i;
-    for (let i = 1; i <= patternArr.length; i++) {
-      for (let j = 1; j <= strArr.length; j++) {
-        const cost = strArr[j - 1] === patternArr[i - 1] ? 0 : 1;
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j - 1] + cost
-        );
-      }
-    }
-    const distance = matrix[patternArr.length][strArr.length];
-    const threshold = Math.floor(pattern.length * 0.4);
-    return distance <= threshold;
-  };
-
-  // Filter users based on active tab
-  const filterUsersByTab = (users) => {
-    switch (activeTab) {
-      case "Requests":
-        return users.filter((user) => user.status === "Pending");
-      case "Accepted":
-        return users.filter((user) => user.status === "Accepted");
-      case "Declined":
-        return users.filter((user) => user.status === "Declined");
-      default:
-        return users;
-    }
-  };
-
-  // Apply filters and pagination
-  const filteredUsers = filterUsersByTab(searchUsers(USERS_DATA, searchTerm));
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const currentItems = filteredUsers.slice(
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const currentItems = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   // Handlers
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
+  const handlePrevPage = () => {
+    setCurrentPage((p) => Math.max(1, p - 1));
   };
 
-  const handlePageChange = (page) => setCurrentPage(page);
-  const handlePrevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
-  
-  const handleAccept = (employeeId) => console.log(`Accepted user ${employeeId}`);
-  const handleDecline = (employeeId) => console.log(`Declined user ${employeeId}`);
-
-  const handleSelectAll = (e) => {
-    setSelectAll(e.target.checked);
-    setSelectedItems(e.target.checked ? currentItems.map(user => user.employeeId) : []);
+  const handleNextPage = () => {
+    setCurrentPage((p) => Math.min(totalPages, p + 1));
   };
 
-  const handleSelectItem = (employeeId) => {
-    setSelectedItems(prev => {
-      const newSelected = prev.includes(employeeId)
-        ? prev.filter(id => id !== employeeId)
-        : [...prev, employeeId];
-      setSelectAll(newSelected.length === currentItems.length);
-      return newSelected;
-    });
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setCurrentPage(1);
-    setSelectedItems([]);
-    setSelectAll(false);
+  const handlePrint = () => {
+    // Add print functionality
+  };
+
+  const handleGenerate = () => {
+    // Add generate report functionality
   };
 
   return (
-    <div className="h-full flex flex-col p-2 gap-3 overflow-y-auto relative">
-      {/* Search Bar */}
-      <div className="relative w-full shadow-md bg-white rounded-lg">
-        <label htmlFor="Search" className="sr-only">
-          Search
-        </label>
+    <div className="h-full flex flex-col">
+      {/* Fixed Header Section */}
+      <div className="bg-gray-50 p-2">
+        {/* Search Bar */}
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-bold">Users</h2>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleGenerate}
+                className="bg-Icpetgreen text-white px-3 py-1.5 rounded-lg text-sm hover:bg-opacity-90 flex items-center gap-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Generate
+              </button>
+              <button
+                onClick={handlePrint}
+                className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
+              >
+                <Printer className="w-5 h-5 text-Icpetgreen" />
+              </button>
+            </div>
+          </div>
 
-        <input
-          type="text"
-          id="Search"
-          value={searchTerm}
-          onChange={handleSearch}
-          placeholder="Search name, ID, position, etc."
-          className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
-        />
+          <div className="relative">
+            <input
+              type="text"
+              id="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search name, ID, email, or contact"
+              className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
+            />
+            <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
+              <button
+                type="button"
+                className="text-Icpetgreen hover:text-gray-700"
+              >
+                <span className="sr-only">Search</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+              </button>
+            </span>
+          </div>
+        </div>
 
-        <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
-          <button
-            type="button"
-            className="text-Icpetgreen hover:text-gray-700"
-          >
-            <span className="sr-only">Search</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="h-4 w-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
-            </svg>
-          </button>
-        </span>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="w-full">
-        <div className="block">
-          <label htmlFor="userTab" className="sr-only">
-            User Tab
-          </label>
-
+        {/* Tab Navigation */}
+        <div className="mt-2">
           <select
             id="userTab"
             className="w-full rounded-md border-gray-200 py-2 text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
             value={activeTab}
-            onChange={(e) => handleTabChange(e.target.value)}
+            onChange={(e) => setActiveTab(e.target.value)}
           >
-            <option>All</option>
-            <option>Requests</option>
-            <option>Accepted</option>
-            <option>Declined</option>
+            <option>Basic Details</option>
+            <option>Usage History</option>
+            <option>Payment History</option>
+            <option>Logs and Report</option>
           </select>
         </div>
       </div>
 
-      {/* User Cards */}
-      <div className="flex flex-col gap-3">
-        {/* Select All Checkbox */}
-        <div className="flex items-center gap-2 px-2">
-          <input
-            type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-Icpetgreen focus:ring-Icpetgreen"
-            checked={selectAll}
-            onChange={handleSelectAll}
-          />
-          <span className="text-sm text-gray-600">Select All</span>
-        </div>
-
-        {currentItems.length > 0 ? (
-          currentItems.map((user) => (
-            <div key={user.employeeId} className="bg-white p-4 rounded-lg shadow">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-Icpetgreen focus:ring-Icpetgreen mt-1"
-                  checked={selectedItems.includes(user.employeeId)}
-                  onChange={() => handleSelectItem(user.employeeId)}
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto p-2">
+        <div className="flex flex-col gap-3 pb-16">
+          {currentItems.map((user, index) => (
+            <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+              <div className="flex gap-4">
+                <img
+                  src={user.image || DEFAULT_PROFILE_IMAGE}
+                  alt={`${user.name}'s profile`}
+                  className="h-12 w-12 rounded-full object-cover"
                 />
                 <div className="flex-1">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={DEFAULT_PROFILE_IMAGE}
-                        alt={`${user.name}'s profile`}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium text-gray-900">
-                            {user.name}
-                          </h3>
-                          {user.priority && (
-                            <span className="text-red-500 text-lg">!</span>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-500">{user.position}</p>
-                      </div>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-base font-medium">{user.name}</h3>
+                      <p className="text-xs text-gray-500">{user.userId}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="text-Icpetgreen p-1 hover:bg-gray-100 rounded">
+                        <Pencil size={18} />
+                      </button>
+                      <button className="text-red-500 p-1 hover:bg-gray-100 rounded">
+                        <Trash size={18} />
+                      </button>
                     </div>
                   </div>
-                  <div className="mt-2 space-y-1 text-sm text-gray-600">
-                    <p>{user.employeeId}</p>
-                    <p>{user.email}</p>
-                    <p>{user.contact}</p>
-                  </div>
-                  <div className="mt-3">
-                    {user.status === "Pending" ? (
-                      <div className="flex gap-2">
-                        <button
-                          className="flex-1 rounded-lg bg-Icpetgreen px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700"
-                          onClick={() => handleAccept(user.employeeId)}
-                        >
-                          Accept
-                        </button>
-                        <button
-                          className="flex-1 rounded-lg border border-red-500 px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-500 hover:text-white"
-                          onClick={() => handleDecline(user.employeeId)}
-                        >
-                          Decline
-                        </button>
-                      </div>
-                    ) : (
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                          user.status === "Accepted"
-                            ? "text-Icpetgreen bg-green-50"
-                            : "text-red-500 bg-red-50"
-                        }`}
-                      >
-                        {user.status}
-                      </span>
-                    )}
+                  <div className="text-sm">
+                    <p className="text-gray-600">{user.email}</p>
+                    <p className="text-gray-600">{user.contact}</p>
                   </div>
                 </div>
               </div>
             </div>
-          ))
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            No results found. Please try a different search term.
-          </div>
-        )}
+          ))}
+        </div>
       </div>
 
-      {/* Pagination */}
-      <div className="rounded-b-lg border-t border-gray-200 px-4 py-2 bg-white">
+      {/* Fixed Footer - Pagination */}
+      <div className="bg-white border-t border-gray-200 p-2 shadow-sm">
         <ol className="flex justify-center gap-1 text-xs font-medium">
           <li>
             <button
