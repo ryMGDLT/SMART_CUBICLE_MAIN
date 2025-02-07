@@ -36,11 +36,14 @@ function App() {
       <AuthProvider>
         <div className="App">
           <Routes>
-            {/* Authentication Routes using ViewController */}
+            {/* Redirect Root ("/") to Login if Not Authenticated */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
+            {/* Authentication Routes */}
             <Route path="/login" element={<ViewController desktopComponent={LoginDesktop} mobileComponent={LoginMobile} />} />
             <Route path="/signup" element={<ViewController desktopComponent={SignupDesktop} mobileComponent={SignupMobile} />} />
 
-            {/* Private Routes */}
+            {/* Private Routes - Only Accessible After Logging In */}
             <Route element={<PrivateRoute />}>
               <Route path="/" element={<Nav />}>
                 <Route path="dashboard" element={<ViewController desktopComponent={DashboardDesktop} mobileComponent={DashboardMobile} />} />
@@ -53,7 +56,7 @@ function App() {
               </Route>
             </Route>
 
-            {/* Redirect to Login for Unknown Routes */}
+            {/* Catch-All Redirects Unauthenticated Users to Login */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </div>
