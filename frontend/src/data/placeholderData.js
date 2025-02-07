@@ -1,6 +1,7 @@
 // Default profile image path
 export const DEFAULT_PROFILE_IMAGE = "/images/sadGato.jpg";
 
+//JANITORS PAGE
 // Sample data for Janitors
 export const JANITORS_DATA = [
   {
@@ -131,6 +132,7 @@ export const JANITORS_DATA = [
   },
 ];
 
+//USERS PAGE
 // Sample data for Users
 export const USERS_DATA = [
   {
@@ -279,6 +281,7 @@ export const USERS_DATA = [
   },
   {
     name: "Rosa Santos",
+    image: "./images/sadGato.jpg",
     employeeId: "TUPM-22-0015",
     email: "rosa.santos@tup.edu.ph",
     contact: "+639555666777",
@@ -288,6 +291,7 @@ export const USERS_DATA = [
   },
 ];
 
+//PROFILE PAGE
 // Sample data for Profile
 export const PROFILE_DATA = [
   {
@@ -296,4 +300,538 @@ export const PROFILE_DATA = [
     employeeId: "TUPM-21-0001",
     position: "Manager",
   },
-]
+];
+
+//RESOURCES PAGE
+//Sample data for Inventory Table - Resources Page
+export const RESOURCES_DATA = [
+  {
+    resources: "PPE",
+    currentStock: 100,
+    restockThreshold: 50,
+    recommendedRestockingTime: "2024-01-15",
+    recommendedRestock: 100,
+    lastRestocked: "2023-12-15",
+    nextRestockingDate: "2024-01-15",
+    status: "Sufficient",
+  },
+  {
+    resources: "Bleach",
+    currentStock: 75,
+    restockThreshold: 30,
+    recommendedRestockingTime: "2024-01-20",
+    recommendedRestock: 50,
+    lastRestocked: "2023-12-20",
+    nextRestockingDate: "2024-01-20",
+    status: "Sufficient",
+  },
+  {
+    resources: "Mops",
+    currentStock: 45,
+    restockThreshold: 20,
+    recommendedRestockingTime: "2024-01-25",
+    recommendedRestock: 40,
+    lastRestocked: "2023-12-25",
+    nextRestockingDate: "2024-01-25",
+    status: "Sufficient",
+  },
+  {
+    resources: "Brooms",
+    currentStock: 35,
+    restockThreshold: 15,
+    recommendedRestockingTime: "2024-01-30",
+    recommendedRestock: 30,
+    lastRestocked: "2023-12-30",
+    nextRestockingDate: "2024-01-30",
+    status: "Sufficient",
+  },
+  {
+    resources: "Gloves",
+    currentStock: 25,
+    restockThreshold: 40,
+    recommendedRestockingTime: "2024-01-10",
+    recommendedRestock: 80,
+    lastRestocked: "2023-12-10",
+    nextRestockingDate: "2024-01-10",
+    status: "Almost Out",
+  },
+  {
+    resources: "Trash Bags",
+    currentStock: 150,
+    restockThreshold: 100,
+    recommendedRestockingTime: "2024-02-01",
+    recommendedRestock: 200,
+    lastRestocked: "2023-12-01",
+    nextRestockingDate: "2024-02-01",
+    status: "Sufficient",
+  },
+  {
+    resources: "Disinfectant",
+    currentStock: 15,
+    restockThreshold: 25,
+    recommendedRestockingTime: "2024-01-05",
+    recommendedRestock: 50,
+    lastRestocked: "2023-12-05",
+    nextRestockingDate: "2024-01-05",
+    status: "Almost Out",
+  },
+  {
+    resources: "Paper Towels",
+    currentStock: 0,
+    restockThreshold: 30,
+    recommendedRestockingTime: "2024-01-08",
+    recommendedRestock: 60,
+    lastRestocked: "2023-12-08",
+    nextRestockingDate: "2024-01-08",
+    status: "Empty",
+  },
+  {
+    resources: "Hand Soap",
+    currentStock: 40,
+    restockThreshold: 20,
+    recommendedRestockingTime: "2024-01-22",
+    recommendedRestock: 40,
+    lastRestocked: "2023-12-22",
+    nextRestockingDate: "2024-01-22",
+    status: "Sufficient",
+  },
+  {
+    resources: "Toilet Paper",
+    currentStock: 5,
+    restockThreshold: 20,
+    recommendedRestockingTime: "2024-01-12",
+    recommendedRestock: 40,
+    lastRestocked: "2023-12-12",
+    nextRestockingDate: "2024-01-12",
+    status: "Almost Out",
+  },
+  {
+    resources: "Glass Cleaner",
+    currentStock: 0,
+    restockThreshold: 15,
+    recommendedRestockingTime: "2024-01-18",
+    recommendedRestock: 30,
+    lastRestocked: "2023-12-18",
+    nextRestockingDate: "2024-01-18",
+    status: "Empty",
+  },
+  {
+    resources: "Floor Wax",
+    currentStock: 28,
+    restockThreshold: 15,
+    recommendedRestockingTime: "2024-02-05",
+    recommendedRestock: 25,
+    lastRestocked: "2023-12-05",
+    nextRestockingDate: "2024-02-05",
+    status: "Sufficient",
+  },
+  {
+    resources: "Dust Masks",
+    currentStock: 10,
+    restockThreshold: 25,
+    recommendedRestockingTime: "2024-01-14",
+    recommendedRestock: 50,
+    lastRestocked: "2023-12-14",
+    nextRestockingDate: "2024-01-14",
+    status: "Almost Out",
+  },
+  {
+    resources: "Buckets",
+    currentStock: 12,
+    restockThreshold: 10,
+    recommendedRestockingTime: "2024-01-28",
+    recommendedRestock: 15,
+    lastRestocked: "2023-12-28",
+    nextRestockingDate: "2024-01-28",
+    status: "Sufficient",
+  },
+  {
+    resources: "Sponges",
+    currentStock: 0,
+    restockThreshold: 30,
+    recommendedRestockingTime: "2024-01-16",
+    recommendedRestock: 60,
+    lastRestocked: "2023-12-16",
+    nextRestockingDate: "2024-01-16",
+    status: "Empty",
+  },
+  {
+    resources: "Scrub Brushes",
+    currentStock: 8,
+    restockThreshold: 15,
+    recommendedRestockingTime: "2024-01-19",
+    recommendedRestock: 25,
+    lastRestocked: "2023-12-19",
+    nextRestockingDate: "2024-01-19",
+    status: "Almost Out",
+  },
+  {
+    resources: "Air Freshener",
+    currentStock: 45,
+    restockThreshold: 20,
+    recommendedRestockingTime: "2024-02-10",
+    recommendedRestock: 40,
+    lastRestocked: "2023-12-10",
+    nextRestockingDate: "2024-02-10",
+    status: "Sufficient",
+  },
+  {
+    resources: "Sanitizer",
+    currentStock: 5,
+    restockThreshold: 25,
+    recommendedRestockingTime: "2024-01-13",
+    recommendedRestock: 50,
+    lastRestocked: "2023-12-13",
+    nextRestockingDate: "2024-01-13",
+    status: "Almost Out",
+  },
+  {
+    resources: "Vacuum Bags",
+    currentStock: 0,
+    restockThreshold: 10,
+    recommendedRestockingTime: "2024-01-21",
+    recommendedRestock: 20,
+    lastRestocked: "2023-12-21",
+    nextRestockingDate: "2024-01-21",
+    status: "Empty",
+  },
+  {
+    resources: "Dusters",
+    currentStock: 30,
+    restockThreshold: 15,
+    recommendedRestockingTime: "2024-02-15",
+    recommendedRestock: 25,
+    lastRestocked: "2023-12-15",
+    nextRestockingDate: "2024-02-15",
+    status: "Sufficient",
+  },
+];
+
+// Sample data for Reminders
+export const REMINDERS_DATA = [
+  {
+    date: "Today",
+    items: [
+      {
+        name: "Maria Santos",
+        resource: "Bleach",
+        status: "Excessive Usage",
+      },
+      {
+        name: "John Cruz",
+        resource: "Water Usage",
+        status: "Higher than Average",
+      },
+      {
+        name: "Anna Reyes",
+        resource: "Sanitizer",
+        status: "Almost Empty",
+      },
+    ],
+  },
+  {
+    date: "01/15/24",
+    items: [
+      {
+        name: "Pedro Garcia",
+        resource: "Detergent",
+        status: "Higher than Average",
+      },
+      {
+        name: "Sofia Lopez",
+        resource: "PPE",
+        status: "Low Stock",
+      },
+      {
+        name: "Marco Tan",
+        resource: "Mops",
+        status: "Needs Replacement",
+      },
+      {
+        name: "Luis Torres",
+        resource: "Air Freshener",
+        status: "Almost Empty",
+      },
+    ],
+  },
+  {
+    date: "01/18/24",
+    items: [
+      {
+        name: "Diana Lee",
+        resource: "Vacuum Bags",
+        status: "Empty",
+      },
+    ],
+  },
+  {
+    date: "01/22/24",
+    items: [
+      {
+        name: "Carlos Santos",
+        resource: "Water Usage",
+        status: "Excessive Usage",
+      },
+      {
+        name: "Maya Cruz",
+        resource: "Bleach",
+        status: "Higher than Average",
+      },
+      {
+        name: "Gabriel Lim",
+        resource: "Dusters",
+        status: "Low Stock",
+      },
+      {
+        name: "Emma Garcia",
+        resource: "Sanitizer",
+        status: "Almost Empty",
+      },
+      {
+        name: "Lucas Reyes",
+        resource: "PPE",
+        status: "Needs Replacement",
+      },
+    ],
+  },
+  {
+    date: "01/25/24",
+    items: [
+      {
+        name: "Isabella Santos",
+        resource: "Detergent",
+        status: "Excessive Usage",
+      },
+      {
+        name: "Miguel Lopez",
+        resource: "Mops",
+        status: "Needs Replacement",
+      },
+    ],
+  },
+];
+
+// USAGE MONITOR PAGE
+// Sample data for Janitor Schedule
+export const JANITOR_SCHEDULE_DATA = [
+  {
+    janitor: "Maria Santos",
+    lastCleaning: "8:00 AM",
+    scheduled: "8:00 AM",
+    status: "Done",
+  },
+  {
+    janitor: "John Smith",
+    lastCleaning: "9:15 AM",
+    scheduled: "9:00 AM",
+    status: "Done",
+  },
+  {
+    janitor: "Rosa Santos",
+    lastCleaning: "10:30 AM",
+    scheduled: "10:00 AM",
+    status: "Done",
+  },
+  {
+    janitor: "Manuel Torres",
+    lastCleaning: "11:45 AM",
+    scheduled: "11:00 AM",
+    status: "In Progress",
+  },
+  {
+    janitor: "Carlos Santos",
+    lastCleaning: "1:15 PM",
+    scheduled: "1:00 PM",
+    status: "Done",
+  },
+  {
+    janitor: "Isabella Santos",
+    lastCleaning: "-",
+    scheduled: "2:00 PM",
+    status: "Pending",
+  },
+  {
+    janitor: "Gabriel Lim",
+    lastCleaning: "-",
+    scheduled: "3:00 PM",
+    status: "Pending",
+  },
+  {
+    janitor: "Emma Garcia",
+    lastCleaning: "-",
+    scheduled: "4:00 PM",
+    status: "Pending",
+  },
+  {
+    janitor: "Lucas Reyes",
+    lastCleaning: "-",
+    scheduled: "5:00 PM",
+    status: "Pending",
+  },
+  {
+    janitor: "Miguel Lopez",
+    lastCleaning: "-",
+    scheduled: "6:00 PM",
+    status: "Pending",
+  },
+];
+
+// Sample data for Usage Card Report
+export const USAGE_CARD_REPORT_DATA = [
+  {
+    title: "Today",
+    count: 110,
+    isLive: true,
+  },
+  {
+    title: "Yesterday",
+    count: 95,
+    isLive: false,
+  },
+  {
+    title: "Last Week",
+    count: 850,
+    isLive: false,
+  },
+  {
+    title: "Last Month",
+    count: 3240,
+    isLive: false,
+  },
+  {
+    title: "January",
+    count: 2890,
+    isLive: false,
+  },
+  {
+    title: "December",
+    count: 3100,
+    isLive: false,
+  },
+  {
+    title: "November",
+    count: 2950,
+    isLive: false,
+  },
+  {
+    title: "October",
+    count: 3050,
+    isLive: false,
+  },
+  {
+    title: "September",
+    count: 2800,
+    isLive: false,
+  },
+  {
+    title: "August",
+    count: 3150,
+    isLive: false,
+  },
+  {
+    title: "July",
+    count: 3400,
+    isLive: false,
+  },
+  {
+    title: "June",
+    count: 3250,
+    isLive: false,
+  },
+];
+
+// Sample data for Inventory Table - Usage Monitor
+export const USAGE_MONITOR_DATA = [
+  {
+    timeStamp: "2025-01-16 08:00 AM",
+    capacity: { value: "85%", status: "High Capacity", color: "text-red-500" },
+    waterLevel: { value: "25%", status: "Low", color: "text-orange-500" },
+    odor: { value: "Moderate", color: "text-yellow-500" },
+    temperature: { value: "75°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Restock water resources soon",
+  },
+  {
+    timeStamp: "2025-01-16 09:30 AM",
+    capacity: { value: "70%", status: "Moderate", color: "text-yellow-500" },
+    waterLevel: { value: "40%", status: "Medium", color: "text-yellow-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "72°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Monitor water levels",
+  },
+  {
+    timeStamp: "2025-01-16 11:00 AM",
+    capacity: { value: "55%", status: "Normal", color: "text-green-500" },
+    waterLevel: { value: "60%", status: "Adequate", color: "text-green-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "74°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "No action needed",
+  },
+  {
+    timeStamp: "2025-01-16 12:30 PM",
+    capacity: { value: "40%", status: "Low", color: "text-orange-500" },
+    waterLevel: { value: "75%", status: "High", color: "text-green-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "76°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Schedule cleaning",
+  },
+  {
+    timeStamp: "2025-01-16 02:00 PM",
+    capacity: { value: "30%", status: "Very Low", color: "text-red-500" },
+    waterLevel: { value: "90%", status: "Very High", color: "text-red-500" },
+    odor: { value: "High", color: "text-red-500" },
+    temperature: {
+      value: "78°F",
+      status: "Elevated",
+      color: "text-yellow-500",
+    },
+    actionRequired: "Immediate cleaning required",
+  },
+  {
+    timeStamp: "2025-01-16 03:30 PM",
+    capacity: { value: "65%", status: "Normal", color: "text-green-500" },
+    waterLevel: { value: "50%", status: "Medium", color: "text-yellow-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "73°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Regular maintenance",
+  },
+  {
+    timeStamp: "2025-01-16 05:00 PM",
+    capacity: { value: "80%", status: "High", color: "text-orange-500" },
+    waterLevel: { value: "30%", status: "Low", color: "text-orange-500" },
+    odor: { value: "Moderate", color: "text-yellow-500" },
+    temperature: { value: "75°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Prepare for water refill",
+  },
+  {
+    timeStamp: "2025-01-16 06:30 PM",
+    capacity: { value: "90%", status: "Very High", color: "text-red-500" },
+    waterLevel: { value: "15%", status: "Very Low", color: "text-red-500" },
+    odor: { value: "High", color: "text-red-500" },
+    temperature: {
+      value: "77°F",
+      status: "Slightly High",
+      color: "text-yellow-500",
+    },
+    actionRequired: "Urgent water refill needed",
+  },
+  {
+    timeStamp: "2025-01-16 08:00 PM",
+    capacity: {
+      value: "75%",
+      status: "Moderate High",
+      color: "text-yellow-500",
+    },
+    waterLevel: { value: "35%", status: "Low", color: "text-orange-500" },
+    odor: { value: "Moderate", color: "text-yellow-500" },
+    temperature: { value: "74°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Schedule water refill",
+  },
+  {
+    timeStamp: "2025-01-16 09:30 PM",
+    capacity: { value: "60%", status: "Normal", color: "text-green-500" },
+    waterLevel: { value: "55%", status: "Medium", color: "text-yellow-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "72°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Monitor usage overnight",
+  },
+];

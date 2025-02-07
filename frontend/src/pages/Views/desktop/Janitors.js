@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { Trash, Pencil, Printer } from "heroicons-react";
-import { JANITORS_DATA, DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
+import {
+  JANITORS_DATA,
+  DEFAULT_PROFILE_IMAGE,
+} from "../../../data/placeholderData";
 
 export default function Janitors() {
   const [activeTab, setActiveTab] = useState("Basic Details");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 8; // Fixed number of items per page
+  const itemsPerPage = 10; // Fixed number of items per page
 
   // Improved search function with better fuzzy matching
   const searchJanitors = (data, term) => {
@@ -106,9 +109,9 @@ export default function Janitors() {
   };
 
   return (
-    <div className="h-full shadow-md bg-white rounded-lg p-6">
+    <div className="h-full flex flex-col shadow-md bg-white rounded-lg p-6">
       {/* Header - Search Bar and Generate Report Button */}
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between shrink-0">
         {/* Search Bar */}
         <div className="relative w-1/2">
           <label htmlFor="Search" className="sr-only">
@@ -148,18 +151,24 @@ export default function Janitors() {
           </span>
         </div>
         {/* Generate Report Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end space-x-4 shrink-0">
           <button
             type="button"
-            className="bg-Icpetgreen text-white px-8 py-2 rounded-lg hover:bg-gray-800 transition duration-300 flex items-center gap-2"
+            className="bg-Icpetgreen text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition duration-300 flex items-center gap-2 shadow-md"
           >
             Generate Report
-            <Printer className="w-4 h-4 text-white" />
+          </button>
+          <button
+            type="button"
+            className="bg-white px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition duration-300 flex items-center justify-center shadow-md"
+          >
+            <Printer className="w-5 h-5 text-Icpetgreen hover:text-white" />
           </button>
         </div>
       </div>
+
       {/* Tab Navigation */}
-      <div className="mt-6">
+      <div className="mt-6 shrink-0">
         <div className="sm:hidden">
           <label htmlFor="userTab" className="sr-only">
             User Tab
@@ -205,55 +214,69 @@ export default function Janitors() {
           </nav>
         </div>
       </div>
-      {/* Janitor Table */}
-      <div className="mt-3 rounded-lg border border-gray-200">
-        <div className="overflow-x-auto rounded-t-lg">
-          <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="w-48 px-4 py-4 text-left font-medium text-gray-900">
+
+      {/* Janitor Table Container */}
+      <div className="mt-3 flex-1 flex flex-col h-full rounded-lg border border-gray-200 overflow-hidden">
+        {/* Table Header - Fixed */}
+        <div className="bg-gray-50">
+          <table className="min-w-full table-fixed divide-y divide-gray-200 bg-white text-sm">
+            <thead className="bg-gray-50">
+              <tr className="border-b-2 border-gray-200">
+                <th className="w-16 py-4 text-center font-medium text-gray-900">
+                  Profile
+                </th>
+                <th className="w-48 py-4 text-center font-medium text-gray-900">
                   Name
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-48 py-4 text-center font-medium text-gray-900">
                   Employee ID
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-72 py-4 text-center font-medium text-gray-900">
                   Employee Email
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-48 py-4 text-center font-medium text-gray-900">
                   Contact Information
                 </th>
-                <th className="px-4 py-4 text-left font-medium text-gray-900">
+                <th className="w-32 py-4 text-center font-medium text-gray-900">
                   Action
                 </th>
               </tr>
             </thead>
+          </table>
+        </div>
 
+        {/* Table Body - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm table-fixed">
             <tbody className="divide-y divide-gray-200">
               {currentItems.length > 0 ? (
                 currentItems.map((janitor) => (
                   <tr key={janitor.employeeId}>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
+                    <td className="w-16 py-4">
+                      <div className="flex justify-center">
                         <img
                           src={janitor.image || DEFAULT_PROFILE_IMAGE}
                           alt={`${janitor.name}'s profile`}
                           className="h-10 w-10 rounded-full object-cover"
                         />
-                        <span className="font-medium text-gray-900">
-                          {janitor.name}
-                        </span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-gray-700">
+                    <td className="w-48 py-4 text-center text-gray-700">
+                      <span className="font-medium text-gray-900">
+                        {janitor.name}
+                      </span>
+                    </td>
+                    <td className="w-48 py-4 text-center text-gray-700">
                       {janitor.employeeId}
                     </td>
-                    <td className="px-4 py-4 text-gray-700">{janitor.email}</td>
-                    <td className="px-4 py-4 text-gray-700">
+                    <td className="w-72 py-4 text-center text-gray-700">
+                      {janitor.email}
+                    </td>
+                    <td className="w-48 py-4 text-center text-gray-700">
                       {janitor.contact}
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex gap-2">
+                    <td className="w-32 py-4">
+                      <div className="flex justify-center gap-2">
                         <button className="rounded-lg px-3 py-1 text-xs font-medium">
                           <Pencil className="w-4 h-4 text-Icpetgreen" />
                         </button>
@@ -266,10 +289,7 @@ export default function Janitors() {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="5"
-                    className="px-4 py-8 text-center text-gray-500"
-                  >
+                  <td colSpan="5" className="text-center text-gray-500 py-8">
                     No results found. Please try a different search term.
                   </td>
                 </tr>
@@ -278,8 +298,8 @@ export default function Janitors() {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="rounded-b-lg border-t border-gray-200 px-4 py-2">
+        {/* Pagination - Fixed at bottom */}
+        <div className="shrink-0 rounded-b-lg border-t border-gray-200 px-4 py-2 bg-white">
           <ol className="flex justify-center gap-1 text-xs font-medium">
             <li>
               <button

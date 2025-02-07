@@ -32,7 +32,8 @@ export default function Profile() {
             <input
               type="text"
               value={profileData.name}
-              className="w-full px-4 py-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none text-base"
+              disabled
+              className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed text-base"
             />
           </div>
 
@@ -41,7 +42,8 @@ export default function Profile() {
             <input
               type="email"
               value={profileData.email}
-              className="w-full px-4 py-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none text-base"
+              disabled
+              className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed text-base"
             />
           </div>
 
@@ -50,7 +52,8 @@ export default function Profile() {
             <input
               type="text"
               value={profileData.employeeId}
-              className="w-full px-4 py-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none text-base"
+              disabled
+              className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed text-base"
             />
           </div>
 
@@ -59,7 +62,8 @@ export default function Profile() {
             <input
               type="text"
               value={profileData.position}
-              className="w-full px-4 py-3 bg-gray-50 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none text-base"
+              disabled
+              className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed text-base"
             />
           </div>
         </div>
