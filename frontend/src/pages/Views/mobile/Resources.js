@@ -131,23 +131,23 @@ export default function MobileResources() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Fixed Tab Navigation */}
-      <div className="flex border-b border-gray-200 bg-white sticky top-0 z-20">
+      {/* Tab Navigation */}
+      <div className="flex gap-2 bg-white p-2 rounded-lg shadow-sm">
         <button
-          className={`flex-1 py-4 text-sm font-medium ${
+          className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
             activeTab === "inventory"
-              ? "text-Icpetgreen border-b-2 border-Icpetgreen"
-              : "text-gray-500"
+              ? "bg-Icpetgreen text-white"
+              : "text-gray-600 hover:bg-gray-50"
           }`}
           onClick={() => setActiveTab("inventory")}
         >
           Inventory
         </button>
         <button
-          className={`flex-1 py-4 text-sm font-medium ${
+          className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
             activeTab === "reminders"
-              ? "text-Icpetgreen border-b-2 border-Icpetgreen"
-              : "text-gray-500"
+              ? "bg-Icpetgreen text-white"
+              : "text-gray-600 hover:bg-gray-50"
           }`}
           onClick={() => setActiveTab("reminders")}
         >
@@ -155,9 +155,9 @@ export default function MobileResources() {
         </button>
       </div>
 
-      {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-hidden">
-        {activeTab === "inventory" ? (
+      {/* Content Area */}
+      <div className="flex-1 overflow-y-auto">
+        {activeTab === "inventory" && (
           <div className="h-full flex flex-col overflow-hidden bg-gray-50">
             {/* Charts Section - Scrollable */}
             <div className="flex-1 overflow-y-auto">
@@ -329,8 +329,9 @@ export default function MobileResources() {
               </div>
             </div>
           </div>
-        ) : (
-          // Reminders Tab - Scrollable Content
+        )}
+
+        {activeTab === "reminders" && (
           <div className="h-full overflow-y-auto bg-gray-50">
             <div className="p-4">
               <div className="bg-white rounded-lg border border-gray-200 p-4">
