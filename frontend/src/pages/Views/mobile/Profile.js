@@ -1,6 +1,9 @@
 import React from "react";
 import { Camera } from "heroicons-react";
-import { PROFILE_DATA, DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
+import {
+  PROFILE_DATA,
+  DEFAULT_PROFILE_IMAGE,
+} from "../../../data/placeholderData";
 
 export default function Profile() {
   const profileData = PROFILE_DATA[0]; // Using the first profile data
@@ -13,7 +16,7 @@ export default function Profile() {
           <div className="relative mb-4">
             <img
               src={DEFAULT_PROFILE_IMAGE}
-              alt="Profile Picture"
+              alt="Profile"
               className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
             />
             <button
