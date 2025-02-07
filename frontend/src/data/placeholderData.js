@@ -1,6 +1,7 @@
 // Default profile image path
 export const DEFAULT_PROFILE_IMAGE = "/images/sadGato.jpg";
 
+//JANITORS PAGE
 // Sample data for Janitors
 export const JANITORS_DATA = [
   {
@@ -131,6 +132,7 @@ export const JANITORS_DATA = [
   },
 ];
 
+//USERS PAGE
 // Sample data for Users
 export const USERS_DATA = [
   {
@@ -289,6 +291,7 @@ export const USERS_DATA = [
   },
 ];
 
+//PROFILE PAGE
 // Sample data for Profile
 export const PROFILE_DATA = [
   {
@@ -299,13 +302,14 @@ export const PROFILE_DATA = [
   },
 ];
 
-//Sample data for Resources
+//RESOURCES PAGE
+//Sample data for Inventory Table - Resources Page
 export const RESOURCES_DATA = [
   {
     resources: "PPE",
     currentStock: 100,
     restockThreshold: 50,
-      recommendedRestockingTime: "2024-01-15",
+    recommendedRestockingTime: "2024-01-15",
     recommendedRestock: 100,
     lastRestocked: "2023-12-15",
     nextRestockingDate: "2024-01-15",
@@ -604,5 +608,230 @@ export const REMINDERS_DATA = [
         status: "Needs Replacement",
       },
     ],
+  },
+];
+
+// USAGE MONITOR PAGE
+// Sample data for Janitor Schedule
+export const JANITOR_SCHEDULE_DATA = [
+  {
+    janitor: "Maria Santos",
+    lastCleaning: "8:00 AM",
+    scheduled: "8:00 AM",
+    status: "Done",
+  },
+  {
+    janitor: "John Smith",
+    lastCleaning: "9:15 AM",
+    scheduled: "9:00 AM",
+    status: "Done",
+  },
+  {
+    janitor: "Rosa Santos",
+    lastCleaning: "10:30 AM",
+    scheduled: "10:00 AM",
+    status: "Done",
+  },
+  {
+    janitor: "Manuel Torres",
+    lastCleaning: "11:45 AM",
+    scheduled: "11:00 AM",
+    status: "In Progress",
+  },
+  {
+    janitor: "Carlos Santos",
+    lastCleaning: "1:15 PM",
+    scheduled: "1:00 PM",
+    status: "Done",
+  },
+  {
+    janitor: "Isabella Santos",
+    lastCleaning: "-",
+    scheduled: "2:00 PM",
+    status: "Pending",
+  },
+  {
+    janitor: "Gabriel Lim",
+    lastCleaning: "-",
+    scheduled: "3:00 PM",
+    status: "Pending",
+  },
+  {
+    janitor: "Emma Garcia",
+    lastCleaning: "-",
+    scheduled: "4:00 PM",
+    status: "Pending",
+  },
+  {
+    janitor: "Lucas Reyes",
+    lastCleaning: "-",
+    scheduled: "5:00 PM",
+    status: "Pending",
+  },
+  {
+    janitor: "Miguel Lopez",
+    lastCleaning: "-",
+    scheduled: "6:00 PM",
+    status: "Pending",
+  },
+];
+
+// Sample data for Usage Card Report
+export const USAGE_CARD_REPORT_DATA = [
+  {
+    title: "Today",
+    count: 110,
+    isLive: true,
+  },
+  {
+    title: "Yesterday",
+    count: 95,
+    isLive: false,
+  },
+  {
+    title: "Last Week",
+    count: 850,
+    isLive: false,
+  },
+  {
+    title: "Last Month",
+    count: 3240,
+    isLive: false,
+  },
+  {
+    title: "January",
+    count: 2890,
+    isLive: false,
+  },
+  {
+    title: "December",
+    count: 3100,
+    isLive: false,
+  },
+  {
+    title: "November",
+    count: 2950,
+    isLive: false,
+  },
+  {
+    title: "October",
+    count: 3050,
+    isLive: false,
+  },
+  {
+    title: "September",
+    count: 2800,
+    isLive: false,
+  },
+  {
+    title: "August",
+    count: 3150,
+    isLive: false,
+  },
+  {
+    title: "July",
+    count: 3400,
+    isLive: false,
+  },
+  {
+    title: "June",
+    count: 3250,
+    isLive: false,
+  },
+];
+
+// Sample data for Inventory Table - Usage Monitor
+export const USAGE_MONITOR_DATA = [
+  {
+    timeStamp: "2025-01-16 08:00 AM",
+    capacity: { value: "85%", status: "High Capacity", color: "text-red-500" },
+    waterLevel: { value: "25%", status: "Low", color: "text-orange-500" },
+    odor: { value: "Moderate", color: "text-yellow-500" },
+    temperature: { value: "75°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Restock water resources soon",
+  },
+  {
+    timeStamp: "2025-01-16 09:30 AM",
+    capacity: { value: "70%", status: "Moderate", color: "text-yellow-500" },
+    waterLevel: { value: "40%", status: "Medium", color: "text-yellow-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "72°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Monitor water levels",
+  },
+  {
+    timeStamp: "2025-01-16 11:00 AM",
+    capacity: { value: "55%", status: "Normal", color: "text-green-500" },
+    waterLevel: { value: "60%", status: "Adequate", color: "text-green-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "74°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "No action needed",
+  },
+  {
+    timeStamp: "2025-01-16 12:30 PM",
+    capacity: { value: "40%", status: "Low", color: "text-orange-500" },
+    waterLevel: { value: "75%", status: "High", color: "text-green-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "76°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Schedule cleaning",
+  },
+  {
+    timeStamp: "2025-01-16 02:00 PM",
+    capacity: { value: "30%", status: "Very Low", color: "text-red-500" },
+    waterLevel: { value: "90%", status: "Very High", color: "text-red-500" },
+    odor: { value: "High", color: "text-red-500" },
+    temperature: {
+      value: "78°F",
+      status: "Elevated",
+      color: "text-yellow-500",
+    },
+    actionRequired: "Immediate cleaning required",
+  },
+  {
+    timeStamp: "2025-01-16 03:30 PM",
+    capacity: { value: "65%", status: "Normal", color: "text-green-500" },
+    waterLevel: { value: "50%", status: "Medium", color: "text-yellow-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "73°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Regular maintenance",
+  },
+  {
+    timeStamp: "2025-01-16 05:00 PM",
+    capacity: { value: "80%", status: "High", color: "text-orange-500" },
+    waterLevel: { value: "30%", status: "Low", color: "text-orange-500" },
+    odor: { value: "Moderate", color: "text-yellow-500" },
+    temperature: { value: "75°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Prepare for water refill",
+  },
+  {
+    timeStamp: "2025-01-16 06:30 PM",
+    capacity: { value: "90%", status: "Very High", color: "text-red-500" },
+    waterLevel: { value: "15%", status: "Very Low", color: "text-red-500" },
+    odor: { value: "High", color: "text-red-500" },
+    temperature: {
+      value: "77°F",
+      status: "Slightly High",
+      color: "text-yellow-500",
+    },
+    actionRequired: "Urgent water refill needed",
+  },
+  {
+    timeStamp: "2025-01-16 08:00 PM",
+    capacity: {
+      value: "75%",
+      status: "Moderate High",
+      color: "text-yellow-500",
+    },
+    waterLevel: { value: "35%", status: "Low", color: "text-orange-500" },
+    odor: { value: "Moderate", color: "text-yellow-500" },
+    temperature: { value: "74°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Schedule water refill",
+  },
+  {
+    timeStamp: "2025-01-16 09:30 PM",
+    capacity: { value: "60%", status: "Normal", color: "text-green-500" },
+    waterLevel: { value: "55%", status: "Medium", color: "text-yellow-500" },
+    odor: { value: "Low", color: "text-green-500" },
+    temperature: { value: "72°F", status: "Normal", color: "text-green-500" },
+    actionRequired: "Monitor usage overnight",
   },
 ];
