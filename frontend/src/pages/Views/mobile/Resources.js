@@ -12,9 +12,8 @@ import {
   Legend,
 } from "chart.js";
 import { ChevronUp, ChevronDown, Pencil, Printer } from "heroicons-react";
-import { RESOURCES_DATA } from "../../../data/placeholderData";
+import { RESOURCES_DATA, REMINDERS_DATA } from "../../../data/placeholderData";
 import ReminderCard from "../../../Components/ui/reminderCard";
-import { REMINDERS_DATA } from "../../../data/placeholderData";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../../styles/datepicker-custom.css";
