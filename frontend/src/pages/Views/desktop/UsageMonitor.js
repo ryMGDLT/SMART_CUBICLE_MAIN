@@ -452,4 +452,6 @@ export default function UsageMonitor() {
           </div>
         </div>
       </div>
+    </div>
+  );
 }
