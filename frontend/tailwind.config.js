@@ -3,6 +3,9 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
     extend: {
+      accentColor: {
+        teal: "#0d9488",
+      },
       colors: {
         fafbfe: "#FAFBFE",
         grayish: "#8F8F8F",
