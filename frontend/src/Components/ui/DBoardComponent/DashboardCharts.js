@@ -79,6 +79,25 @@ export const ResourcesUsageChart = ({
               ...resourcesChartOptions,
               responsive: true,
               maintainAspectRatio: false,
+              elements: {
+                point: {
+                  radius: 6, 
+                  hoverRadius: 8, 
+                  hitRadius: 10, 
+                  borderWidth: 2,
+                  fill: true, 
+                  backgroundColor: "transparent",   
+
+
+
+                  borderColor: (context) => {
+                    const chart = context.chart;
+                    const {datasetIndex } = context.dataPoint;
+                    return chart.data.datasets[datasetIndex].borderColor;
+                  },
+                },
+                pointStyle: "circle", 
+              },
             }}
           />
         )}
@@ -154,6 +173,25 @@ export const TrendsOverTimeChart = ({
               ...trendsChartOptions,
               responsive: true,
               maintainAspectRatio: false,
+              elements: {
+                point: {
+                  radius: 6, 
+                  hoverRadius: 8, 
+                  hitRadius: 10, 
+                  borderWidth: 2,
+                  fill: true, 
+                  backgroundColor: "transparent", 
+
+
+                  borderColor: (context) => {
+                   
+                    const chart = context.chart;
+                    const { datasetIndex } = context.dataPoint;
+                    return chart.data.datasets[datasetIndex].borderColor;
+                  },
+                },
+                pointStyle: "circle", 
+              },
             }}
           />
         )}
@@ -174,7 +212,26 @@ export const UsageMonitoringChart = () => {
             ...chartOptions,
             responsive: true,
             maintainAspectRatio: false,
+            elements: {
+              point: {
+                radius: 6, 
+                hoverRadius: 8, 
+                hitRadius: 10, 
+                borderWidth: 2,
+                fill: true, 
+                backgroundColor: "transparent", 
+
+
+                borderColor: (context) => {
+                  
+        
+                },
+              },
+              pointStyle: "circle", 
+            },
           }}
+            
+        
         />
       </div>
     </div>
