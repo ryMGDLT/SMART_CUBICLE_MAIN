@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Card } from "../../../Components/ui components/card";
-import CalendarComponent from "../../../Components/ui components/DBoardComponent.js/dCalendar";
-import CustomCalendar from "../../../Components/ui components/DBoardComponent.js/asideCalendar";
+import { Card } from "../../../Components/ui/card";
+import CalendarComponent from "../../../Components/ui/DBoardComponent/dCalendar";
+import CustomCalendar from "../../../Components/ui/DBoardComponent/asideCalendar";
 import "../../../styles/Calendar.css";
-import SummarizedReport from "../../../Components/ui components/DBoardComponent.js/SummarizedCard";
+import SummarizedReport from "../../../Components/ui/DBoardComponent/SummarizedCard";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../Components/ui components/DBoardComponent.js/DashboardCharts";
+} from "../../../Components/ui/DBoardComponent/DashboardCharts";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -122,16 +122,16 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col md:flex-row mt-[-15px] ml-[-15px] mr-[-10px] mx-auto">
       {/* Sidebar */}
-      <aside className="w-full md:w-1/4 min-h-screen p-4 flex flex-col">
-        <Card className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4 flex flex-col mt-[-12px]">
+      <aside className="w-full md:w-1/4 min-h-screen h-full p-4 flex flex-col mt-[-12px]">
+        <Card className="bg-white shadow-lg p-4 flex flex-col h-full overflow-y-auto outline outline-gray-200 outline-1">
           {/* Calendar */}
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center mb-4 overflow-y-auto">
             <CustomCalendar
               handleDateClick={() => setShowDateCard(true)}
               today={new Date().getDate()}
             />
           </div>
-          <hr className="w-full border-t border-gray-200 my-4 mt-5" />
+          <hr className="w-full border-t border-gray-200 my-4 shadow-lg" />
 
           {/* Reminders Section */}
           <div className="flex flex-col items-start mt-4 mb-4">
@@ -165,7 +165,7 @@ export default function Dashboard() {
                       type="checkbox"
                       checked={remindersChecked.peakHours}
                       onChange={() => handleReminderChange("peakHours")}
-                      className="w-4 h-4 text-red-600 bg-white border-red-500 rounded-sm focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-white focus:ring-2 dark:bg-white dark:border-white"
+                      className="w-4 h-4 text-red-600 bg-white border-red-500 rounded-sm focus:ring-red-500 dark:focus:ring-red-500 dark:ring-offset-white focus:ring-2 dark:bg-white dark:border-white"
                     />
                   </div>
                   <span>Peak Hours</span>
@@ -197,9 +197,10 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          <hr className="w-full border-t border-gray-200 my-4 mt-5" />
+          <hr className="w-full border-t border-gray-200 mt-5 mb-5 shadow-lg" />
+
           {/* Janitor Schedule */}
-          <div className="flex-grow">
+          <div className="flex-grow overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Janitor Schedule (Today)</h2>
             <table className="w-full">
               <thead>
@@ -232,7 +233,17 @@ export default function Dashboard() {
                     </td>
                     <td className="py-3">{shift.time}</td>
                     <td className="py-3">
-                      <span className={`text-${shift.color}-500`}>
+                      <span
+                        className={
+                          shift.color === "green"
+                            ? "text-green-500"
+                            : shift.color === "red"
+                            ? "text-red-500"
+                            : shift.color === "yellow"
+                            ? "text-yellow-500"
+                            : ""
+                        }
+                      >
                         {shift.status}
                       </span>
                     </td>
@@ -250,7 +261,7 @@ export default function Dashboard() {
         <div className="flex-1 p-1 ml-[-5px]">
           <div className="grid grid-cols-1 gap-6">
             {/* Summarized Report */}
-            <Card>
+            <Card className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4">
               <SummarizedReport
                 selectedPeriod={selectedPeriod}
                 setSelectedPeriod={setPeriod}

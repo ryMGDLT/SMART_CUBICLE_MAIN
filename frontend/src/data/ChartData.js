@@ -1,51 +1,50 @@
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    LineElement,
-    PointElement,
-    Filler,
-    Title,
-    Tooltip,
-    Legend,
-  } from "chart.js";
- 
-  
-  // Register ChartJS components
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    LineElement,
-    PointElement,
-    Filler,
-    Title,
-    Tooltip,
-    Legend
-  );
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Filler,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Filler,
+  Title,
+  Tooltip,
+  Legend
+);
+
 // Resources Usage Chart Data
 export const resourcesChartData = (chartType) => ({
-    labels: ["Water", "Bleach (Toilet)", "Bleach (Walls & Floor)", "Detergent"],
-    datasets: [
-      {
-        label: "Actual Usage",
-        data: [5.5, 6.5, 7.5, 7.5],
-        backgroundColor: chartType === "line" ? "rgba(59, 130, 246, 0.1)" : "rgb(59, 130, 246)",
-        borderColor: "rgb(59, 130, 246)",
-        barPercentage: 0.6,
-        fill: true,
-      },
-      {
-        label: "Recommended",
-        data: [4, 8, 2, 2],
-        backgroundColor: chartType === "line" ? "rgba(74, 222, 128, 0.1)" : "rgb(74, 222, 128)",
-        borderColor: "rgb(74, 222, 128)",
-        barPercentage: 0.6,
-        fill: true,
-      },
-    ],
-  });
+  labels: ["Water", "Bleach (Toilet)", "Bleach (Walls & Floor)", "Detergent"],
+  datasets: [
+    {
+      label: "Actual Usage",
+      data: [5.5, 6.5, 7.5, 7.5],
+      backgroundColor: chartType === "line" ? "rgba(59, 130, 246, 0.1)" : "rgb(59, 130, 246)",
+      borderColor: "rgb(59, 130, 246)",
+      barPercentage: 0.6,
+    },
+    {
+      label: "Recommended",
+      data: [4, 8, 2, 2],
+      backgroundColor: chartType === "line" ? "rgba(74, 222, 128, 0.1)" : "rgb(74, 222, 128)",
+      borderColor: "rgb(74, 222, 128)",
+      barPercentage: 0.6,
+    },
+  ],
+});
+
 // Trends Over Time Chart Data
 export const trendsChartData = (chartType) => ({
   labels: ["1st Week", "2nd Week", "3rd Week", "4th Week", "5th Week"],
@@ -54,24 +53,21 @@ export const trendsChartData = (chartType) => ({
       label: "Cleaning Pattern",
       data: [2, 3, 5, 6, 8],
       borderColor: "rgb(59, 130, 246)",
-      backgroundColor: (chartType) === "line" ? "rgba(59, 130, 246, 0.1)" : "rgb(59, 130, 246)",
+      backgroundColor: chartType === "line" ? "rgba(59, 130, 246, 0.1)" : "rgb(59, 130, 246)",
       tension: 0.4,
-      fill: true,
     },
     {
       label: "Resources Consumed",
       data: [3, 4, 5.5, 6, 7],
       borderColor: "rgb(74, 222, 128)",
-      backgroundColor: (chartType) === "line" ? "rgba(74, 222, 128, 0.1)" : "rgb(74, 222, 128)",
+      backgroundColor: chartType === "line" ? "rgba(74, 222, 128, 0.1)" : "rgb(74, 222, 128)",
       tension: 0.4,
-      fill: true,
     },
   ],
 });
 
 // Usage Monitoring Chart Data
 export const usageData = {
-
   labels: [
     "7:00 AM",
     "8:00 AM",
@@ -91,7 +87,28 @@ export const usageData = {
       label: "Usage",
       data: [65, 15, 25, 20, 35, 18, 60, 22, 45, 50, 85, 40],
       fill: true,
-      backgroundColor: "rgba(54, 162, 235, 0.2)",
+      backgroundColor: function (context) {
+        const chart = context.chart;
+        if (!chart.chartArea) {
+        
+          return "rgba(54, 162, 235, 0.2)";
+        }
+
+        const ctx = chart.ctx;
+        const gradient = ctx.createLinearGradient(
+          0,
+          chart.chartArea.bottom,
+          0,
+          chart.chartArea.top
+        );
+
+        gradient.addColorStop(0, "rgba(54, 162, 235, 0.1)"); 
+        gradient.addColorStop(1, "rgba(54, 162, 235, 0.6)"); 
+
+
+
+        return gradient;
+      },
       borderColor: "rgba(54, 162, 235, 1)",
       pointBackgroundColor: function (context) {
         const index = context.dataIndex;
@@ -127,9 +144,12 @@ export const usageData = {
       pointRadius: 6,
       borderWidth: 1,
       hidden: false,
+      hoverRadius: 8,
+      hitRadius: 10,
     },
   ],
 };
+
 
 // Chart Options
 export const chartOptions = {
@@ -153,6 +173,7 @@ export const chartOptions = {
           const peakDataset = chart.getDatasetMeta(1);
           const isPeakShown = !peakDataset.hidden;
           const dataIndex = tooltipItem.dataIndex;
+
           if (isPeakShown && dataIndex === 10 && tooltipItem.dataset.label === "Usage") {
             return `Peak: ${tooltipItem.raw} Users`;
           }
