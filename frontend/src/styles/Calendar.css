@@ -628,3 +628,651 @@ td.fc-list-event-graphic {
   margin-left: 50px;
   flex-wrap: wrap;
 }
+.dboardCalendar .fc-prev-button,
+.dboardCalendar .fc-next-button {
+  background-color: white !important;
+  border: none !important;
+  color: black !important;
+  outline: none !important;
+  box-shadow: none !important;
+
+}
+
+
+.dboardCalendar .fc-daygrid-day-events {
+  max-height: 100px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.dboardCalendar .fc-daygrid-day-events::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.dboardCalendar .fc-daygrid-day-events:hover {
+  scrollbar-width: thin;
+  scrollbar-color: gray #f1f1f1;
+}
+
+.dboardCalendar .fc-daygrid-day-events:hover::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dboardCalendar .fc-daygrid-day-events:hover::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 15px;
+}
+
+.dboardCalendar .fc-daygrid-day-events:hover::-webkit-scrollbar-thumb {
+  background: #4a90e2;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+.dboardCalendar .fc-daygrid-day-events:hover::-webkit-scrollbar-thumb:hover {
+  background: #357ab8;
+}
+
+.dboardCalendar .fc-daygrid-day-events:hover::-webkit-scrollbar-thumb:active {
+  background: #2a6496;
+}
+
+
+.mobileCalendar .fc-button {
+  padding: 6px 12px;
+  color: black;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.mobileCalendar .fc-button:hover {
+  background-color: lightgray !important;
+  scale: 1.05;
+  box-shadow: none !important;
+}
+
+
+.mobileCalendar .fc-button.fc-button-active {
+  background-color: #31ab9f !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+
+.mobileCalendar .fc-button-group .fc-button:not(:last-child) {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+
+
+
+.mobileCalendar .fc-button.no-border {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+.mobileCalendar .fc .fc-toolbar-title {
+  font-size: 1rem !important;
+  font-weight: bold !important;
+}
+
+
+.mobileCalendar .fc .fc-daygrid-day-frame {
+  border-color: rgba(226, 226, 226, 0.2) !important;
+  border-radius: 5px !important;
+}
+
+
+.mobileCalendar .fc .fc-scrollgrid-section table {
+  border-color: rgba(226, 226, 226, 0.2) !important;
+}
+
+
+.mobileCalendar .fc .fc-daygrid-day-top {
+  border-bottom-color: rgba(226, 226, 226, 0.2) !important;
+}
+
+
+.mobileCalendar .fc .fc-timegrid-slot {
+  border-top-color: rgba(226, 226, 226, 0.2) !important;
+}
+
+
+.mobileCalendar th.fc-col-header-cell.fc-day.fc-day {
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  margin: 10px !important;
+  padding: 10px !important;
+}
+
+
+.mobileCalendar .fc .fc-daygrid-day.fc-day-today {
+  background-color: lightgray !important;
+}
+
+
+.mobileCalendar .fc .fc-col-header-cell-cushion {
+  font-size: 1rem !important;
+  font-weight: bold !important;
+}
+
+
+.mobileCalendar .custom-day-cell {
+  background-color: lightgray !important;
+}
+
+
+.mobileCalendar .fc .fc-timegrid-divider {
+  padding: 0px;
+}
+
+
+.mobileCalendar .fc-timegrid-slot-label {
+  letter-spacing: 1px;
+}
+
+
+.mobileCalendar .fc-list-view .fc-list-table {
+  border-collapse: separate !important;
+}
+
+
+.mobileCalendar .fc-list-view .fc-list-item {
+  border: none !important;
+}
+
+
+.mobileCalendar .fc-list-view .fc-list-item-time {
+  display: none;
+}
+
+
+.mobileCalendar .fc-list-view .fc-list-item-title {
+  margin-left: 0 !important;
+}
+
+
+.mobileCalendar .fc-theme-standard .fc-list-day-cushion {
+  background-color: #23897d;
+  border: none;
+  border-radius: 5px;
+  text-align: center;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.mobileCalendar .fc-theme-standard .fc-list {
+  border: none;
+}
+
+
+.mobileCalendar .fc-daygrid-day-frame,
+.mobileCalendar .fc-timegrid-slot,
+.mobileCalendar .fc-scrollgrid-sync-table {
+  border-color: rgba(226, 226, 226, 0.4) !important;
+}
+
+
+.mobileCalendar .fc-col-header-cell,
+.mobileCalendar .fc-daygrid-day-top {
+  border-color: rgba(226, 226, 226, 0.4) !important;
+}
+
+
+.mobileCalendar .fc-timegrid-axis-frame,
+.mobileCalendar .fc-timegrid-slot-lane {
+  border-color: rgba(226, 226, 226, 0.4) !important;
+}
+
+
+.mobileCalendar .fc .fc-scrollgrid {
+  border-color: rgba(226, 226, 226, 0.4) !important;
+  border-radius: 5px !important;
+}
+
+
+.mobileCalendar .fc .fc-timegrid-divider {
+  border-color: rgba(226, 226, 226, 0.4) !important;
+  border-radius: 5px !important;
+}
+
+
+.mobileCalendar .fc-theme-standard td,
+.mobileCalendar .fc-theme-standard th {
+  border-color: rgba(226, 226, 226, 0.4) !important;
+  border-radius: 5px !important;
+}
+
+
+.mobileCalendar .fc-theme-standard .fc-list-day-cushion {
+  background-color: #23897d;
+  border-radius: 5px !important;
+  text-align: center !important;
+}
+
+
+.mobileCalendar .fc .fc-list-day-cushion {
+  text-align: center !important;
+  font-weight: bold;
+  padding: 10px 0;
+  margin: 0 !important;
+  padding-left: 0 !important;
+
+  padding-right: 0 !important;
+}
+
+.mobileCalendar .fc-direction-ltr .fc-list-day-text,
+.mobileCalendar .fc-direction-rtl .fc-list-day-side-text {
+  float: center;
+  text-align: center;
+  font-size: 13px;
+}
+
+
+.mobileCalendar .fc-timeGridDay-view .fc-day-today {
+  background-color: transparent !important;
+}
+
+
+.mobileCalendar .fc-timeGridDay-view .fc-daygrid-day-frame {
+  background-color: transparent !important;
+}
+
+
+.mobileCalendar .fc-event {
+  background-color: #f0f4fd !important;
+  border-left: 4px solid #0044cc !important;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-radius: 4px;
+
+  padding: 6px;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  margin-bottom: 2px !important;
+  font-size: 12px;
+}
+
+.mobileCalendar .fc-event.blue-event-style .event-assigned-name {
+  color: #0044cc !important;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.mobileCalendar .fc-event.blue-event-style .event-time {
+  color: #0044cc !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+
+.mobileCalendar .fc-event.blue-event-style .event-title {
+  color: #0044cc !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+.mobileCalendar .fc-event.blue-event-style {
+  line-height: 1.2;
+  color: #0044cc;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding: 4px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  font-size: 12px;
+}
+.mobileCalendar .fc-event.black-event-style .event-assigned-name {
+  color: #1a141f !important;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+.mobileCalendar .fc-event.black-event-style .event-time {
+  color: #1a141f !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+
+/* Style for the event title */
+.mobileCalendar .fc-event.black-event-style .event-title {
+  color: #1a141f !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+.mobileCalendar .fc-event.black-event-style {
+  background-color: #eff0f1 !important;
+  border-left: 4px solid #1a141f !important;
+
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.mobileCalendar .fc-event.red-event-style {
+  background-color: #faeee4 !important;
+  border-left: 4px solid #c41d39 !important;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+
+  border-bottom-right-radius: 10px;
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+
+  font-size: 12px;
+}
+.mobileCalendar .fc-event.red-event-style .event-title {
+  color: #c41d39 !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+.mobileCalendar .fc-event.red-event-style .event-assigned-name {
+  color: #c41d39 !important;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+.mobileCalendar .fc-event.red-event-style .event-time {
+  color: #c41d39 !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+
+.mobileCalendar .fc-timegrid-slot-label-frame {
+  height: 5px;
+}
+
+
+.mobileCalendar .fc-timegrid-event-harness {
+  margin-top: -1px;
+}
+
+
+.mobileCalendar .fc-timegrid-event {
+  border-radius: 4px;
+  background-color: #f0f8ff;
+  border: 1px solid #d3d3d3;
+  padding: 4px;
+  box-sizing: border-box;
+
+}
+    
+td.fc-list-event-time {
+  display: none;
+}
+td.fc-list-event-graphic {
+  display: none;
+}
+
+.mobileCalendar .fc-event.red-event-style .list-event-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 0;
+  background-color: #faeee4 !important;
+  border-left: 4px solid #c41d39 !important;
+
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+  margin-left: -15px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.mobileCalendar .fc-event.red-event-style .list-event-time {
+  width: 200px; 
+  color: #c41d39 !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+
+  margin-left: 20px;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+    
+.mobileCalendar .fc-event .red-event-style .list-event-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+
+.mobileCalendar .fc-event.red-event-style .list-event-title {
+  color: #c41d39 !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 50px;
+  display: flex;
+  align-items: flex-start;
+
+  flex-wrap: wrap;
+}
+
+.mobileCalendar .fc-event.red-event-style .list-event-assigned {
+  color: #c41d39 !important;
+  font-size: 25px;
+  font-weight: bold;
+  margin-left: 50px;
+}
+
+
+.mobileCalendar .fc-event.blue-event-style .list-event-container {
+  display: flex;
+
+  align-items: flex-start;
+  padding: 8px 0;
+  background-color: #f0f4fd !important;
+  border-left: 4px solid #0044cc !important;
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: flex-start;
+  margin-left: 10px;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+  margin-left: -15px;
+}
+
+.mobileCalendar .fc-event.blue-event-style .list-event-time {
+  width: 200px; 
+  color: #0044cc !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+
+  margin-left: 20px;
+}
+
+.mobileCalendar .fc-event .blue-event-style .list-event-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+
+.mobileCalendar .fc-event.blue-event-style .list-event-title {
+  color: #0044cc !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 50px;
+}
+
+
+.mobileCalendar .fc-event.blue-event-style .list-event-assigned {
+  color: #0044cc !important;
+  font-size: 25px;
+  font-weight: bold;
+  margin-left: 50px;
+}
+
+
+.mobileCalendar .fc-event.black-event-style .list-event-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 0;
+  background-color: #eff0f1 !important;
+  border-left: 4px solid #1a141f !important;
+
+  line-height: 1.2;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: flex-start;
+  margin-left: 10px;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 12px;
+  margin-left: -15px;
+}
+
+.mobileCalendar .fc-event.black-event-style .list-event-time {
+  width: 200px; 
+  color: #1a141f !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+
+  margin-left: 20px;
+}
+
+.mobileCalendar .fc-event.black-event-style .list-event-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+
+.mobileCalendar .fc-event.black-event-style .list-event-title {
+  color: #1a141f !important;
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 50px;
+}
+
+
+.mobileCalendar .fc-event.black-event-style .list-event-assigned {
+  color: #1a141f !important;
+  font-size: 25px;
+  font-weight: bold;
+  margin-left: 50px;
+  flex-wrap: wrap;
+}
+
+
+/* Ensure the toolbar uses flexbox */
+.mobileCalendar .fc-toolbar {
+  display: flex;
+  justify-content: space-between; /* Space between left and right groups */
+  align-items: center; /* Align items vertically in the center */
+}
+
+/* Group prev and next buttons on the left */
+.mobileCalendar .fc-toolbar .fc-button-group:first-child {
+  order: 1; /* Place this group on the left */
+  display: flex;
+  gap: 5px; /* Add spacing between prev and next buttons */
+}
+
+/* Group view buttons (Month, Week, Day, List) on the right */
+.mobileCalendar .fc-toolbar .fc-button-group:last-child {
+  order: 2; /* Place this group on the right */
+  display: flex;
+  gap: 5px; /* Add spacing between buttons */
+}
+
+/* Style for prev and next buttons */
+.mobileCalendar .fc-prev-button,
+.mobileCalendar .fc-next-button {
+  background-color: white !important;
+  border: none !important;
+  color: black !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 6px 12px; /* Adjust padding for better touch targets */
+  font-size: 14px; /* Increase font size for readability */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+
+
+/* Style for view buttons (Month, Week, Day, List) */
+.mobileCalendar .fc-button {
+  padding: 6px 12px;
+  color: black;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+
+
+.mobileCalendar .fc-button.fc-button-active {
+  background-color: #31ab9f !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+/* Ensure button groups have proper spacing */
+.mobileCalendar .fc-button-group {
+  border: 1px solid lightgrey !important;
+  overflow: hidden;
+  display: inline-flex;
+  border-radius: 10px;
+  background-color: white;
+  margin-left: 10px !important;
+}

@@ -1,6 +1,6 @@
 import "./styles/App.css";
 import "./styles/Calendar.css";
-import Nav from "./Components/Nav";
+import Nav from "./Components/utils/Nav";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./pages/Auth/PrivateRoute";
 
