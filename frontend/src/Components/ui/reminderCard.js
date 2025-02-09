@@ -1,5 +1,4 @@
 import React from "react";
-import { REMINDERS_DATA } from "../../data/placeholderData";
 
 function ReminderCard({ date, items }) {
   // Function to get status color
