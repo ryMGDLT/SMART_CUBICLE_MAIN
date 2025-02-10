@@ -11,7 +11,7 @@ export default function SummarizedReport({
   dropdownRef, // Add dropdownRef prop
 }) {
   return (
-    <div className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4">
+    <div>
       <div className="flex flex-col space-y-4">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

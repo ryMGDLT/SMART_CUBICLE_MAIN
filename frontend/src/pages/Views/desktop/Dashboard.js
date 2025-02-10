@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Card } from "../../../Components/ui/card";
-import CalendarComponent from "../../../Components/ui/DBoardComponent/dCalendar";
-import CustomCalendar from "../../../Components/ui/DBoardComponent/asideCalendar";
+import React, { useState, useEffect } from "react";
+import { Card } from "../../../Components/utils/card";
+import CustomCalendar from "../../../Components/Calendar/asideCalendar";
 import "../../../styles/Calendar.css";
-import SummarizedReport from "../../../Components/ui/DBoardComponent/SummarizedCard";
+import SummarizedReport from "../../../Components/Reports/SummarizedCard";
+import { useDropdown } from "../../../Components/utils/useDropdown";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../Components/ui/DBoardComponent/DashboardCharts";
+} from "../../../Components/Charts/DashboardCharts";
+import { toggleMetric } from "../../../Components/utils/metricUtils";
+import { handleReminderChange } from "../../../Components/utils/reminderUtils";
+import Reminders from "../../../Components/Reminder/Reminder";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,6 +24,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { DateCard } from "../../../Components/Calendar/dateCard";
 
 // Register Chart.js components
 ChartJS.register(
@@ -35,29 +39,7 @@ ChartJS.register(
   Legend
 );
 
-// Custom hook for dropdown functionality
-const useDropdown = (initialState) => {
-  const [isOpen, setIsOpen] = useState(initialState);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("pointerdown", handleClickOutside);
-    return () => {
-      document.removeEventListener("pointerdown", handleClickOutside);
-    };
-  }, []);
-
-  return [isOpen, setIsOpen, ref];
-};
-
 export default function Dashboard() {
-  // State management
   const [chartType, setChartType] = useState("bar");
   const [trendsChartType, setTrendsChartType] = useState("line");
   const [showDateCard, setShowDateCard] = useState(false);
@@ -76,36 +58,22 @@ export default function Dashboard() {
   ]);
 
   // Dropdown handlers
-  const [
-    showSummarizedDropdown,
-    setShowSummarizedDropdown,
-    summarizedDropdownRef,
-  ] = useDropdown(false);
-  const [showChartDropdown, setShowChartDropdown, chartDropdownRef] =
-    useDropdown(false);
-  const [showTrendsDropdown, setShowTrendsDropdown, trendsDropdownRef] =
-    useDropdown(false);
+  const [showSummarizedDropdown, setShowSummarizedDropdown, summarizedDropdownRef] = useDropdown(false);
+  const [showChartDropdown, setShowChartDropdown, chartDropdownRef] = useDropdown(false);
+  const [showTrendsDropdown, setShowTrendsDropdown, trendsDropdownRef] = useDropdown(false);
 
-  // Derived state
+
   const showOtherCards = !showDateCard;
 
-  // Handlers
-  const handleReminderChange = (key) => {
-    setRemindersChecked((prevState) => ({
-      ...prevState,
-      [key]: !prevState[key],
-    }));
+
+  const handleReminderChangeWrapper = (key) => {
+    handleReminderChange(setRemindersChecked, key);
   };
 
-  const toggleMetric = (item) => {
-    setSelectedMetrics((prevMetrics) =>
-      prevMetrics.includes(item)
-        ? prevMetrics.filter((metric) => metric !== item)
-        : [...prevMetrics, item]
-    );
+  const toggleMetricWrapper = (item) => {
+    toggleMetric(setSelectedMetrics, item);
   };
 
-  // Effects for localStorage persistence
   useEffect(() => {
     const storedShowDateCard = localStorage.getItem("showDateCard") === "true";
     setShowDateCard(storedShowDateCard);
@@ -134,68 +102,8 @@ export default function Dashboard() {
           <hr className="w-full border-t border-gray-200 my-4 shadow-lg" />
 
           {/* Reminders Section */}
-          <div className="flex flex-col items-start mt-4 mb-4">
-            <h2 className="text-xl font-bold mb-4">Reminders</h2>
-            <div className="w-full space-y-3">
-              {/* Cleaning Schedule */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
-                    <input
-                      id="blue-checkbox"
-                      type="checkbox"
-                      checked={remindersChecked.cleaningSchedule}
-                      onChange={() => handleReminderChange("cleaningSchedule")}
-                      className="w-4 h-4 text-blue-600 bg-white border-white rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-white focus:ring-2 dark:bg-white dark:border-white"
-                    />
-                  </div>
-                  <span>Cleaning Schedule</span>
-                </div>
-                <span className="bg-blue-500 text-white text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full">
-                  2
-                </span>
-              </div>
-
-              {/* Peak Hours */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-red-500 rounded flex items-center justify-center">
-                    <input
-                      id="red-checkbox"
-                      type="checkbox"
-                      checked={remindersChecked.peakHours}
-                      onChange={() => handleReminderChange("peakHours")}
-                      className="w-4 h-4 text-red-600 bg-white border-red-500 rounded-sm focus:ring-red-500 dark:focus:ring-red-500 dark:ring-offset-white focus:ring-2 dark:bg-white dark:border-white"
-                    />
-                  </div>
-                  <span>Peak Hours</span>
-                </div>
-                <span className="bg-red-500 text-white text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full">
-                  2
-                </span>
-              </div>
-
-              {/* Resource Restocking */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-black rounded flex items-center justify-center">
-                    <input
-                      id="black-checkbox"
-                      type="checkbox"
-                      checked={remindersChecked.resourceRestocking}
-                      onChange={() =>
-                        handleReminderChange("resourceRestocking")
-                      }
-                      className="w-4 h-4 text-black bg-white border-white rounded-sm focus:ring-black dark:focus:ring-black dark:ring-offset-white focus:ring-2 dark:bg-white dark:border-white"
-                    />
-                  </div>
-                  <span>Resource Restocking</span>
-                </div>
-                <span className="bg-black text-white text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full">
-                  2
-                </span>
-              </div>
-            </div>
+          <div>
+          <Reminders remindersChecked={remindersChecked} setRemindersChecked={setRemindersChecked} />
           </div>
           <hr className="w-full border-t border-gray-200 mt-5 mb-5 shadow-lg" />
 
@@ -262,23 +170,29 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 gap-6">
             {/* Summarized Report */}
             <Card className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4">
-              <SummarizedReport
-                selectedPeriod={selectedPeriod}
-                setSelectedPeriod={setPeriod}
-                allMetrics={[
-                  "Usage Peak Hour",
-                  "Total Cleaning Time",
-                  "Recommended Cleaning Time",
-                  "Total Resources Restocked",
-                  "Recommended Resources",
-                ]}
-                selectedMetrics={selectedMetrics}
-                toggleMetric={toggleMetric}
-                showDropdown={showSummarizedDropdown}
-                setShowDropdown={setShowSummarizedDropdown}
-                dropdownRef={summarizedDropdownRef}
-              />
+            <SummarizedReport
+            selectedPeriod={selectedPeriod}
+            setSelectedPeriod={setPeriod}
+            allMetrics={[
+              "Usage Peak Hour",
+              "Total Cleaning Time",
+              "Recommended Cleaning Time",
+              "Total Resources Restocked",
+              "Recommended Resources",
+            ]}
+            selectedMetrics={selectedMetrics}
+            toggleMetric={toggleMetricWrapper}
+            showDropdown={showSummarizedDropdown}
+            setShowDropdown={setShowSummarizedDropdown}
+            dropdownRef={summarizedDropdownRef}
+            showPeriodSelector={true}
+            showMetricsDropdown={true}
+            showMetricsCards={true}
+            showHeader={true}
+
+          />
             </Card>
+
 
             {/* Charts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -312,31 +226,11 @@ export default function Dashboard() {
 
       {/* Date Card */}
       {showDateCard && (
-        <Card
-          className="bg-white shadow-lg outline outline-gray-200 mt-1 outline-1 p-4 flex-1 relative mr-1 ml-[-1px] h-full flex flex-col"
-          id="date-card"
-        >
-          <button
-            onClick={() => setShowDateCard(false)}
-            className="text-gray-500 hover:text-gray-800 absolute top-4 right-4 transition-transform transform hover:rotate-180 mt-1 mr-4"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 size-5 hover:text-red-600 hover:scale-150"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9.293l-4.646-4.647a1 1 0 00-1.414 1.414L8.586 10l-4.646 4.646a1 1 0 001.414 1.414L10 10.414l4.646 4.646a1 1 0 001.414-1.414L11.414 10l4.646-4.646a1 1 0 00-1.414-1.414L10 9.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-          <div className="flex flex-col flex-grow mt-10 mb-5 mr-5 ml-5 dboardCalendar">
-            <CalendarComponent remindersChecked={remindersChecked} />
-          </div>
-        </Card>
+        <DateCard
+          showDateCard={showDateCard}
+          setShowDateCard={setShowDateCard}
+          remindersChecked={remindersChecked}
+        />
       )}
     </div>
   );

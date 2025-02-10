@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Line } from "react-chartjs-2";
+import {UsageMonitoringChart,} from "../../../Components/Charts/DashboardCharts";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -19,7 +19,8 @@ import {
   DEFAULT_PROFILE_IMAGE,
   USAGE_MONITOR_DATA,
 } from "../../../data/placeholderData";
-import CardUsageReport from "../../../Components/ui/cardUsageReport";
+import CardUsageReport from "../../../Components/Reports/cardUsageReport";
+
 
 // Register ChartJS components
 ChartJS.register(
@@ -43,133 +44,7 @@ export default function UsageMonitor() {
   };
 
   // Usage Monitoring Chart Data
-  const usageData = {
-    labels: [
-      "7:00 AM",
-      "8:00 AM",
-      "9:00 AM",
-      "10:00 AM",
-      "11:00 AM",
-      "12:00 NN",
-      "1:00 PM",
-      "2:00 PM",
-      "3:00 PM",
-      "4:00 PM",
-      "5:00 PM",
-      "6:00 PM",
-    ],
-    datasets: [
-      {
-        label: "Usage",
-        data: [65, 15, 25, 20, 35, 18, 60, 22, 45, 50, 85, 40],
-        fill: true,
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        borderColor: "rgba(54, 162, 235, 1)",
-        pointBackgroundColor: function (context) {
-          const index = context.dataIndex;
-          const chart = context.chart;
-          const peakDataset = chart.getDatasetMeta(1);
-          if (!peakDataset.hidden && index === 10) {
-            return "rgba(255, 99, 132, 1)";
-          } else if (peakDataset.hidden && index === 10) {
-            return "rgba(54, 162, 235, 1)";
-          }
-          return "rgba(54, 162, 235, 1)";
-        },
-        pointRadius: function (context) {
-          const index = context.dataIndex;
-          const chart = context.chart;
-          const peakDataset = chart.getDatasetMeta(1);
-          if (!peakDataset.hidden && index === 10) {
-            return 6;
-          } else if (peakDataset.hidden && index === 10) {
-            return 4;
-          }
-          return 4;
-        },
-        tension: 0.4,
-      },
-      {
-        label: "Peak Usage Point",
-        data: [
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          85,
-          null,
-        ],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        pointBackgroundColor: "rgba(255, 99, 132, 1)",
-        pointBorderColor: "rgba(255, 99, 132, 1)",
-        pointRadius: 6,
-        borderWidth: 1,
-        hidden: false,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "bottom",
-        onClick: (e, legendItem, legend) => {
-          const index = legendItem.datasetIndex;
-          const ci = legend.chart;
-          const datasetMeta = ci.getDatasetMeta(index);
-          datasetMeta.hidden = !datasetMeta.hidden;
-          ci.update();
-        },
-      },
-      tooltip: {
-        callbacks: {
-          label: function (tooltipItem) {
-            const chart = tooltipItem.chart;
-            const peakDataset = chart.getDatasetMeta(1);
-            const isPeakShown = !peakDataset.hidden;
-            const dataIndex = tooltipItem.dataIndex;
-
-            if (
-              isPeakShown &&
-              dataIndex === 10 &&
-              tooltipItem.dataset.label === "Usage"
-            ) {
-              return `Peak: ${tooltipItem.raw} Users`;
-            }
-            if (tooltipItem.dataset.label === "Peak Usage Point") {
-              return null;
-            }
-            return `Usage: ${tooltipItem.raw} Users`;
-          },
-        },
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-      x: {
-        grid: {
-          display: true,
-        },
-        offset: true,
-        ticks: {
-          maxRotation: 0,
-          minRotation: 0,
-        },
-      },
-    },
-  };
-
+ 
   return (
     <div className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg">
       {/* Main Content Container */}
@@ -191,13 +66,7 @@ export default function UsageMonitor() {
               </div>
             </div>
             <div className="flex-1 p-4 min-h-0">
-              <Line
-                data={usageData}
-                options={{
-                  ...chartOptions,
-                  maintainAspectRatio: false,
-                }}
-              />
+            <UsageMonitoringChart showHeading={false} />
             </div>
           </div>
 
