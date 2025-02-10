@@ -17,7 +17,7 @@ import {
   DEFAULT_PROFILE_IMAGE,
   USAGE_MONITOR_DATA,
 } from "../../../data/placeholderData";
-import CardUsageReport from "../../../Components/ui/cardUsageReport";
+import CardUsageReport from "../../../Components/Reports/cardUsageReport";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
