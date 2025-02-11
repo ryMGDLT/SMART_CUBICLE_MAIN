@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Pencil, Trash, Printer } from "heroicons-react";
 import {
   JANITORS_DATA,
@@ -6,46 +6,407 @@ import {
 } from "../../../data/placeholderData";
 
 export default function Janitors() {
+  const [activeTab, setActiveTab] = useState("Basic Details");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("Basic Details");
   const itemsPerPage = 6;
 
-  // Pagination calculation
-  const filteredData = JANITORS_DATA.filter((janitor) =>
-    Object.values(janitor).some((value) =>
-      value.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  // Filtering logic
+  const filteredJanitors = useMemo(() => {
+    return JANITORS_DATA.filter((janitor) => {
+      const hasRequiredProperties =
+        activeTab === "Basic Details"
+          ? janitor.basicDetails
+          : activeTab === "Schedule"
+          ? janitor.schedule
+          : activeTab === "Performance Track"
+          ? janitor.performanceTrack
+          : activeTab === "Resource Usage"
+          ? janitor.resourceUsage
+          : activeTab === "Logs and Report"
+          ? janitor.logsReport
+          : null;
+
+      if (!hasRequiredProperties) return false;
+
+      return Object.values(hasRequiredProperties)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    });
+  }, [searchTerm, activeTab]);
+
+  const currentItems = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return filteredJanitors.slice(indexOfFirstItem, indexOfLastItem);
+  }, [currentPage, filteredJanitors, itemsPerPage]);
+
+  const totalPages = useMemo(
+    () => Math.ceil(filteredJanitors.length / itemsPerPage),
+    [filteredJanitors, itemsPerPage]
   );
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const currentItems = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  const pageNumbers = useMemo(
+    () => Array.from({ length: totalPages }, (_, i) => i + 1),
+    [totalPages]
   );
 
-  // Generate page numbers array
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-  // Pagination handlers
-  const handlePrevPage = () => {
-    setCurrentPage((p) => Math.max(1, p - 1));
+  // Handlers
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
   };
 
-  const handleNextPage = () => {
+  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePrevPage = () => setCurrentPage((p) => Math.max(1, p - 1));
+  const handleNextPage = () =>
     setCurrentPage((p) => Math.min(totalPages, p + 1));
+
+  const handleEdit = (id) => {
+    console.log("Edit janitor:", id);
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
+  const handleDelete = (id) => {
+    console.log("Delete janitor:", id);
   };
 
-  const handlePrint = () => {
-    // Add print functionality here
-  };
+  const renderCard = (janitor, tab) => {
+    // Get the correct data object based on the tab
+    const data =
+      tab === "Basic Details"
+        ? janitor.basicDetails
+        : tab === "Schedule"
+        ? janitor.schedule
+        : tab === "Performance Track"
+        ? janitor.performanceTrack
+        : tab === "Resource Usage"
+        ? janitor.resourceUsage
+        : tab === "Logs and Report"
+        ? janitor.logsReport
+        : null;
 
-  const handleGenerate = () => {
-    // Add generate report functionality here
+    if (!data) return null;
+
+    switch (tab) {
+      case "Basic Details":
+        return (
+          <div className="flex gap-4">
+            <img
+              src={data.image || DEFAULT_PROFILE_IMAGE}
+              alt={data.name}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <p className="text-xs text-gray-500">{data.employeeId}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleEdit(data.employeeId)}
+                  >
+                    <Pencil size={18} />
+                  </button>
+                  <button
+                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleDelete(data.employeeId)}
+                  >
+                    <Trash size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-1 text-sm">
+                <p className="text-gray-600">{data.email}</p>
+                <p className="text-gray-600">{data.contact}</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "Schedule":
+        return (
+          <div className="flex gap-4">
+            <img
+              src={data.image || DEFAULT_PROFILE_IMAGE}
+              alt={data.name}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <p className="text-xs text-gray-500">{data.date}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleEdit(data.employeeId)}
+                  >
+                    <Pencil size={18} />
+                  </button>
+                  <button
+                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleDelete(data.employeeId)}
+                  >
+                    <Trash size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <p className="text-gray-500">Shift</p>
+                  <p className="font-medium">{data.shift}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Time In/Out</p>
+                  <p className="font-medium">
+                    {data.timeIn} - {data.timeOut}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Cleaning Hour</p>
+                  <p className="font-medium">{data.cleaningHour}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Status</p>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      data.status === "On Time"
+                        ? "bg-green-100 text-green-800"
+                        : data.status === "Late"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {data.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "Performance Track":
+        return (
+          <div className="flex gap-4">
+            <img
+              src={data.image || DEFAULT_PROFILE_IMAGE}
+              alt={data.name}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      data.status === "Excellent"
+                        ? "bg-green-100 text-green-800"
+                        : data.status === "Good"
+                        ? "bg-blue-100 text-blue-800"
+                        : data.status === "Fair"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {data.status}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleEdit(data.employeeId)}
+                  >
+                    <Pencil size={18} />
+                  </button>
+                  <button
+                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleDelete(data.employeeId)}
+                  >
+                    <Trash size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <p className="text-gray-500">Today</p>
+                  <p className="font-medium">{data.today} hrs</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">This Week</p>
+                  <p className="font-medium">{data.thisWeek} hrs</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">This Month</p>
+                  <p className="font-medium">{data.thisMonth} hrs</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">This Year</p>
+                  <p className="font-medium">{data.thisYear} hrs</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "Resource Usage":
+        return (
+          <div className="flex gap-4">
+            <img
+              src={data.image || DEFAULT_PROFILE_IMAGE}
+              alt={data.name}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <p className="text-xs text-gray-500">{data.resource}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleEdit(data.employeeId)}
+                  >
+                    <Pencil size={18} />
+                  </button>
+                  <button
+                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleDelete(data.employeeId)}
+                  >
+                    <Trash size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <p className="text-gray-500">Amount Used</p>
+                  <p className="font-medium">{data.amountUsed}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Remaining</p>
+                  <p className="font-medium">{data.remaining}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Restocked</p>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      data.restocked === "Yes"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {data.restocked}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-gray-500">Note</p>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      data.note === "Normal Usage"
+                        ? "bg-green-100 text-green-800"
+                        : data.note === "Higher than Average"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : data.note === "Excessive Usage"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {data.note}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "Logs and Report":
+        return (
+          <div className="flex gap-4">
+            <img
+              src={data.image || DEFAULT_PROFILE_IMAGE}
+              alt={data.name}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <p className="text-xs text-gray-500">{data.date}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleEdit(data.employeeId)}
+                  >
+                    <Pencil size={18} />
+                  </button>
+                  <button
+                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
+                    onClick={() => handleDelete(data.employeeId)}
+                  >
+                    <Trash size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <p className="text-gray-500">Time</p>
+                  <p className="font-medium">
+                    {data.startTime} - {data.endTime}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Duration</p>
+                  <p className="font-medium">{data.duration} hrs</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Task</p>
+                  <p className="font-medium">{data.task}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Status</p>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      data.status === "Done"
+                        ? "bg-green-100 text-green-800"
+                        : data.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {data.status}
+                  </span>
+                </div>
+                <div className="col-span-2 flex gap-4">
+                  <a
+                    href={data.beforePicture}
+                    className="text-blue-600 hover:underline text-sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Before Picture
+                  </a>
+                  <a
+                    href={data.afterPicture}
+                    className="text-blue-600 hover:underline text-sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    After Picture
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return <div>No content available</div>;
+    }
   };
 
   return (
@@ -58,27 +419,13 @@ export default function Janitors() {
             <h2 className="text-lg font-bold">Janitors</h2>
             <div className="flex items-center gap-2">
               <button
-                onClick={handleGenerate}
+                onClick={() => console.log("Generate Schedule")}
                 className="bg-Icpetgreen text-white px-3 py-1.5 rounded-lg text-sm hover:bg-opacity-90 flex items-center gap-1"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
                 Generate
               </button>
               <button
-                onClick={handlePrint}
+                onClick={() => console.log("Print")}
                 className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
               >
                 <Printer className="w-5 h-5 text-Icpetgreen" />
@@ -89,33 +436,26 @@ export default function Janitors() {
           <div className="relative">
             <input
               type="text"
-              id="Search"
+              placeholder="Search"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search name, ID, email, or contact"
+              onChange={handleSearch}
               className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
             />
             <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
-              <button
-                type="button"
-                className="text-Icpetgreen hover:text-gray-700"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <span className="sr-only">Search</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="h-4 w-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                  />
-                </svg>
-              </button>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
             </span>
           </div>
         </div>
@@ -123,61 +463,41 @@ export default function Janitors() {
         {/* Tab Navigation */}
         <div className="mt-2">
           <select
-            id="userTab"
-            className="w-full rounded-md border-gray-200 py-2 text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
             value={activeTab}
             onChange={(e) => setActiveTab(e.target.value)}
+            className="w-full rounded-lg border-gray-200 p-2.5 text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
           >
             <option>Basic Details</option>
             <option>Schedule</option>
-            <option>Performance Task</option>
+            <option>Performance Track</option>
             <option>Resource Usage</option>
             <option>Logs and Report</option>
           </select>
         </div>
       </div>
 
-      {/* Scrollable Content Area */}
+      {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-2">
         <div className="flex flex-col gap-3 pb-16">
-          {currentItems.map((janitor, index) => (
-            <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
-              <div className="flex gap-4">
-                <img
-                  src={janitor.image || DEFAULT_PROFILE_IMAGE}
-                  alt={`${janitor.name}'s profile`}
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-base font-medium">{janitor.name}</h3>
-                      <p className="text-xs text-gray-500">
-                        {janitor.employeeId}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button className="text-Icpetgreen p-1 hover:bg-gray-100 rounded">
-                        <Pencil size={18} />
-                      </button>
-                      <button className="text-red-500 p-1 hover:bg-gray-100 rounded">
-                        <Trash size={18} />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="text-sm">
-                    <p className="text-gray-600">{janitor.email}</p>
-                    <p className="text-gray-600">{janitor.contact}</p>
-                  </div>
-                </div>
+          {currentItems.length > 0 ? (
+            currentItems.map((janitor, index) => (
+              <div
+                key={`${activeTab}-${index}`}
+                className="bg-white p-4 rounded-lg shadow-sm"
+              >
+                {renderCard(janitor, activeTab)}
               </div>
+            ))
+          ) : (
+            <div className="bg-white p-8 rounded-lg shadow-sm text-center text-gray-500">
+              No results found. Please try a different search term.
             </div>
-          ))}
+          )}
         </div>
       </div>
 
-      {/* Fixed Footer - Pagination */}
-      <div className="bg-white border-t border-gray-200 p-2 shadow-sm">
+      {/* Fixed Pagination */}
+      <div className="shrink-0 bg-white border-t border-gray-200 px-4 py-2">
         <ol className="flex justify-center gap-1 text-xs font-medium">
           <li>
             <button
