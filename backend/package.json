@@ -1,21 +1,28 @@
 {
-  "name": "smart_cubicle_main",
+  "name": "backend",
   "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "author": "RYMGDLT",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@testing-library/react": "^16.2.0",
+    "@sendgrid/mail": "^8.1.4",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "g": "^2.0.1",
-    "mongoose": "^8.9.5",
-    "nodemon": "^3.1.9",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "web-vitals": "^4.2.4"
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.13.0",
+    "mongoose": "^8.10.0",
+    "nodemailer": "^6.10.0",
+    "nodemon": "^3.1.9"
   }
 }

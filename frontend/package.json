@@ -11,6 +11,7 @@
     "@heroicons/react": "^1.0.6",
     "ajv": "^8.17.1",
     "ajv-keywords": "^5.1.0",
+    "axios": "^1.7.9",
     "chart.js": "^4.0.0",
     "chartjs-plugin-annotation": "^3.1.0",
     "cookie": "^1.0.2",
