@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { USERS_DATA } from "../../../data/placeholderData";
 
 export default function Users() {
@@ -9,93 +9,28 @@ export default function Users() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
-  // Improved search function with fuzzy matching
-  const searchUsers = (data, term) => {
-    if (!term.trim()) return data;
+  // Update filteredData to include both search and tab filtering
+  const filteredData = useMemo(() => {
+    return USERS_DATA.filter((user) => {
+      const matchesTab =
+        activeTab === "All" ||
+        (activeTab === "Requests" && user.status === "Pending") ||
+        (activeTab === "Accepted" && user.status === "Accepted") ||
+        (activeTab === "Declined" && user.status === "Declined");
 
-    const searchValue = term.toLowerCase();
-
-    return data.filter((user) => {
-      // Check each field individually for better matching
-      const nameMatch = fuzzyMatch(user.name.toLowerCase(), searchValue);
-      const idMatch = user.employeeId.toLowerCase().includes(searchValue);
-      const emailMatch = user.email.toLowerCase().includes(searchValue);
-      const contactMatch = user.contact.includes(searchValue);
-      const positionMatch = user.position.toLowerCase().includes(searchValue);
-
-      // Return true if any field matches
-      return (
-        nameMatch || idMatch || emailMatch || contactMatch || positionMatch
+      const matchesSearch = Object.values(user).some((value) =>
+        String(value).toLowerCase().includes(searchTerm.toLowerCase())
       );
+
+      return matchesTab && matchesSearch;
     });
-  };
-
-  // Improved fuzzy matching function
-  const fuzzyMatch = (str, pattern) => {
-    // Exact match check
-    if (str.includes(pattern)) return true;
-
-    // Convert strings to arrays for manipulation
-    const strArr = str.split("");
-    const patternArr = pattern.split("");
-
-    // Initialize matrix for dynamic programming
-    const matrix = Array(patternArr.length + 1)
-      .fill()
-      .map(() => Array(strArr.length + 1).fill(0));
-
-    // Initialize first row and column
-    for (let i = 0; i <= strArr.length; i++) {
-      matrix[0][i] = i;
-    }
-    for (let i = 0; i <= patternArr.length; i++) {
-      matrix[i][0] = i;
-    }
-
-    // Fill matrix
-    for (let i = 1; i <= patternArr.length; i++) {
-      for (let j = 1; j <= strArr.length; j++) {
-        const cost = strArr[j - 1] === patternArr[i - 1] ? 0 : 1;
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j] + 1, // deletion
-          matrix[i][j - 1] + 1, // insertion
-          matrix[i - 1][j - 1] + cost // substitution
-        );
-      }
-    }
-
-    // Get the minimum edit distance
-    const distance = matrix[patternArr.length][strArr.length];
-
-    // Calculate threshold based on pattern length
-    const threshold = Math.floor(pattern.length * 0.4); // 40% tolerance
-
-    // Return true if distance is within threshold
-    return distance <= threshold;
-  };
-
-  // Filter users based on active tab and search term
-  const filterUsersByTab = (users) => {
-    switch (activeTab) {
-      case "Requests":
-        return users.filter((user) => user.status === "Pending");
-      case "Accepted":
-        return users.filter((user) => user.status === "Accepted");
-      case "Declined":
-        return users.filter((user) => user.status === "Declined");
-      default: // "All" tab
-        return users;
-    }
-  };
-
-  // Apply both search and tab filters
-  const filteredUsers = filterUsersByTab(searchUsers(USERS_DATA, searchTerm));
+  }, [searchTerm, activeTab]);
 
   // Calculate pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   // Generate page numbers array dynamically
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -225,7 +160,7 @@ export default function Users() {
             id="Search"
             value={searchTerm}
             onChange={handleSearch}
-            placeholder="Search name, ID, position, etc."
+            placeholder="Search"
             className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
           />
 
@@ -383,7 +318,7 @@ export default function Users() {
           </table>
         </div>
 
-        {/* Pagination - Fixed at bottom */}
+        {/* Pagination*/}
         <div className="shrink-0 rounded-b-lg border-t border-gray-200 px-4 py-2 bg-white">
           <ol className="flex justify-center gap-1 text-xs font-medium">
             <li>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Trash, Pencil, Printer } from "heroicons-react";
 import {
   JANITORS_DATA,
@@ -9,87 +9,57 @@ export default function Janitors() {
   const [activeTab, setActiveTab] = useState("Basic Details");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 10; // Fixed number of items per page
+  const itemsPerPage = 10;
 
-  // Improved search function with better fuzzy matching
-  const searchJanitors = (data, term) => {
-    if (!term.trim()) return data;
+  // Memoize filtered data to prevent unnecessary recalculations
+  const filteredJanitors = useMemo(() => {
+    return JANITORS_DATA.filter((janitor) => {
+      // Check if the required properties exist based on activeTab
+      const hasRequiredProperties =
+        activeTab === "Basic Details"
+          ? janitor.basicDetails
+          : activeTab === "Schedule"
+          ? janitor.schedule
+          : activeTab === "Performance Track"
+          ? janitor.performanceTrack
+          : activeTab === "Resource Usage"
+          ? janitor.resourceUsage
+          : activeTab === "Logs and Report"
+          ? janitor.logsReport
+          : null;
 
-    const searchValue = term.toLowerCase();
+      if (!hasRequiredProperties) return false;
 
-    return data.filter((janitor) => {
-      // Check each field individually for better matching
-      const nameMatch = fuzzyMatch(janitor.name.toLowerCase(), searchValue);
-      const idMatch = janitor.employeeId.toLowerCase().includes(searchValue);
-      const emailMatch = janitor.email.toLowerCase().includes(searchValue);
-      const contactMatch = janitor.contact.includes(searchValue);
-
-      // Return true if any field matches
-      return nameMatch || idMatch || emailMatch || contactMatch;
+      // Then do the search filtering
+      return Object.values(hasRequiredProperties)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
     });
-  };
+  }, [searchTerm, activeTab]);
 
-  // Improved fuzzy matching function
-  const fuzzyMatch = (str, pattern) => {
-    // Exact match check
-    if (str.includes(pattern)) return true;
+  // Memoize current items
+  const currentItems = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return filteredJanitors.slice(indexOfFirstItem, indexOfLastItem);
+  }, [currentPage, filteredJanitors, itemsPerPage]);
 
-    // Convert strings to arrays for manipulation
-    const strArr = str.split("");
-    const patternArr = pattern.split("");
-
-    // Initialize matrix for dynamic programming
-    const matrix = Array(patternArr.length + 1)
-      .fill()
-      .map(() => Array(strArr.length + 1).fill(0));
-
-    // Initialize first row and column
-    for (let i = 0; i <= strArr.length; i++) {
-      matrix[0][i] = i;
-    }
-    for (let i = 0; i <= patternArr.length; i++) {
-      matrix[i][0] = i;
-    }
-
-    // Fill matrix
-    for (let i = 1; i <= patternArr.length; i++) {
-      for (let j = 1; j <= strArr.length; j++) {
-        const cost = strArr[j - 1] === patternArr[i - 1] ? 0 : 1;
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j] + 1, // deletion
-          matrix[i][j - 1] + 1, // insertion
-          matrix[i - 1][j - 1] + cost // substitution
-        );
-      }
-    }
-
-    // Get the minimum edit distance
-    const distance = matrix[patternArr.length][strArr.length];
-
-    // Calculate threshold based on pattern length
-    const threshold = Math.floor(pattern.length * 0.4); // 40% tolerance
-
-    // Return true if distance is within threshold
-    return distance <= threshold;
-  };
-
-  const filteredJanitors = searchJanitors(JANITORS_DATA, searchTerm);
-
-  // Calculate pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredJanitors.slice(
-    indexOfFirstItem,
-    indexOfLastItem
+  // Memoize total pages
+  const totalPages = useMemo(
+    () => Math.ceil(filteredJanitors.length / itemsPerPage),
+    [filteredJanitors, itemsPerPage]
   );
-  const totalPages = Math.ceil(filteredJanitors.length / itemsPerPage);
 
-  // Generate page numbers array dynamically
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // Memoize page numbers array
+  const pageNumbers = useMemo(
+    () => Array.from({ length: totalPages }, (_, i) => i + 1),
+    [totalPages]
+  );
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
 
   const handlePageChange = (page) => {
@@ -97,270 +67,1084 @@ export default function Janitors() {
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    setCurrentPage((prev) => Math.max(1, prev - 1));
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+  };
+
+  const handleEdit = (id) => {
+    console.log("Edit janitor:", id);
+  };
+
+  const handleDelete = (id) => {
+    console.log("Delete janitor:", id);
+  };
+
+  const renderTable = () => {
+    switch (activeTab) {
+      case "Basic Details":
+        return (
+          <div className="flex flex-col h-full">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="w-20 p-4 text-left text-xs font-medium text-gray-500">
+                      Profile
+                    </th>
+                    <th className="w-48 p-4 text-left text-xs font-medium text-gray-500">
+                      Name
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Employee ID
+                    </th>
+                    <th className="w-64 p-4 text-left text-xs font-medium text-gray-500">
+                      Email
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Contact
+                    </th>
+                    <th className="w-24 p-4 text-left text-xs font-medium text-gray-500">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentItems.length > 0 ? (
+                    currentItems.map(
+                      (janitor, index) =>
+                        janitor.basicDetails && (
+                          <tr
+                            key={`${activeTab}-${janitor.basicDetails.employeeId}-${index}`}
+                          >
+                            <td className="w-20 p-4 whitespace-nowrap">
+                              <img
+                                src={
+                                  janitor.basicDetails.image ||
+                                  DEFAULT_PROFILE_IMAGE
+                                }
+                                alt={janitor.basicDetails.name}
+                                className="h-10 w-10 rounded-full object-cover"
+                              />
+                            </td>
+                            <td className="w-48 p-4 whitespace-nowrap font-medium text-gray-900">
+                              {janitor.basicDetails.name}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.basicDetails.employeeId}
+                            </td>
+                            <td className="w-64 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.basicDetails.email}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.basicDetails.contact}
+                            </td>
+                            <td className="w-24 p-4 whitespace-nowrap">
+                              <div className="flex gap-2">
+                                <button
+                                  className="text-Icpetgreen hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleEdit(janitor.basicDetails.employeeId)
+                                  }
+                                  aria-label="Edit"
+                                >
+                                  <Pencil className="w-5 h-5" />
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleDelete(
+                                      janitor.basicDetails.employeeId
+                                    )
+                                  }
+                                  aria-label="Delete"
+                                >
+                                  <Trash className="w-5 h-5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                    )
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="px-4 py-8 text-center text-gray-500"
+                      >
+                        No results found. Please try a different search term.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-2">
+              <ol className="flex justify-center gap-1 text-xs font-medium">
+                <li>
+                  <button
+                    onClick={handlePrevPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === 1}
+                  >
+                    <span className="sr-only">Prev Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+
+                {pageNumbers.map((page) => (
+                  <li key={page}>
+                    <button
+                      onClick={() => handlePageChange(page)}
+                      className={`h-8 w-8 rounded border ${
+                        currentPage === page
+                          ? "border-Icpetgreen bg-Icpetgreen text-white"
+                          : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
+                      } text-center leading-8`}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+
+                <li>
+                  <button
+                    onClick={handleNextPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="sr-only">Next Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </ol>
+            </div>
+          </div>
+        );
+
+      case "Schedule":
+        return (
+          <div className="flex flex-col h-full">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="w-20 p-4 text-left text-xs font-medium text-gray-500">
+                      Profile
+                    </th>
+                    <th className="w-48 p-4 text-left text-xs font-medium text-gray-500">
+                      Name
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Date
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Shift
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Time In
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Time Out
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Cleaning Hour
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Task
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Status
+                    </th>
+                    <th className="w-24 p-4 text-left text-xs font-medium text-gray-500">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentItems.length > 0 ? (
+                    currentItems.map(
+                      (janitor, index) =>
+                        janitor.schedule && (
+                          <tr
+                            key={`${activeTab}-${janitor.schedule.employeeId}-${index}`}
+                          >
+                            <td className="w-20 p-4 whitespace-nowrap">
+                              <img
+                                src={janitor.schedule.image}
+                                alt={janitor.schedule.name}
+                                className="h-10 w-10 rounded-full object-cover"
+                              />
+                            </td>
+                            <td className="w-48 p-4 whitespace-nowrap font-medium text-gray-900">
+                              {janitor.schedule.name}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.schedule.date}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.schedule.shift}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.schedule.timeIn}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.schedule.timeOut}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.schedule.cleaningHour}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.schedule.task}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  janitor.schedule.status === "On Time"
+                                    ? "bg-green-100 text-green-800"
+                                    : janitor.schedule.status === "Late"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-yellow-100 text-yellow-800"
+                                }`}
+                              >
+                                {janitor.schedule.status}
+                              </span>
+                            </td>
+                            <td className="w-24 p-4 whitespace-nowrap">
+                              <div className="flex gap-2">
+                                <button
+                                  className="text-Icpetgreen hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleEdit(janitor.schedule.employeeId)
+                                  }
+                                  aria-label="Edit"
+                                >
+                                  <Pencil className="w-5 h-5" />
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleDelete(janitor.schedule.employeeId)
+                                  }
+                                  aria-label="Delete"
+                                >
+                                  <Trash className="w-5 h-5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                    )
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="10"
+                        className="px-4 py-8 text-center text-gray-500"
+                      >
+                        No results found. Please try a different search term.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-2">
+              <ol className="flex justify-center gap-1 text-xs font-medium">
+                <li>
+                  <button
+                    onClick={handlePrevPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === 1}
+                  >
+                    <span className="sr-only">Prev Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+
+                {pageNumbers.map((page) => (
+                  <li key={page}>
+                    <button
+                      onClick={() => handlePageChange(page)}
+                      className={`h-8 w-8 rounded border ${
+                        currentPage === page
+                          ? "border-Icpetgreen bg-Icpetgreen text-white"
+                          : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
+                      } text-center leading-8`}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+
+                <li>
+                  <button
+                    onClick={handleNextPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="sr-only">Next Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </ol>
+            </div>
+          </div>
+        );
+
+      case "Performance Track":
+        return (
+          <div className="flex flex-col h-full">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="w-20 p-4 text-left text-xs font-medium text-gray-500">
+                      Profile
+                    </th>
+                    <th className="w-48 p-4 text-left text-xs font-medium text-gray-500">
+                      Name
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Today
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      This Week
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      This Month
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      This Year
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Max Hours
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Min Hours
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Status
+                    </th>
+                    <th className="w-24 p-4 text-left text-xs font-medium text-gray-500">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentItems.length > 0 ? (
+                    currentItems.map(
+                      (janitor, index) =>
+                        janitor.performanceTrack && (
+                          <tr
+                            key={`${activeTab}-${janitor.performanceTrack.employeeId}-${index}`}
+                          >
+                            <td className="w-20 p-4 whitespace-nowrap">
+                              <img
+                                src={janitor.performanceTrack.image}
+                                alt={janitor.performanceTrack.name}
+                                className="h-10 w-10 rounded-full object-cover"
+                              />
+                            </td>
+                            <td className="w-48 p-4 whitespace-nowrap font-medium text-gray-900">
+                              {janitor.performanceTrack.name}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.performanceTrack.today}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.performanceTrack.thisWeek}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.performanceTrack.thisMonth}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.performanceTrack.thisYear}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.performanceTrack.maxCleaningHours}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.performanceTrack.minCleaningHours}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  janitor.performanceTrack.status ===
+                                  "Excellent"
+                                    ? "bg-green-100 text-green-800"
+                                    : janitor.performanceTrack.status === "Good"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : janitor.performanceTrack.status === "Fair"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {janitor.performanceTrack.status}
+                              </span>
+                            </td>
+                            <td className="w-24 p-4 whitespace-nowrap">
+                              <div className="flex gap-2">
+                                <button
+                                  className="text-Icpetgreen hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleEdit(
+                                      janitor.performanceTrack.employeeId
+                                    )
+                                  }
+                                  aria-label="Edit"
+                                >
+                                  <Pencil className="w-5 h-5" />
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleDelete(
+                                      janitor.performanceTrack.employeeId
+                                    )
+                                  }
+                                  aria-label="Delete"
+                                >
+                                  <Trash className="w-5 h-5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                    )
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="10"
+                        className="px-4 py-8 text-center text-gray-500"
+                      >
+                        No results found. Please try a different search term.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-2">
+              <ol className="flex justify-center gap-1 text-xs font-medium">
+                <li>
+                  <button
+                    onClick={handlePrevPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === 1}
+                  >
+                    <span className="sr-only">Prev Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+
+                {pageNumbers.map((page) => (
+                  <li key={page}>
+                    <button
+                      onClick={() => handlePageChange(page)}
+                      className={`h-8 w-8 rounded border ${
+                        currentPage === page
+                          ? "border-Icpetgreen bg-Icpetgreen text-white"
+                          : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
+                      } text-center leading-8`}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+
+                <li>
+                  <button
+                    onClick={handleNextPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="sr-only">Next Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </ol>
+            </div>
+          </div>
+        );
+
+      case "Resource Usage":
+        return (
+          <div className="flex flex-col h-full">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="w-20 p-4 text-left text-xs font-medium text-gray-500">
+                      Profile
+                    </th>
+                    <th className="w-48 p-4 text-left text-xs font-medium text-gray-500">
+                      Name
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Resource
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Amount Used
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Remaining
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Restocked
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Note
+                    </th>
+                    <th className="w-24 p-4 text-left text-xs font-medium text-gray-500">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentItems.length > 0 ? (
+                    currentItems.map(
+                      (janitor, index) =>
+                        janitor.resourceUsage && (
+                          <tr
+                            key={`${activeTab}-${janitor.resourceUsage.employeeId}-${index}`}
+                          >
+                            <td className="w-20 p-4 whitespace-nowrap">
+                              <img
+                                src={janitor.resourceUsage.image}
+                                alt={janitor.resourceUsage.name}
+                                className="h-10 w-10 rounded-full object-cover"
+                              />
+                            </td>
+                            <td className="w-48 p-4 whitespace-nowrap font-medium text-gray-900">
+                              {janitor.resourceUsage.name}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.resourceUsage.resource}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.resourceUsage.amountUsed}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.resourceUsage.remaining}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  janitor.resourceUsage.restocked === "Yes"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {janitor.resourceUsage.restocked}
+                              </span>
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  janitor.resourceUsage.note === "Normal Usage"
+                                    ? "bg-green-100 text-green-800"
+                                    : janitor.resourceUsage.note ===
+                                      "Higher than Average"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : janitor.resourceUsage.note ===
+                                      "Excessive Usage"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-gray-100 text-gray-800"
+                                }`}
+                              >
+                                {janitor.resourceUsage.note}
+                              </span>
+                            </td>
+                            <td className="w-24 p-4 whitespace-nowrap">
+                              <div className="flex gap-2">
+                                <button
+                                  className="text-Icpetgreen hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleEdit(janitor.resourceUsage.employeeId)
+                                  }
+                                  aria-label="Edit"
+                                >
+                                  <Pencil className="w-5 h-5" />
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleDelete(
+                                      janitor.resourceUsage.employeeId
+                                    )
+                                  }
+                                  aria-label="Delete"
+                                >
+                                  <Trash className="w-5 h-5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                    )
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="8"
+                        className="px-4 py-8 text-center text-gray-500"
+                      >
+                        No results found. Please try a different search term.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-2">
+              <ol className="flex justify-center gap-1 text-xs font-medium">
+                <li>
+                  <button
+                    onClick={handlePrevPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === 1}
+                  >
+                    <span className="sr-only">Prev Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+
+                {pageNumbers.map((page) => (
+                  <li key={page}>
+                    <button
+                      onClick={() => handlePageChange(page)}
+                      className={`h-8 w-8 rounded border ${
+                        currentPage === page
+                          ? "border-Icpetgreen bg-Icpetgreen text-white"
+                          : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
+                      } text-center leading-8`}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+
+                <li>
+                  <button
+                    onClick={handleNextPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="sr-only">Next Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </ol>
+            </div>
+          </div>
+        );
+
+      case "Logs and Report":
+        return (
+          <div className="flex flex-col h-full">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="w-20 p-4 text-left text-xs font-medium text-gray-500">
+                      Profile
+                    </th>
+                    <th className="w-48 p-4 text-left text-xs font-medium text-gray-500">
+                      Name
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Date
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Start Time
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      End Time
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Duration
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Task
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Before
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      After
+                    </th>
+                    <th className="w-40 p-4 text-left text-xs font-medium text-gray-500">
+                      Status
+                    </th>
+                    <th className="w-24 p-4 text-left text-xs font-medium text-gray-500">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentItems.length > 0 ? (
+                    currentItems.map(
+                      (janitor, index) =>
+                        janitor.logsReport && (
+                          <tr
+                            key={`${activeTab}-${janitor.logsReport.employeeId}-${index}`}
+                          >
+                            <td className="w-20 p-4 whitespace-nowrap">
+                              <img
+                                src={janitor.logsReport.image}
+                                alt={janitor.logsReport.name}
+                                className="h-10 w-10 rounded-full object-cover"
+                              />
+                            </td>
+                            <td className="w-48 p-4 whitespace-nowrap font-medium text-gray-900">
+                              {janitor.logsReport.name}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.logsReport.date}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.logsReport.startTime}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.logsReport.endTime}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.logsReport.duration} hrs
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap text-gray-700">
+                              {janitor.logsReport.task}
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap">
+                              <a
+                                href={janitor.logsReport.beforePicture}
+                                className="text-blue-600 hover:underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                View
+                              </a>
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap">
+                              <a
+                                href={janitor.logsReport.afterPicture}
+                                className="text-blue-600 hover:underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                View
+                              </a>
+                            </td>
+                            <td className="w-40 p-4 whitespace-nowrap">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  janitor.logsReport.status === "Done"
+                                    ? "bg-green-100 text-green-800"
+                                    : janitor.logsReport.status === "Pending"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {janitor.logsReport.status}
+                              </span>
+                            </td>
+                            <td className="w-24 p-4 whitespace-nowrap">
+                              <div className="flex gap-2">
+                                <button
+                                  className="text-Icpetgreen hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleEdit(janitor.logsReport.employeeId)
+                                  }
+                                  aria-label="Edit"
+                                >
+                                  <Pencil className="w-5 h-5" />
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80"
+                                  onClick={() =>
+                                    handleDelete(janitor.logsReport.employeeId)
+                                  }
+                                  aria-label="Delete"
+                                >
+                                  <Trash className="w-5 h-5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                    )
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="11"
+                        className="px-4 py-8 text-center text-gray-500"
+                      >
+                        No results found. Please try a different search term.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-2">
+              <ol className="flex justify-center gap-1 text-xs font-medium">
+                <li>
+                  <button
+                    onClick={handlePrevPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === 1}
+                  >
+                    <span className="sr-only">Prev Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+
+                {pageNumbers.map((page) => (
+                  <li key={page}>
+                    <button
+                      onClick={() => handlePageChange(page)}
+                      className={`h-8 w-8 rounded border ${
+                        currentPage === page
+                          ? "border-Icpetgreen bg-Icpetgreen text-white"
+                          : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
+                      } text-center leading-8`}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+
+                <li>
+                  <button
+                    onClick={handleNextPage}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="sr-only">Next Page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </ol>
+            </div>
+          </div>
+        );
+
+      default:
+        return <div>No content available</div>;
     }
   };
 
   return (
     <div className="h-full flex flex-col shadow-md bg-white rounded-lg p-6">
-      {/* Header - Search Bar and Generate Report Button */}
-      <div className="flex flex-row justify-between shrink-0">
-        {/* Search Bar */}
-        <div className="relative w-1/2">
-          <label htmlFor="Search" className="sr-only">
-            Search
-          </label>
-
+      <div className="flex flex-row justify-between items-center shrink-0">
+        <div className="relative w-96">
           <input
             type="text"
-            id="Search"
+            placeholder="Search"
             value={searchTerm}
             onChange={handleSearch}
-            placeholder="Search name, ID, email, or contact"
-            className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
+            className="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-Icpetgreen focus:border-transparent"
           />
-
-          <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
-            <button
-              type="button"
-              className="text-Icpetgreen hover:text-gray-700"
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <span className="sr-only">Search</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="h-4 w-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
           </span>
         </div>
-        {/* Generate Report Button */}
-        <div className="flex justify-end space-x-4 shrink-0">
+
+        <div className="flex items-center gap-3">
           <button
-            type="button"
-            className="bg-Icpetgreen text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition duration-300 flex items-center gap-2 shadow-md"
+            className="bg-Icpetgreen text-white px-4 py-2 rounded-lg hover:bg-opacity-90"
+            onClick={() => console.log("Generate Schedule")}
           >
-            Generate Report
+            Generate Schedule
           </button>
           <button
-            type="button"
-            className="bg-white px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition duration-300 flex items-center justify-center shadow-md"
+            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50"
+            onClick={() => console.log("Print")}
           >
-            <Printer className="w-5 h-5 text-Icpetgreen hover:text-white" />
+            <Printer className="w-5 h-5 text-Icpetgreen" />
           </button>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="mt-6 shrink-0">
-        <div className="sm:hidden">
-          <label htmlFor="userTab" className="sr-only">
-            User Tab
-          </label>
-
-          <select
-            id="userTab"
-            className="w-full rounded-md border-gray-200"
-            value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value)}
-          >
-            <option>Basic Details</option>
-            <option>Schedule</option>
-            <option>Performance Task</option>
-            <option>Resource Usage</option>
-            <option>Logs and Report</option>
-          </select>
-        </div>
-
-        <div className="hidden sm:block">
-          <nav className="flex gap-6" aria-label="Tabs">
-            {[
-              "Basic Details",
-              "Schedule",
-              "Performance Task",
-              "Resource Usage",
-              "Logs and Report",
-            ].map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`shrink-0 rounded-lg w-32 p-2 text-sm font-medium text-center ${
-                  activeTab === tab
-                    ? "bg-Icpetgreen text-white"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                }`}
-                aria-current={activeTab === tab ? "page" : undefined}
-              >
-                {tab}
-              </button>
-            ))}
-          </nav>
-        </div>
+      <div className="mt-6">
+        <nav className="flex gap-4" aria-label="Tabs">
+          {[
+            "Basic Details",
+            "Schedule",
+            "Performance Track",
+            "Resource Usage",
+            "Logs and Report",
+          ].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                activeTab === tab
+                  ? "bg-Icpetgreen text-white"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* Janitor Table Container */}
-      <div className="mt-3 flex-1 flex flex-col h-full rounded-lg border border-gray-200 overflow-hidden">
-        {/* Table Header - Fixed */}
-        <div className="bg-gray-50">
-          <table className="min-w-full table-fixed divide-y divide-gray-200 bg-white text-sm">
-            <thead className="bg-gray-50">
-              <tr className="border-b-2 border-gray-200">
-                <th className="w-16 py-4 text-center font-medium text-gray-900">
-                  Profile
-                </th>
-                <th className="w-48 py-4 text-center font-medium text-gray-900">
-                  Name
-                </th>
-                <th className="w-48 py-4 text-center font-medium text-gray-900">
-                  Employee ID
-                </th>
-                <th className="w-72 py-4 text-center font-medium text-gray-900">
-                  Employee Email
-                </th>
-                <th className="w-48 py-4 text-center font-medium text-gray-900">
-                  Contact Information
-                </th>
-                <th className="w-32 py-4 text-center font-medium text-gray-900">
-                  Action
-                </th>
-              </tr>
-            </thead>
-          </table>
-        </div>
-
-        {/* Table Body - Scrollable */}
-        <div className="flex-1 overflow-y-auto">
-          <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm table-fixed">
-            <tbody className="divide-y divide-gray-200">
-              {currentItems.length > 0 ? (
-                currentItems.map((janitor) => (
-                  <tr key={janitor.employeeId}>
-                    <td className="w-16 py-4">
-                      <div className="flex justify-center">
-                        <img
-                          src={janitor.image || DEFAULT_PROFILE_IMAGE}
-                          alt={`${janitor.name}'s profile`}
-                          className="h-10 w-10 rounded-full object-cover"
-                        />
-                      </div>
-                    </td>
-                    <td className="w-48 py-4 text-center text-gray-700">
-                      <span className="font-medium text-gray-900">
-                        {janitor.name}
-                      </span>
-                    </td>
-                    <td className="w-48 py-4 text-center text-gray-700">
-                      {janitor.employeeId}
-                    </td>
-                    <td className="w-72 py-4 text-center text-gray-700">
-                      {janitor.email}
-                    </td>
-                    <td className="w-48 py-4 text-center text-gray-700">
-                      {janitor.contact}
-                    </td>
-                    <td className="w-32 py-4">
-                      <div className="flex justify-center gap-2">
-                        <button className="rounded-lg px-3 py-1 text-xs font-medium">
-                          <Pencil className="w-4 h-4 text-Icpetgreen" />
-                        </button>
-                        <button className="rounded-lg px-3 py-1 text-xs font-medium">
-                          <Trash className="w-4 h-4 text-red-500" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center text-gray-500 py-8">
-                    No results found. Please try a different search term.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination - Fixed at bottom */}
-        <div className="shrink-0 rounded-b-lg border-t border-gray-200 px-4 py-2 bg-white">
-          <ol className="flex justify-center gap-1 text-xs font-medium">
-            <li>
-              <button
-                onClick={handlePrevPage}
-                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
-                disabled={currentPage === 1}
-              >
-                <span className="sr-only">Prev Page</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </li>
-
-            {pageNumbers.map((page) => (
-              <li key={page}>
-                <button
-                  onClick={() => handlePageChange(page)}
-                  className={`h-8 w-8 rounded border ${
-                    currentPage === page
-                      ? "border-Icpetgreen bg-Icpetgreen text-white"
-                      : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
-                  } text-center leading-8`}
-                >
-                  {page}
-                </button>
-              </li>
-            ))}
-
-            <li>
-              <button
-                onClick={handleNextPage}
-                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
-                disabled={currentPage === totalPages}
-              >
-                <span className="sr-only">Next Page</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </li>
-          </ol>
-        </div>
+      <div className="flex-1 overflow-hidden mt-6 shadow-md rounded-lg border border-gray-200">
+        {renderTable()}
       </div>
     </div>
   );
