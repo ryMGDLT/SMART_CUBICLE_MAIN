@@ -1,6 +1,6 @@
 import React from "react";
-import { Card } from "../../Components/utils/card";
-import CalendarComponent from "../../Components/Calendar/customCalendar";
+import { Card } from "../utils/card";
+import CalendarComponent from "./customCalendar";
 
 export const DateCard = ({ showDateCard, setShowDateCard, remindersChecked }) => {
   return (
