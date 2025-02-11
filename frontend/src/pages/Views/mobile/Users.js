@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Pencil, Trash, Printer } from "heroicons-react";
 import {
   USERS_DATA,
@@ -6,23 +6,41 @@ import {
 } from "../../../data/placeholderData";
 
 export default function Users() {
+  const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("Basic Details");
   const itemsPerPage = 6;
 
-  // Pagination calculation
-  const filteredData = USERS_DATA.filter((user) =>
-    Object.values(user).some((value) =>
-      value.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  // Update the filtering logic with proper string conversion
+  const filteredData = useMemo(() => {
+    return USERS_DATA.filter((user) => {
+      const matchesTab =
+        activeTab === "All" ||
+        (activeTab === "Requests" && user.status === "Pending") ||
+        (activeTab === "Accepted" && user.status === "Accepted") ||
+        (activeTab === "Declined" && user.status === "Declined");
+
+      const matchesSearch = Object.values(user).some((value) =>
+        // Convert value to string before using toLowerCase()
+        String(value).toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      return matchesTab && matchesSearch;
+    });
+  }, [searchTerm, activeTab]);
+
+  // Calculate pagination
+  const currentItems = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  }, [currentPage, filteredData, itemsPerPage]);
+
+  const totalPages = useMemo(
+    () => Math.ceil(filteredData.length / itemsPerPage),
+    [filteredData, itemsPerPage]
   );
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const currentItems = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   // Handlers
@@ -90,7 +108,7 @@ export default function Users() {
               id="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search name, ID, email, or contact"
+              placeholder="Search"
               className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
             />
             <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
@@ -126,10 +144,10 @@ export default function Users() {
             value={activeTab}
             onChange={(e) => setActiveTab(e.target.value)}
           >
-            <option>Basic Details</option>
-            <option>Usage History</option>
-            <option>Payment History</option>
-            <option>Logs and Report</option>
+            <option>All</option>
+            <option>Requests</option>
+            <option>Accepted</option>
+            <option>Declined</option>
           </select>
         </div>
       </div>
@@ -142,7 +160,7 @@ export default function Users() {
               <div className="flex gap-4">
                 <img
                   src={user.image || DEFAULT_PROFILE_IMAGE}
-                  alt={`${user.name}'s profile`}
+                  alt={user.name}
                   className="h-12 w-12 rounded-full object-cover"
                 />
                 <div className="flex-1">
