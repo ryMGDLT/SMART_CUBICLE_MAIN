@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "../../../Components/Controller/AuthController";
 import { Link } from "react-router-dom";
+import { Button } from "../../../Components/ui/button";
 
 export default function LoginPage() {
   const [username, setUsername] = React.useState("");
@@ -81,12 +82,13 @@ export default function LoginPage() {
             </a>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="w-1/2 mx-auto block bg-Icpetgreen text-white py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+            className="w-1/2 mx-auto block"
+            variant="default"
           >
             Log In
-          </button>
+          </Button>
         </form>
 
         <div className="text-center mt-4">
