@@ -28,6 +28,7 @@
     "react-floating-action-button": "^1.0.5",
     "react-router": "^6.14.1",
     "react-router-dom": "^7.1.5",
+    "shadcn-ui": "^0.9.4",
     "web-vitals": "^4.2.4",
     "yaml": "^2.7.0"
   },
