@@ -36,6 +36,8 @@ export default function Janitors() {
       const tabProperty = activeTab.toLowerCase().replace(/\s+/g, '');
       const propertyKey = tabProperty === 'basicdetails' ? 'basicDetails' 
         : tabProperty === 'logsandreport' ? 'logsReport'
+        : tabProperty === 'performancetrack' ? 'performanceTrack'
+        : tabProperty === 'resourceusage' ? 'resourceUsage'
         : tabProperty;
       
       const data = janitor[propertyKey];
