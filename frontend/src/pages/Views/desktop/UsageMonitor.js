@@ -269,7 +269,7 @@ export default function UsageMonitor() {
                   <div className="w-24 font-medium text-gray-900">Status</div>
                   <div className="w-10"></div>
                 </div>
-              </div>
+      </div>
 
               {/* Scrollable Content */}
               <div className="overflow-y-auto absolute inset-0 pt-12">

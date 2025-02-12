@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -11,13 +11,18 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { ChevronUp, ChevronDown, Pencil, Printer } from "heroicons-react";
+import { ChevronUp, ChevronDown, Pencil, Printer, ChevronLeft, ChevronRight } from "heroicons-react";
 import { RESOURCES_DATA } from "../../../data/placeholderData";
 import ReminderCard from "../../../Components/Reports/reminderCard";
 import { REMINDERS_DATA } from "../../../data/placeholderData";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import "../../../styles/datepicker-custom.css";
+import { Button } from "../../../Components/ui/button";
+import { cn } from "../../../lib/utils";
+import { Calendar } from "../../../Components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../../../Components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format, setDefaultOptions } from "date-fns";
+import { enUS } from "date-fns/locale";
+import { MonthPicker } from "../../../Components/ui/month-picker";
 
 // Register ChartJS components
 ChartJS.register(
@@ -31,17 +36,41 @@ ChartJS.register(
   Legend
 );
 
+// Set default locale for date-fns
+setDefaultOptions({ locale: enUS });
+
 export default function Resources() {
-  // Add these new state variables
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 4;
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [chartType, setChartType] = useState("bar");
+  const [trendsType, setTrendsType] = useState("line");
+
+  // Handler for printing
+  const handlePrint = () => {
+    window.print();
+  };
+
+  // Handler for generating report
+  const handleGenerate = () => {
+    // Add your report generation logic here
+    console.log("Generating report...");
+  };
 
   // Import RESOURCES_DATA and calculate pagination
+  const filteredData = useMemo(() => {
+    return RESOURCES_DATA.filter((resource) =>
+      Object.values(resource).some((value) =>
+        String(value).toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm]);
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = RESOURCES_DATA.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(RESOURCES_DATA.length / itemsPerPage);
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   // Add pagination handlers
   const handlePageChange = (page) => {
@@ -207,44 +236,46 @@ export default function Resources() {
             <div className="flex items-center justify-between py-4">
               <h2 className="font-bold text-2xl">Inventory</h2>
               <div className="flex items-center justify-between relative w-1/6">
-                <ChevronUp
-                  className="w-7 h-7 text-gray-500 cursor-pointer hover:text-gray-700 rounded-lg border border-gray-200"
-                  onClick={() => handleMonthChange(1)}
-                />
-
-                <div className="relative inline-block">
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={(date) => setSelectedDate(date)}
-                    dateFormat="MMMM yyyy"
-                    showMonthYearPicker
-                    showPopperArrow={false}
-                    popperContainer={({ children }) => (
-                      <div className="absolute z-[9999] mt-2">{children}</div>
-                    )}
-                    customInput={
-                      <span className="text-gray-700 font-medium cursor-pointer">
-                        {selectedDate.toLocaleString("default", {
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </span>
-                    }
-                  />
-                </div>
-                <ChevronDown
-                  className="w-7 h-7 text-gray-500 cursor-pointer hover:text-gray-700 rounded-lg border border-gray-200"
-                  onClick={() => handleMonthChange(-1)}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[280px] justify-start text-left font-normal",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "MMM yyyy") : <span>Pick a month</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <MonthPicker
+                      selectedMonth={selectedDate}
+                      onMonthSelect={setSelectedDate}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div className="flex items-center gap-4">
-                <button className="bg-Icpetgreen text-white px-4 py-2 rounded-lg hover:bg-opacity-90">
-                  Generate Graph
-                </button>
-                <button className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50">
-                  <Printer className="w-5 h-5 text-Icpetgreen" />
-                </button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleGenerate}
+                  className="flex items-center gap-2 bg-Icpetgreen hover:bg-Icpetgreen/90"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Generate Report
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrint}
+                  className="flex items-center gap-2"
+                >
+                  <Printer className="w-4 h-4" />
+                </Button>
               </div>
             </div>
             {/* Table Container */}
@@ -321,9 +352,13 @@ export default function Resources() {
                         </td>
                         <td className="w-16 py-4">
                           <div className="flex justify-center">
-                            <button className="text-Icpetgreen hover:text-gray-800 transition-colors">
-                              <Pencil className="w-4 h-4" />
-                            </button>
+                            <Button
+                              variant="link"
+                              size="sm"
+                              className="text-Icpetgreen hover:text-Icpetgreen/90"
+                            >
+                              View Details
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -357,16 +392,19 @@ export default function Resources() {
                   </li>
                   {pageNumbers.map((page) => (
                     <li key={page}>
-                      <button
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => handlePageChange(page)}
-                        className={`h-8 w-8 rounded border ${
+                        className={cn(
                           currentPage === page
-                            ? "border-teal-600 bg-teal-600 text-white"
-                            : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
-                        } text-center leading-8`}
+                            ? "bg-Icpetgreen text-white hover:bg-Icpetgreen/90 border-Icpetgreen"
+                            : "hover:bg-gray-50",
+                          "h-8 w-8 p-0"
+                        )}
                       >
                         {page}
-                      </button>
+                      </Button>
                     </li>
                   ))}
                   <li>

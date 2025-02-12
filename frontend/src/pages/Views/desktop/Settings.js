@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import { Switch } from "../../../Components/ui/switch";
+import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../Components/ui/button";
+import { cn } from "../../../lib/utils";
 
 export default function Settings() {
   const [selectedTheme, setSelectedTheme] = useState('light');
@@ -14,13 +18,7 @@ export default function Settings() {
 
         <div className="flex flex-row gap-4 mt-4 items-center">
           <label className="text-md">Status</label>
-          <label
-            htmlFor="notifStatus"
-            className="relative inline-block h-6 w-12 cursor-pointer rounded-full bg-gray-300 transition [-webkit-tap-highlight-color:_transparent] has-[:checked]:bg-Icpetgreen"
-          >
-            <input type="checkbox" id="notifStatus" className="peer sr-only" />
-            <span className="absolute inset-y-0 start-0 m-1 size-4 rounded-full bg-white transition-all peer-checked:start-6"></span>
-          </label>
+          <Switch id="notification-status" />
         </div>
       </div>
 
@@ -29,31 +27,39 @@ export default function Settings() {
         <h2 className="text-2xl font-medium">Theme</h2>
         <label className="text-sm text-gray-500">You can customize your theme settings</label>
         <div className="grid grid-cols-2 gap-4 mt-4">
-          <button
+          <Button
+            variant="outline"
             onClick={() => setSelectedTheme('light')}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl border-${
-              selectedTheme === 'light' ? '2 border-Icpetgreen' : '1 border-gray-300'
-            } hover:border-Icpetgreen/50 transition-all`}
+            className={cn(
+              "flex flex-col items-center justify-center p-4 h-auto rounded-xl",
+              selectedTheme === 'light' 
+                ? "border-2 border-Icpetgreen" 
+                : "border border-gray-300 hover:border-Icpetgreen/50"
+            )}
           >
             <div className="w-16 h-16 rounded-full bg-Icpetblue border-4 border-Icpetgreen mb-3" />
             <span className="text-base font-medium">Light Mode</span>
             {selectedTheme === 'light' && (
               <span className="text-sm text-Icpetgreen mt-2">Active</span>
             )}
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="outline"
             onClick={() => setSelectedTheme('dark')}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl border-${
-              selectedTheme === 'dark' ? '2 border-Icpetgreen' : '1 border-gray-300'
-            } hover:border-Icpetgreen/50 transition-all`}
+            className={cn(
+              "flex flex-col items-center justify-center p-4 h-auto rounded-xl",
+              selectedTheme === 'dark' 
+                ? "border-2 border-Icpetgreen" 
+                : "border border-gray-300 hover:border-Icpetgreen/50"
+            )}
           >
             <div className="w-16 h-16 rounded-full bg-gray-800 border-4 border-gray-300 mb-3" />
             <span className="text-base font-medium">Dark Mode</span>
             {selectedTheme === 'dark' && (
               <span className="text-sm text-Icpetgreen mt-2">Active</span>
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -63,41 +69,40 @@ export default function Settings() {
         <label className="text-sm text-gray-500">
           You can change your password here
         </label>
-        {/* Change Password - Horizontal 3 inputs positions*/}
         <div className="flex flex-row gap-6 mb-6 mt-4">
           <div className="flex flex-col flex-1">
             <label className="mb-2">Current Password</label>
-            <input
-              type="currentPassword"
+            <Input
+              type="password"
               placeholder="Current Password"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
+              className="focus-visible:ring-Icpetgreen"
             />
           </div>
           <div className="flex flex-col flex-1">
             <label className="mb-2">New Password</label>
-            <input
-              type="newPassword"
+            <Input
+              type="password"
               placeholder="New Password"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
+              className="focus-visible:ring-Icpetgreen"
             />
           </div>
           <div className="flex flex-col flex-1">
             <label className="mb-2">Confirm Password</label>
-            <input
-              type="confirmPassword"
+            <Input
+              type="password"
               placeholder="Confirm Password"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
+              className="focus-visible:ring-Icpetgreen"
             />
           </div>
         </div>
 
         <div className="flex justify-end">
-          <button
-            type="button"
-            className="bg-Icpetgreen text-white px-16 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+          <Button 
+            variant="default"
+            className="bg-Icpetgreen hover:bg-Icpetgreen/90 px-16"
           >
             Save
-          </button>
+          </Button>
         </div>
       </div>
     </div>
