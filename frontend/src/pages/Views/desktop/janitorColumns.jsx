@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Pencil, Trash } from "heroicons-react"
 import { Button } from "../../../Components/ui/button"
 import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData"
+import { Badge } from "../../../Components/ui/badge"
 
 export const getColumns = (handleEdit, handleDelete, activeTab) => {
   const basicDetailsColumns = [
@@ -104,17 +105,14 @@ export const getColumns = (handleEdit, handleDelete, activeTab) => {
       accessorKey: "schedule.status",
       header: "Status",
       cell: ({ row }) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${
-            row.original.schedule.status === "On Time"
-              ? "bg-green-100 text-green-800"
-              : row.original.schedule.status === "Late"
-              ? "bg-red-100 text-red-800"
-              : "bg-yellow-100 text-yellow-800"
-          }`}
+        <Badge
+          variant={
+            row.original.schedule.status === "On Time" ? "success" :
+            row.original.schedule.status === "Late" ? "danger" : "warning"
+          }
         >
           {row.original.schedule.status}
-        </span>
+        </Badge>
       ),
     },
     {
@@ -182,21 +180,20 @@ export const getColumns = (handleEdit, handleDelete, activeTab) => {
     {
       accessorKey: "performanceTrack.status",
       header: "Status",
-      cell: ({ row }) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${
-            row.original.performanceTrack.status === "Excellent"
-              ? "bg-green-100 text-green-800"
-              : row.original.performanceTrack.status === "Good"
-              ? "bg-blue-100 text-blue-800"
-              : row.original.performanceTrack.status === "Fair"
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          {row.original.performanceTrack.status}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const status = row.original.performanceTrack.status;
+        return (
+          <Badge
+            variant={
+              status === "Excellent" ? "success" :
+              status === "Good" ? "default" :
+              status === "Fair" ? "warning" : "danger"
+            }
+          >
+            {status}
+          </Badge>
+        );
+      },
     },
     {
       id: "actions",
@@ -256,34 +253,26 @@ export const getColumns = (handleEdit, handleDelete, activeTab) => {
       accessorKey: "resourceUsage.restocked",
       header: "Restocked",
       cell: ({ row }) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${
-            row.original.resourceUsage.restocked === "Yes"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
+        <Badge
+          variant={row.original.resourceUsage.restocked === "Yes" ? "success" : "warning"}
         >
           {row.original.resourceUsage.restocked}
-        </span>
+        </Badge>
       ),
     },
     {
       accessorKey: "resourceUsage.note",
       header: "Note",
       cell: ({ row }) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${
-            row.original.resourceUsage.note === "Normal Usage"
-              ? "bg-green-100 text-green-800"
-              : row.original.resourceUsage.note === "Higher than Average"
-              ? "bg-yellow-100 text-yellow-800"
-              : row.original.resourceUsage.note === "Excessive Usage"
-              ? "bg-red-100 text-red-800"
-              : "bg-gray-100 text-gray-800"
-          }`}
+        <Badge
+          variant={
+            row.original.resourceUsage.note === "Normal Usage" ? "success" :
+            row.original.resourceUsage.note === "Higher than Average" ? "warning" :
+            row.original.resourceUsage.note === "Excessive Usage" ? "danger" : "default"
+          }
         >
           {row.original.resourceUsage.note}
-        </span>
+        </Badge>
       ),
     },
     {
@@ -381,17 +370,14 @@ export const getColumns = (handleEdit, handleDelete, activeTab) => {
       accessorKey: "logsReport.status",
       header: "Status",
       cell: ({ row }) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${
-            row.original.logsReport.status === "Done"
-              ? "bg-green-100 text-green-800"
-              : row.original.logsReport.status === "Pending"
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-red-100 text-red-800"
-          }`}
+        <Badge
+          variant={
+            row.original.logsReport.status === "Done" ? "success" :
+            row.original.logsReport.status === "Pending" ? "warning" : "danger"
+          }
         >
           {row.original.logsReport.status}
-        </span>
+        </Badge>
       ),
     },
     {
