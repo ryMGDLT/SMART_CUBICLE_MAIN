@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "../../../Components/Controller/AuthController";
 import { Link } from "react-router-dom";
 import { Button } from "../../../Components/ui/button";
+import { Input } from "../../../Components/ui/input";
 
 export default function LoginPage() {
   const [username, setUsername] = React.useState("");
@@ -37,13 +38,13 @@ export default function LoginPage() {
         </div>
         <form className="mt-2" onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-white text-sm mb-2">
-              Email/Username
+            <label className="block font-bold text-Icpetgreen text-sm mb-2">
+              Email:
             </label>
-            <input
+            <Input
               type="text"
-              placeholder="Email/Username"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
+              placeholder="Enter your email"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none bg-white"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -51,15 +52,17 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-white text-sm mb-2">Password</label>
+            <label className="block font-bold text-Icpetgreen text-sm mb-2">
+              Password:
+            </label>
             <div className="relative">
-              <input
+              <Input
                 id="password"
                 //type={showPassword ? "text" : "password"}
                 type="password"
                 name="password"
                 placeholder="Enter your password"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none bg-white"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -92,14 +95,9 @@ export default function LoginPage() {
         </form>
 
         <div className="text-center mt-4">
-          <p className="text-sm">
-            <Link
-              to="/signup"
-              className="text-Icpetgreen text-lg hover:underline"
-            >
-              Sign Up
-            </Link>
-          </p>
+          <Button variant="link" className="w-1/2 mx-auto block">
+            <Link to="/signup">Sign Up</Link>
+          </Button>
         </div>
       </div>
     </div>

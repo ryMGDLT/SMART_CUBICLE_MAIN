@@ -5,7 +5,7 @@ module.exports = {
     "./index.html",
     "./src/**/*.{ts,tsx,js,jsx}",
     "app/**/*.{ts,tsx}",
-    "components/**/*.{ts,tsx}"
+    "components/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
@@ -57,10 +57,10 @@ module.exports = {
         md: `calc(var(--radius) - 2px)`,
         sm: "calc(var(--radius) - 4px)",
       },
+      ringColor: {
+        Icpetgreen: "#23897D",
+      },
     },
   },
-  plugins: [
-    require("@tailwindcss/forms"),
-    require("tailwindcss-animate")
-  ],
+  plugins: [require("@tailwindcss/forms"), require("tailwindcss-animate")],
 };

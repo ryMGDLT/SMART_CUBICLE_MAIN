@@ -4,6 +4,17 @@ import {
   USERS_DATA,
   DEFAULT_PROFILE_IMAGE,
 } from "../../../data/placeholderData";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../../../Components/ui/pagination";
+import { cn } from "../../../lib/utils";
+import { columns } from "./columns";
+import { DataTable } from "../../../Components/ui/data-table";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
@@ -154,103 +165,13 @@ export default function Users() {
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto p-2">
-        <div className="flex flex-col gap-3 pb-16">
-          {currentItems.map((user, index) => (
-            <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
-              <div className="flex gap-4">
-                <img
-                  src={user.image || DEFAULT_PROFILE_IMAGE}
-                  alt={user.name}
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-base font-medium">{user.name}</h3>
-                      <p className="text-xs text-gray-500">{user.userId}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button className="text-Icpetgreen p-1 hover:bg-gray-100 rounded">
-                        <Pencil size={18} />
-                      </button>
-                      <button className="text-red-500 p-1 hover:bg-gray-100 rounded">
-                        <Trash size={18} />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="text-sm">
-                    <p className="text-gray-600">{user.email}</p>
-                    <p className="text-gray-600">{user.contact}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Fixed Footer - Pagination */}
-      <div className="bg-white border-t border-gray-200 p-2 shadow-sm">
-        <ol className="flex justify-center gap-1 text-xs font-medium">
-          <li>
-            <button
-              onClick={handlePrevPage}
-              className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
-              disabled={currentPage === 1}
-            >
-              <span className="sr-only">Prev Page</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </li>
-
-          {pageNumbers.map((page) => (
-            <li key={page}>
-              <button
-                onClick={() => handlePageChange(page)}
-                className={`h-8 w-8 rounded border ${
-                  currentPage === page
-                    ? "border-Icpetgreen bg-Icpetgreen text-white"
-                    : "border-gray-100 bg-white text-gray-900 hover:bg-gray-50"
-                } text-center leading-8`}
-              >
-                {page}
-              </button>
-            </li>
-          ))}
-
-          <li>
-            <button
-              onClick={handleNextPage}
-              className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
-              disabled={currentPage === totalPages}
-            >
-              <span className="sr-only">Next Page</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </li>
-        </ol>
+        <DataTable
+          columns={columns}
+          data={currentItems}
+          pageCount={totalPages}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );
