@@ -1,11 +1,16 @@
 import React from "react";
 import { useAuth } from "../../../Components/Controller/AuthController";
 import { Link } from "react-router-dom";
+import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../Components/ui/button";
 
 export default function LoginPage() {
+  const [fullname, setFullname] = React.useState("");
+  const [employeeid, setEmployeeid] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [additionalField, setAdditionalField] = React.useState("");
+  const [phoneNum, setPhoneNum] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
   //const [showPassword, setShowPassword] = React.useState(false);
   const { login } = useAuth();
 
@@ -39,40 +44,43 @@ export default function LoginPage() {
           {/*full name*/}
           <div className="mb-4 flex space-x-4">
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">Full Name</label>
-              <input
+              <label className="block font-bold text-Icpetgreen text-sm mb-2">
+                Full Name
+              </label>
+              <Input
                 type="text"
-                placeholder="Full Name"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Nathan Drake"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
+                value={fullname}
                 required
+                onChange={(e) => setFullname(e.target.value)}
               />
             </div>
             {/*Employee ID*/}
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">
+              <label className="block font-bold text-Icpetgreen text-sm mb-2">
                 Employee ID
               </label>
-              <input
+              <Input
                 type="text"
-                placeholder="Employee ID"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
-                value={additionalField}
-                onChange={(e) => setAdditionalField(e.target.value)}
+                placeholder="TUPM-21-XXXX"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
+                value={employeeid}
+                required
+                onChange={(e) => setEmployeeid(e.target.value)}
               />
             </div>
           </div>
           {/*username*/}
           <div className="mb-4 flex space-x-4">
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">
-                Email/Username
+              <label className="block font-bold text-Icpetgreen text-sm mb-2">
+                Email
               </label>
-              <input
+              <Input
                 type="text"
-                placeholder="Email/Username"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
+                placeholder="nathandrake@mail.com"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -80,15 +88,42 @@ export default function LoginPage() {
             </div>
             {/*number*/}
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">
+              <label className="block font-bold text-Icpetgreen text-sm mb-2">
                 Contact Number
               </label>
-              <input
-                type="text"
-                placeholder="+63"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
-                value={additionalField}
-                onChange={(e) => setAdditionalField(e.target.value)}
+              <Input
+                type="tel"
+                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                placeholder="+63 XXX-XXX-XXXX"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
+                value={phoneNum}
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  // Remove the prefix if it exists
+                  if (value.startsWith("+63 ")) {
+                    value = value.substring(4);
+                  }
+
+                  // Remove all non-digits
+                  value = value.replace(/\D/g, "");
+
+                  // Handle empty/backspace case
+                  if (!value || value.length === 0) {
+                    setPhoneNum("");
+                    return;
+                  }
+
+                  // Format the number
+                  if (value.length <= 10) {
+                    const formattedNumber = value
+                      .substring(0, 10)
+                      .replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+                    setPhoneNum("+63 " + formattedNumber);
+                  }
+                }}
+                maxLength="17"
+                required
               />
             </div>
           </div>
@@ -96,18 +131,17 @@ export default function LoginPage() {
           <div className="mb-4 flex space-x-4">
             {/*Password*/}
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">Password</label>
               <div className="relative">
-                <input
-                  id="password"
-                  //type={showPassword ? "text" : "password"}
+                <label className="block font-bold text-Icpetgreen text-sm mb-2">
+                  Password
+                </label>
+                <Input
                   type="password"
-                  name="password"
                   placeholder="Enter your password"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   required
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 {/* {password && ( 
                   <button
@@ -122,20 +156,17 @@ export default function LoginPage() {
             </div>
             {/*confirm password*/}
             <div className="w-1/2">
-              <label className="block text-white text-sm mb-2">
-                Confirm Password
-              </label>
               <div className="relative">
-                <input
-                  id="password"
-                  //type={showPassword ? "text" : "password"}
+                <label className="block font-bold text-Icpetgreen text-sm mb-2">
+                  Confirm Password
+                </label>
+                <Input
                   type="password"
-                  name="Confirm Password"
-                  placeholder="Enter your password"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white  "
+                  value={confirmPassword}
                   required
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 {/* {password && ( 
                   <button
@@ -149,24 +180,24 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-          <div className="text-center mt-2">
-            <p className="text-sm">
-              <Link
-                to="/login"
-                className="text-Icpetgreen text-lg py-2 rounded-lg hover:underline transition duration-300"
-              >
-                Log In
-              </Link>
-            </p>
+          <div className="text-center mt-2">  
+            <Button
+              type="submit"
+              variant="link"
+              className="w-1/2 mx-auto block mt-4"
+            >
+              <Link to="/login">Log In</Link>
+            </Button>
           </div>
         </form>
 
-        <button
+        <Button
           type="submit"
-          className="text-white w-1/2 mx-auto block mt-4 bg-Icpetgreen py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+          variant="default"
+          className="w-1/4 mx-auto block mt-4"
         >
           Sign Up
-        </button>
+        </Button>
       </div>
     </div>
   );
