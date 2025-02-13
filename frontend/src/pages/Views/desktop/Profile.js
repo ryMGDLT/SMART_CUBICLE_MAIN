@@ -1,9 +1,12 @@
 import React from "react";
-import { Camera } from "heroicons-react";
+import { Camera } from "lucide-react";
 import {
   PROFILE_DATA,
   DEFAULT_PROFILE_IMAGE,
 } from "../../../data/placeholderData";
+import { Avatar, AvatarImage, AvatarFallback } from "../../../Components/ui/avatar";
+import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../Components/ui/button";
 
 export default function Profile() {
   const profileData = PROFILE_DATA[0]; // Using the first profile data
@@ -15,17 +18,18 @@ export default function Profile() {
           {/* Profile Picture Section - Left Side */}
           <div className="relative">
             <div className="relative">
-              <img
-                src={DEFAULT_PROFILE_IMAGE}
-                alt="Profile"
-                className="w-40 h-40 rounded-full object-cover border-4 border-white shadow-lg"
-              />
-              <button
-                className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-50"
+              <Avatar className="w-40 h-40">
+                <AvatarImage src={DEFAULT_PROFILE_IMAGE} alt={profileData.name} />
+                <AvatarFallback>{profileData.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute bottom-2 right-2 bg-white rounded-full shadow-md hover:bg-gray-50"
                 aria-label="Change profile picture"
               >
                 <Camera className="w-5 h-5 text-gray-600" />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -34,20 +38,20 @@ export default function Profile() {
             <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col">
                 <label className="text-sm text-gray-600 mb-1">Full Name</label>
-                <input
+                <Input
                   type="text"
                   value={profileData.name}
                   disabled
-                  className="w-full px-4 py-2 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed"
+                  className="bg-gray-100"
                 />
               </div>
               <div className="flex flex-col">
                 <label className="text-sm text-gray-600 mb-1">Email</label>
-                <input
+                <Input
                   type="email"
                   value={profileData.email}
                   disabled
-                  className="w-full px-4 py-2 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed"
+                  className="bg-gray-100"
                 />
               </div>
             </div>
@@ -57,20 +61,20 @@ export default function Profile() {
                 <label className="text-sm text-gray-600 mb-1">
                   Employee ID
                 </label>
-                <input
+                <Input
                   type="text"
                   value={profileData.employeeId}
                   disabled
-                  className="w-full px-4 py-2 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed"
+                  className="bg-gray-100"
                 />
               </div>
               <div className="flex flex-col">
                 <label className="text-sm text-gray-600 mb-1">Position</label>
-                <input
+                <Input
                   type="text"
                   value={profileData.position}
                   disabled
-                  className="w-full px-4 py-2 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed"
+                  className="bg-gray-100"
                 />
               </div>
             </div>
@@ -79,12 +83,12 @@ export default function Profile() {
 
         {/* Save Button */}
         <div className="flex justify-end mt-8">
-          <button
-            type="button"
-            className="px-6 py-2 bg-Icpetgreen text-white rounded-lg hover:bg-opacity-90 transition-colors"
+          <Button 
+            variant="default"
+            className="bg-Icpetgreen hover:bg-Icpetgreen/90"
           >
             Save
-          </button>
+          </Button>
         </div>
       </div>
     </div>

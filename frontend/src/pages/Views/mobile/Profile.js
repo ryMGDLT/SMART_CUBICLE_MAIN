@@ -1,9 +1,12 @@
 import React from "react";
-import { Camera } from "heroicons-react";
+import { Camera } from "lucide-react";
 import {
   PROFILE_DATA,
   DEFAULT_PROFILE_IMAGE,
 } from "../../../data/placeholderData";
+import { Avatar, AvatarImage, AvatarFallback } from "../../../Components/ui/avatar";
+import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../Components/ui/button";
 
 export default function Profile() {
   const profileData = PROFILE_DATA[0]; // Using the first profile data
@@ -14,17 +17,18 @@ export default function Profile() {
         {/* Profile Picture Section - Centered */}
         <div className="flex flex-col items-center mb-6">
           <div className="relative mb-4">
-            <img
-              src={DEFAULT_PROFILE_IMAGE}
-              alt="Profile"
-              className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
-            />
-            <button
-              className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md hover:bg-gray-50"
+            <Avatar className="w-32 h-32">
+              <AvatarImage src={DEFAULT_PROFILE_IMAGE} alt={profileData.name} />
+              <AvatarFallback>{profileData.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute bottom-0 right-0 bg-white rounded-full shadow-md hover:bg-gray-50"
               aria-label="Change profile picture"
             >
               <Camera className="w-5 h-5 text-gray-600" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -32,53 +36,53 @@ export default function Profile() {
         <div className="space-y-4">
           <div className="flex flex-col">
             <label className="text-sm text-gray-600 mb-1">Full Name</label>
-            <input
+            <Input
               type="text"
               value={profileData.name}
               disabled
-              className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed text-base"
+              className="bg-gray-100"
             />
           </div>
 
           <div className="flex flex-col">
             <label className="text-sm text-gray-600 mb-1">Email</label>
-            <input
+            <Input
               type="email"
               value={profileData.email}
               disabled
-              className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed text-base"
+              className="bg-gray-100"
             />
           </div>
 
           <div className="flex flex-col">
             <label className="text-sm text-gray-600 mb-1">Employee ID</label>
-            <input
+            <Input
               type="text"
               value={profileData.employeeId}
               disabled
-              className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed text-base"
+              className="bg-gray-100"
             />
           </div>
 
           <div className="flex flex-col">
             <label className="text-sm text-gray-600 mb-1">Position</label>
-            <input
+            <Input
               type="text"
               value={profileData.position}
               disabled
-              className="w-full px-4 py-3 bg-gray-100 border rounded-lg text-gray-700 cursor-not-allowed text-base"
+              className="bg-gray-100"
             />
           </div>
         </div>
 
         {/* Save Button - Full Width */}
         <div className="mt-6">
-          <button
-            type="button"
-            className="w-full py-3 bg-Icpetgreen text-white rounded-lg hover:bg-opacity-90 transition-colors text-base font-medium"
+          <Button 
+            variant="default"
+            className="w-full py-6 bg-Icpetgreen hover:bg-Icpetgreen/90 text-base font-medium"
           >
             Save Changes
-          </button>
+          </Button>
         </div>
       </div>
     </div>
