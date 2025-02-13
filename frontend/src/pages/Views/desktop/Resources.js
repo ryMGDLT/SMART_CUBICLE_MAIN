@@ -11,18 +11,29 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { ChevronUp, ChevronDown, Pencil, Printer, ChevronLeft, ChevronRight } from "heroicons-react";
+import {
+  ChevronUp,
+  ChevronDown,
+  Pencil,
+  Printer,
+  ChevronLeft,
+  ChevronRight,
+} from "heroicons-react";
 import { RESOURCES_DATA } from "../../../data/placeholderData";
-import ReminderCard from "../../../Components/Reports/reminderCard";
+import ReminderCard from "../../../components/reports/reminderCard";
 import { REMINDERS_DATA } from "../../../data/placeholderData";
-import { Button } from "../../../Components/ui/button";
+import { Button } from "../../../components/ui/button";
 import { cn } from "../../../lib/utils";
-import { Calendar } from "../../../Components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "../../../Components/ui/popover";
+import { Calendar } from "../../../components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../../components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { format, setDefaultOptions } from "date-fns";
 import { enUS } from "date-fns/locale";
-import { MonthPicker } from "../../../Components/ui/month-picker";
+import { MonthPicker } from "../../../components/ui/month-picker";
 
 // Register ChartJS components
 ChartJS.register(
@@ -246,7 +257,11 @@ export default function Resources() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "MMM yyyy") : <span>Pick a month</span>}
+                      {selectedDate ? (
+                        format(selectedDate, "MMM yyyy")
+                      ) : (
+                        <span>Pick a month</span>
+                      )}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">

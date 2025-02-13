@@ -1,8 +1,8 @@
 import React from "react";
-import { useAuth } from "../../../Components/Controller/AuthController";
+import { useAuth } from "../../../components/controller/AuthController";
 import { Link } from "react-router-dom";
-import { Button } from "../../../Components/ui/button";
-import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
 
 export default function LoginPage() {
   const [username, setUsername] = React.useState("");

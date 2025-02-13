@@ -1,12 +1,12 @@
 import "./styles/App.css";
 import "./styles/Calendar.css";
-import Nav from "./Components/utils/Nav";
+import Nav from "./components/utils/Nav";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./pages/Auth/PrivateRoute";
 
 // Context Providers
-import { AuthProvider } from "./Components/Controller/AuthController";
-import ViewController from "./Components/Controller/ViewController";
+import { AuthProvider } from "./components/controller/AuthController";
+import ViewController from "./components/controller/ViewController";
 
 // Authentication Pages
 import LoginDesktop from "./pages/Auth/desktop/Login";
@@ -40,19 +40,91 @@ function App() {
             <Route path="/" element={<Navigate to="/login" replace />} />
 
             {/* Authentication Routes */}
-            <Route path="/login" element={<ViewController desktopComponent={LoginDesktop} mobileComponent={LoginMobile} />} />
-            <Route path="/signup" element={<ViewController desktopComponent={SignupDesktop} mobileComponent={SignupMobile} />} />
+            <Route
+              path="/login"
+              element={
+                <ViewController
+                  desktopComponent={LoginDesktop}
+                  mobileComponent={LoginMobile}
+                />
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <ViewController
+                  desktopComponent={SignupDesktop}
+                  mobileComponent={SignupMobile}
+                />
+              }
+            />
 
             {/* Private Routes - Only Accessible After Logging In */}
             <Route element={<PrivateRoute />}>
               <Route path="/" element={<Nav />}>
-                <Route path="dashboard" element={<ViewController desktopComponent={DashboardDesktop} mobileComponent={DashboardMobile} />} />
-                <Route path="usage-monitor" element={<ViewController desktopComponent={UsageMonitorDesktop} mobileComponent={UsageMonitorMobile} />} />
-                <Route path="janitors" element={<ViewController desktopComponent={JanitorsDesktop} mobileComponent={JanitorsMobile} />} />
-                <Route path="resources" element={<ViewController desktopComponent={ResourcesDesktop} mobileComponent={ResourcesMobile} />} />
-                <Route path="settings" element={<ViewController desktopComponent={SettingsDesktop} mobileComponent={SettingsMobile} />} />
-                <Route path="users" element={<ViewController desktopComponent={UsersDesktop} mobileComponent={UsersMobile} />} />
-                <Route path="user_profile" element={<ViewController desktopComponent={ProfileDesktop} mobileComponent={ProfileMobile} />} />
+                <Route
+                  path="dashboard"
+                  element={
+                    <ViewController
+                      desktopComponent={DashboardDesktop}
+                      mobileComponent={DashboardMobile}
+                    />
+                  }
+                />
+                <Route
+                  path="usage-monitor"
+                  element={
+                    <ViewController
+                      desktopComponent={UsageMonitorDesktop}
+                      mobileComponent={UsageMonitorMobile}
+                    />
+                  }
+                />
+                <Route
+                  path="janitors"
+                  element={
+                    <ViewController
+                      desktopComponent={JanitorsDesktop}
+                      mobileComponent={JanitorsMobile}
+                    />
+                  }
+                />
+                <Route
+                  path="resources"
+                  element={
+                    <ViewController
+                      desktopComponent={ResourcesDesktop}
+                      mobileComponent={ResourcesMobile}
+                    />
+                  }
+                />
+                <Route
+                  path="settings"
+                  element={
+                    <ViewController
+                      desktopComponent={SettingsDesktop}
+                      mobileComponent={SettingsMobile}
+                    />
+                  }
+                />
+                <Route
+                  path="users"
+                  element={
+                    <ViewController
+                      desktopComponent={UsersDesktop}
+                      mobileComponent={UsersMobile}
+                    />
+                  }
+                />
+                <Route
+                  path="user_profile"
+                  element={
+                    <ViewController
+                      desktopComponent={ProfileDesktop}
+                      mobileComponent={ProfileMobile}
+                    />
+                  }
+                />
               </Route>
             </Route>
 

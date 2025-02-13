@@ -1,8 +1,8 @@
 import React from "react";
-import { useAuth } from "../../../Components/Controller/AuthController";
+import { useAuth } from "../../../components/controller/AuthController";
 import { Link } from "react-router-dom";
-import { Input } from "../../../Components/ui/input";
-import { Button } from "../../../Components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 
 export default function LoginPage() {
   const [fullname, setFullname] = React.useState("");
@@ -180,7 +180,7 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-          <div className="text-center mt-2">  
+          <div className="text-center mt-2">
             <Button
               type="submit"
               variant="link"

@@ -8,20 +8,24 @@ import {
   MenuIcon,
   XIcon,
 } from "@heroicons/react/solid";
-import { useAuth } from "../Controller/AuthController";
-
-
+import { useAuth } from "../controller/AuthController";
 
 export default function Nav() {
   const [active, setActive] = useState(() => {
     return localStorage.getItem("activeItem") || "Dashboard";
   });
   const [collapsed, setCollapsed] = useState(() => {
-    return JSON.parse(localStorage.getItem("sidebarCollapsed")) || (window.innerWidth < 768);
+    return (
+      JSON.parse(localStorage.getItem("sidebarCollapsed")) ||
+      window.innerWidth < 768
+    );
   });
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(() => {
-    return JSON.parse(localStorage.getItem("sidebarVisible")) || (window.innerWidth >= 768);
+    return (
+      JSON.parse(localStorage.getItem("sidebarVisible")) ||
+      window.innerWidth >= 768
+    );
   });
   const dropdownRef = useRef(null);
   const { logout } = useAuth();
@@ -68,20 +72,20 @@ export default function Nav() {
       setCollapsed(false);
     }
     setIsSidebarVisible((prev) => !prev);
-    
+
     setTimeout(() => {
-      document.body.style.overflow = 'hidden'; 
+      document.body.style.overflow = "hidden";
       setTimeout(() => {
-        document.body.style.overflow = ''; 
-      }, 300); 
+        document.body.style.overflow = "";
+      }, 300);
     }, 0);
   };
 
   const handleSidebarCollapse = () => {
     setCollapsed((prev) => !prev);
     setTimeout(() => {
-      window.location.reload(); 
-    }, 300); 
+      window.location.reload();
+    }, 300);
   };
 
   const handleSidebarItemClick = () => {
@@ -240,9 +244,7 @@ export default function Nav() {
         }}
       >
         {/* Navbar */}
-        <header
-          className="bg-fafbfe p-4 flex justify-between items-center w-full md:px-6 shadow-md relative z-10 mb-3"
-        > 
+        <header className="bg-fafbfe p-4 flex justify-between items-center w-full md:px-6 shadow-md relative z-10 mb-3">
           {/* Menu Mobile */}
           <button
             className="md:hidden p-2 text-gray-600 hover:text-gray-800 transition-colors duration-300"

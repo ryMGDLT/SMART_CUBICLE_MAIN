@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UsageMonitoringChart } from "../../../Components/Charts/DashboardCharts";
+import { UsageMonitoringChart } from "../../../components/charts/DashboardCharts";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,7 +18,7 @@ import {
   JANITOR_SCHEDULE_DATA,
   USAGE_MONITOR_DATA,
 } from "../../../data/placeholderData";
-import CardUsageReport from "../../../Components/Reports/cardUsageReport";
+import CardUsageReport from "../../../components/reports/cardUsageReport";
 import {
   flexRender,
   getCoreRowModel,
@@ -31,16 +31,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../Components/ui/table";
-import { inventoryColumns } from "../../../data/usage-monitor/inventory-columns";
-import { janitorColumns } from "../../../data/usage-monitor/janitor-columns";
+} from "../../../components/ui/table";
+import { inventoryColumns } from "../../../components/tables/usage-monitor/inventory-columns";
+import { janitorColumns } from "../../../components/tables/usage-monitor/janitor-columns";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-} from "../../../Components/ui/card";
-import { Button } from "../../../Components/ui/button";
+} from "../../../components/ui/card";
+import { Button } from "../../../components/ui/button";
 
 // Register ChartJS components
 ChartJS.register(

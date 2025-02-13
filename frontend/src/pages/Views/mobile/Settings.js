@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Switch } from "../../../Components/ui/switch";
-import { Input } from "../../../Components/ui/input";
-import { Button } from "../../../Components/ui/button";
+import { Switch } from "../../../components/ui/switch";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 import { cn } from "../../../lib/utils";
 
 export default function Settings() {
-  const [selectedTheme, setSelectedTheme] = useState('light');
+  const [selectedTheme, setSelectedTheme] = useState("light");
 
   return (
     <div className="h-full flex flex-col p-2 gap-2 overflow-y-auto">
@@ -30,11 +30,11 @@ export default function Settings() {
         <div className="flex flex-col gap-3">
           <Button
             variant="outline"
-            onClick={() => setSelectedTheme('light')}
+            onClick={() => setSelectedTheme("light")}
             className={cn(
               "flex items-center justify-between w-full p-3 h-auto rounded-lg",
-              selectedTheme === 'light' 
-                ? "border-2 border-Icpetgreen" 
+              selectedTheme === "light"
+                ? "border-2 border-Icpetgreen"
                 : "border border-gray-300 hover:border-Icpetgreen/50"
             )}
           >
@@ -42,18 +42,20 @@ export default function Settings() {
               <div className="w-8 h-8 rounded-full bg-Icpetblue border-2 border-Icpetgreen" />
               <span className="text-sm">Light Mode</span>
             </div>
-            {selectedTheme === 'light' && (
-              <span className="text-xs text-Icpetgreen font-medium">Active</span>
+            {selectedTheme === "light" && (
+              <span className="text-xs text-Icpetgreen font-medium">
+                Active
+              </span>
             )}
           </Button>
 
           <Button
             variant="outline"
-            onClick={() => setSelectedTheme('dark')}
+            onClick={() => setSelectedTheme("dark")}
             className={cn(
               "flex items-center justify-between w-full p-3 h-auto rounded-lg",
-              selectedTheme === 'dark' 
-                ? "border-2 border-Icpetgreen" 
+              selectedTheme === "dark"
+                ? "border-2 border-Icpetgreen"
                 : "border border-gray-300 hover:border-Icpetgreen/50"
             )}
           >
@@ -61,8 +63,10 @@ export default function Settings() {
               <div className="w-8 h-8 rounded-full bg-gray-800 border-2 border-gray-300" />
               <span className="text-sm">Dark Mode</span>
             </div>
-            {selectedTheme === 'dark' && (
-              <span className="text-xs text-Icpetgreen font-medium">Active</span>
+            {selectedTheme === "dark" && (
+              <span className="text-xs text-Icpetgreen font-medium">
+                Active
+              </span>
             )}
           </Button>
         </div>
@@ -102,7 +106,7 @@ export default function Settings() {
         </div>
 
         <div className="flex justify-end mt-4">
-          <Button 
+          <Button
             variant="default"
             className="bg-Icpetgreen hover:bg-Icpetgreen/90 px-16"
           >

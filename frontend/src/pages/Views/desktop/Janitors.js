@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { Printer } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
-import { Button } from "../../../Components/ui/button";
-import { Input } from "../../../Components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../Components/ui/table";
+} from "../../../components/ui/table";
 import {
   Pagination,
   PaginationContent,
@@ -19,16 +19,16 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../Components/ui/pagination";
+} from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
 import { JANITORS_DATA } from "../../../data/placeholderData";
-import { Card } from "../../../Components/utils/card";
+import { Card } from "../../../components/utils/card";
 
-import { basicColumns } from "../../../data/janitor/basic-columns";
-import { scheduleColumns } from "../../../data/janitor/schedule-columns";
-import { logsReportColumns } from "../../../data/janitor/logs-column";
-import { performanceTrackColumns } from "../../../data/janitor/performance-column";
-import { resourceUsageColumns } from "../../../data/janitor/resource-column";
+import { basicColumns } from "../../../components/tables/janitor/basic-columns";
+import { scheduleColumns } from "../../../components/tables/janitor/schedule-columns";
+import { logsReportColumns } from "../../../components/tables/janitor/logs-column";
+import { performanceTrackColumns } from "../../../components/tables/janitor/performance-column";
+import { resourceUsageColumns } from "../../../components/tables/janitor/resource-column";
 import {
   flexRender,
   getCoreRowModel,

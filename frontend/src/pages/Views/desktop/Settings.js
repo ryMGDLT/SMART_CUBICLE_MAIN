@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Switch } from "../../../Components/ui/switch";
-import { Input } from "../../../Components/ui/input";
-import { Button } from "../../../Components/ui/button";
+import { Switch } from "../../../components/ui/switch";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 import { cn } from "../../../lib/utils";
 
 export default function Settings() {
-  const [selectedTheme, setSelectedTheme] = useState('light');
+  const [selectedTheme, setSelectedTheme] = useState("light");
 
   return (
     <div className="h-full shadow-md bg-white rounded-lg p-4">
@@ -25,38 +25,40 @@ export default function Settings() {
       {/* Theme Selection Section */}
       <div className="w-full p-6 bg-white rounded-lg mt-4 shadow-md">
         <h2 className="text-2xl font-medium">Theme</h2>
-        <label className="text-sm text-gray-500">You can customize your theme settings</label>
+        <label className="text-sm text-gray-500">
+          You can customize your theme settings
+        </label>
         <div className="grid grid-cols-2 gap-4 mt-4">
           <Button
             variant="outline"
-            onClick={() => setSelectedTheme('light')}
+            onClick={() => setSelectedTheme("light")}
             className={cn(
               "flex flex-col items-center justify-center p-4 h-auto rounded-xl",
-              selectedTheme === 'light' 
-                ? "border-2 border-Icpetgreen" 
+              selectedTheme === "light"
+                ? "border-2 border-Icpetgreen"
                 : "border border-gray-300 hover:border-Icpetgreen/50"
             )}
           >
             <div className="w-16 h-16 rounded-full bg-Icpetblue border-4 border-Icpetgreen mb-3" />
             <span className="text-base font-medium">Light Mode</span>
-            {selectedTheme === 'light' && (
+            {selectedTheme === "light" && (
               <span className="text-sm text-Icpetgreen mt-2">Active</span>
             )}
           </Button>
 
           <Button
             variant="outline"
-            onClick={() => setSelectedTheme('dark')}
+            onClick={() => setSelectedTheme("dark")}
             className={cn(
               "flex flex-col items-center justify-center p-4 h-auto rounded-xl",
-              selectedTheme === 'dark' 
-                ? "border-2 border-Icpetgreen" 
+              selectedTheme === "dark"
+                ? "border-2 border-Icpetgreen"
                 : "border border-gray-300 hover:border-Icpetgreen/50"
             )}
           >
             <div className="w-16 h-16 rounded-full bg-gray-800 border-4 border-gray-300 mb-3" />
             <span className="text-base font-medium">Dark Mode</span>
-            {selectedTheme === 'dark' && (
+            {selectedTheme === "dark" && (
               <span className="text-sm text-Icpetgreen mt-2">Active</span>
             )}
           </Button>
@@ -97,7 +99,7 @@ export default function Settings() {
         </div>
 
         <div className="flex justify-end">
-          <Button 
+          <Button
             variant="default"
             className="bg-Icpetgreen hover:bg-Icpetgreen/90 px-16"
           >

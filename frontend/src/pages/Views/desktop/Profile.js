@@ -4,9 +4,13 @@ import {
   PROFILE_DATA,
   DEFAULT_PROFILE_IMAGE,
 } from "../../../data/placeholderData";
-import { Avatar, AvatarImage, AvatarFallback } from "../../../Components/ui/avatar";
-import { Input } from "../../../Components/ui/input";
-import { Button } from "../../../Components/ui/button";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from "../../../components/ui/avatar";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 
 export default function Profile() {
   const profileData = PROFILE_DATA[0]; // Using the first profile data
@@ -19,7 +23,10 @@ export default function Profile() {
           <div className="relative">
             <div className="relative">
               <Avatar className="w-40 h-40">
-                <AvatarImage src={DEFAULT_PROFILE_IMAGE} alt={profileData.name} />
+                <AvatarImage
+                  src={DEFAULT_PROFILE_IMAGE}
+                  alt={profileData.name}
+                />
                 <AvatarFallback>{profileData.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <Button
@@ -83,7 +90,7 @@ export default function Profile() {
 
         {/* Save Button */}
         <div className="flex justify-end mt-8">
-          <Button 
+          <Button
             variant="default"
             className="bg-Icpetgreen hover:bg-Icpetgreen/90"
           >

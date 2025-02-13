@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "../../Components/ui/avatar";
-import { DEFAULT_PROFILE_IMAGE } from "../placeholderData";
+import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
+import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 import { UserRoundIcon } from "lucide-react";
 
 export const basicColumns = [

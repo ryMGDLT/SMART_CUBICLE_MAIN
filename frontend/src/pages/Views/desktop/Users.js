@@ -1,29 +1,42 @@
 import React, { useState, useMemo } from "react";
 import { USERS_DATA } from "../../../data/placeholderData";
-import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
-import { Button } from "../../../Components/ui/button";
-import { Input } from "../../../Components/ui/input";
-import { DataTable } from "../../../Components/ui/data-table";
+import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { Input } from "../../../components/ui/input";
+import { cn } from "../../../lib/utils";
+import { getColumns } from "../../../components/tables/user/user-column";
+import { Card } from "../../../components/utils/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../Components/ui/pagination";
-import { cn } from "../../../lib/utils";
-import { getColumns } from "./userColumns";
+} from "../../../components/ui/pagination";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+const TABS = ["All", "Requests", "Accepted", "Declined"];
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 10; // Set to show 10 items per page
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
+  const itemsPerPage = 10;
 
-  // Update filteredData to include both search and tab filtering
+  // Filter logic
   const filteredData = useMemo(() => {
     return USERS_DATA.filter((user) => {
       const matchesTab =
@@ -40,189 +53,213 @@ export default function Users() {
     });
   }, [searchTerm, activeTab]);
 
-  // Calculate pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const currentItems = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  }, [currentPage, filteredData]);
 
-  // Generate page numbers array dynamically
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(1, prev - 1));
+  const handleNextPage = () =>
+    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
 
   const handleAccept = (employeeId) => {
-    // Update user status logic here
     console.log(`Accepted user ${employeeId}`);
   };
 
   const handleDecline = (employeeId) => {
-    // Update user status logic here
     console.log(`Declined user ${employeeId}`);
   };
 
-  // Handle select all checkbox
-  const handleSelectAll = (e) => {
-    setSelectAll(e.target.checked);
-    if (e.target.checked) {
-      // Select all items currently visible on the page
-      const currentIds = currentItems.map((user) => user.employeeId);
-      setSelectedItems(currentIds);
-    } else {
-      // Deselect all items
-      setSelectedItems([]);
-    }
-  };
-
-  // Handle individual item selection
-  const handleSelectItem = (employeeId) => {
-    setSelectedItems((prev) => {
-      if (prev.includes(employeeId)) {
-        // Remove item if already selected
-        const newSelected = prev.filter((id) => id !== employeeId);
-        // Update selectAll state
-        setSelectAll(newSelected.length === currentItems.length);
-        return newSelected;
-      } else {
-        // Add item if not selected
-        const newSelected = [...prev, employeeId];
-        // Update selectAll state
-        setSelectAll(newSelected.length === currentItems.length);
-        return newSelected;
-      }
-    });
-  };
-
-  // Reset pagination when changing tabs
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setCurrentPage(1); // Reset to first page when changing tabs
-    setSelectedItems([]); // Clear selected items
-    setSelectAll(false); // Reset select all checkbox
-  };
+  const table = useReactTable({
+    data: currentItems,
+    columns: getColumns(handleAccept, handleDecline),
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   return (
-    <div className="h-full flex flex-col shadow-md bg-white rounded-lg p-6">
-      {/* Header Section */}
-      <div className="flex flex-row justify-between items-center shrink-0">
-        {/* Tab Navigation */}
-        <div>
-          {/* Mobile view - keep the select for small screens */}
-          <div className="sm:hidden">
-            <label htmlFor="userTab" className="sr-only">
-              User Tab
-            </label>
-            <select
-              id="userTab"
-              className="w-full rounded-md border-gray-200"
-              value={activeTab}
-              onChange={(e) => handleTabChange(e.target.value)}
-            >
-              <option>All</option>
-              <option>Requests</option>
-              <option>Accepted</option>
-              <option>Declined</option>
-            </select>
-          </div>
-
-          {/* Desktop view - use shadcn Tabs */}
-          <div className="hidden sm:block">
-            <Tabs
-              value={activeTab}
-              onValueChange={handleTabChange}
-              className="w-full"
-            >
-              <TabsList className="bg-transparent gap-6 w-auto">
-              {["All", "Requests", "Accepted", "Declined"].map((tab) => (
-                  <TabsTrigger
+    <Card className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 p-2 sm:p-4 gap-2 sm:gap-4">
+        {/* Header Section */}
+        <div className="flex flex-row justify-between items-center shrink-0">
+          {/* Tab Navigation */}
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="bg-transparent gap-6">
+              {TABS.map((tab) => (
+                <TabsTrigger
                   key={tab}
-                    value={tab}
-                    className={cn(
-                      "rounded-lg w-24 data-[state=active]:shadow-none",
-                      "data-[state=active]:bg-Icpetgreen data-[state=active]:text-white",
-                      "data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500",
-                      "hover:text-gray-700 hover:bg-gray-50"
-                    )}
+                  value={tab}
+                  className={cn(
+                    "rounded-lg data-[state=active]:shadow-none",
+                    "data-[state=active]:bg-Icpetgreen data-[state=active]:text-white",
+                    "data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500",
+                    "hover:text-gray-700 hover:bg-gray-50"
+                  )}
                 >
                   {tab}
-                  </TabsTrigger>
+                </TabsTrigger>
               ))}
-              </TabsList>
-            </Tabs>
-          </div>
-        </div>
-        {/* Search Bar */}
-        <div className="relative w-64">
-          <label htmlFor="Search" className="sr-only">
-            Search
-          </label>
+            </TabsList>
+          </Tabs>
 
-          <input
-            type="text"
-            id="Search"
-            value={searchTerm}
-            onChange={handleSearch}
-            placeholder="Search"
-            className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
-          />
-
-          <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
-            <button
-              type="button"
-              className="text-Icpetgreen hover:text-gray-700"
-            >
-              <span className="sr-only">Search</span>
+          {/* Search Bar */}
+          <div className="relative w-64">
+            <Input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="pl-4 pr-10"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth="1.5"
                 stroke="currentColor"
-                className="h-4 w-4"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-            </button>
-          </span>
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* User Table Container */}
-      <div className="mt-3 flex-1 flex flex-col h-full rounded-lg border border-gray-200 overflow-hidden">
-        <div className="flex-1 overflow-y-auto relative">
-          <DataTable
-            columns={getColumns(handleAccept, handleDecline, activeTab)}
-            data={currentItems}
-            pageCount={totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-            className="min-h-full"
-          />
+        {/* Table Container */}
+        <div className="flex-1 overflow-hidden shadow-md rounded-lg border border-gray-200">
+          <div className="flex flex-col h-full">
+            {/* Table Contents */}
+            <div className="flex-1 overflow-auto">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id} className="bg-gray-50">
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          style={{
+                            width: `${header.column.columnDef.size * 100}%`,
+                          }}
+                          className="h-8 px-2 py-2 sm:h-10 sm:px-3 sm:py-3 text-left align-middle font-medium text-gray-900 text-xs sm:text-sm"
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            style={{
+                              width: `${cell.column.columnDef.size * 100}%`,
+                            }}
+                            className="px-2 py-2 sm:px-3 sm:py-3 text-xs sm:text-sm"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={table.getAllColumns().length}
+                        className="h-24 text-center"
+                      >
+                        No results found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Pagination */}
+            <div className="border-t border-gray-200 bg-white p-2">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={handlePrevPage}
+                      className={cn(
+                        "cursor-pointer",
+                        currentPage === 1 && "pointer-events-none opacity-50"
+                      )}
+                    />
+                  </PaginationItem>
+
+                  {pageNumbers.map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(page)}
+                        isActive={currentPage === page}
+                        className={cn(
+                          "cursor-pointer",
+                          currentPage === page &&
+                            "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
+                        )}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  {totalPages > 7 && currentPage < totalPages - 3 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={handleNextPage}
+                      className={cn(
+                        "cursor-pointer",
+                        currentPage === totalPages &&
+                          "pointer-events-none opacity-50"
+                      )}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
