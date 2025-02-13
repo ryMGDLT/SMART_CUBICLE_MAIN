@@ -1,9 +1,16 @@
 import React, { useState, useMemo } from "react";
-import { Printer } from "heroicons-react";
+import { Printer } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
 import { Button } from "../../../Components/ui/button";
 import { Input } from "../../../Components/ui/input";
-import { DataTable } from "../../../Components/ui/data-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../Components/ui/table";
 import {
   Pagination,
   PaginationContent,
@@ -14,8 +21,19 @@ import {
   PaginationPrevious,
 } from "../../../Components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { getColumns } from "./janitorColumns";
 import { JANITORS_DATA } from "../../../data/placeholderData";
+import { Card } from "../../../Components/utils/card";
+
+import { basicColumns } from "../../../data/janitor/basic-columns";
+import { scheduleColumns } from "../../../data/janitor/schedule-columns";
+import { logsReportColumns } from "../../../data/janitor/logs-column";
+import { performanceTrackColumns } from "../../../data/janitor/performance-column";
+import { resourceUsageColumns } from "../../../data/janitor/resource-column";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
 const TABS = [
   "Basic Details",
@@ -33,13 +51,18 @@ export default function Janitors() {
 
   const filteredJanitors = useMemo(() => {
     return JANITORS_DATA.filter((janitor) => {
-      const tabProperty = activeTab.toLowerCase().replace(/\s+/g, '');
-      const propertyKey = tabProperty === 'basicdetails' ? 'basicDetails' 
-        : tabProperty === 'logsandreport' ? 'logsReport'
-        : tabProperty === 'performancetrack' ? 'performanceTrack'
-        : tabProperty === 'resourceusage' ? 'resourceUsage'
-        : tabProperty;
-      
+      const tabProperty = activeTab.toLowerCase().replace(/\s+/g, "");
+      const propertyKey =
+        tabProperty === "basicdetails"
+          ? "basicDetails"
+          : tabProperty === "logsandreport"
+          ? "logsReport"
+          : tabProperty === "performancetrack"
+          ? "performanceTrack"
+          : tabProperty === "resourceusage"
+          ? "resourceUsage"
+          : tabProperty;
+
       const data = janitor[propertyKey];
       if (!data) return false;
 
@@ -64,14 +87,37 @@ export default function Janitors() {
     setCurrentPage(1);
   };
 
-  const handleEdit = (id) => console.log("Edit janitor:", id);
-  const handleDelete = (id) => console.log("Delete janitor:", id);
   const handlePageChange = (page) => setCurrentPage(page);
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(1, prev - 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+  const handleNextPage = () =>
+    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+
+  const getActiveColumns = () => {
+    switch (activeTab) {
+      case "Basic Details":
+        return basicColumns;
+      case "Schedule":
+        return scheduleColumns;
+      case "Performance Track":
+        return performanceTrackColumns;
+      case "Resource Usage":
+        return resourceUsageColumns;
+      case "Logs and Report":
+        return logsReportColumns;
+      default:
+        return basicColumns;
+    }
+  };
+
+  const table = useReactTable({
+    data: currentItems,
+    columns: getActiveColumns(),
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   return (
-    <div className="h-full flex flex-col shadow-md bg-white rounded-lg p-6">
+    <Card className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg overflow-hidden">
+      {/* Search and Buttons Row */}
       <div className="flex flex-row justify-between items-center shrink-0">
         <div className="relative w-96">
           <Input
@@ -107,12 +153,17 @@ export default function Janitors() {
           >
             Generate Schedule
           </Button>
-          <Button variant="outline" size="icon" onClick={() => console.log("Print")}>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => console.log("Print")}
+          >
             <Printer className="w-5 h-5 text-Icpetgreen" />
           </Button>
         </div>
       </div>
 
+      {/* Tabs */}
       <div className="mt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-transparent gap-6">
@@ -134,25 +185,72 @@ export default function Janitors() {
         </Tabs>
       </div>
 
-      <div className="flex-1 overflow-hidden mt-6 shadow-md rounded-lg border border-gray-200">
+      {/* Table Container */}
+      <div className="flex-1 overflow-hidden shadow-md rounded-lg border border-gray-200 mt-4">
         <div className="flex flex-col h-full">
           <div className="overflow-x-auto border-b border-gray-200">
             <div className="min-w-full">
-              <div style={{ height: '1px' }} />
+              <div style={{ height: "1px" }} />
             </div>
           </div>
-          
+
+          {/* Table Contents */}
           <div className="flex-1 overflow-auto">
-            <DataTable
-              columns={getColumns(handleEdit, handleDelete, activeTab)}
-              data={currentItems}
-              pageCount={totalPages}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-              className="min-w-full"
-            />
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id} className="bg-gray-50">
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        style={{
+                          width: `${header.column.columnDef.size * 100}%`,
+                        }}
+                        className="h-8 px-2 py-2 sm:h-10 sm:px-3 sm:py-3 text-left align-middle font-medium text-gray-900 text-xs sm:text-sm"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={getActiveColumns().length}
+                      className="h-24 text-center"
+                    >
+                      No results found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
 
+          {/* Pagination Buttons */}
           <div className="border-t border-gray-200 bg-white p-2">
             <Pagination>
               <PaginationContent>
@@ -165,7 +263,7 @@ export default function Janitors() {
                     )}
                   />
                 </PaginationItem>
-                
+
                 {pageNumbers.map((page) => (
                   <PaginationItem key={page}>
                     <PaginationLink
@@ -173,26 +271,28 @@ export default function Janitors() {
                       isActive={currentPage === page}
                       className={cn(
                         "cursor-pointer",
-                        currentPage === page && "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
+                        currentPage === page &&
+                          "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
                       )}
                     >
                       {page}
                     </PaginationLink>
                   </PaginationItem>
                 ))}
-                
+
                 {totalPages > 7 && currentPage < totalPages - 3 && (
                   <PaginationItem>
                     <PaginationEllipsis />
                   </PaginationItem>
                 )}
-                
+
                 <PaginationItem>
                   <PaginationNext
                     onClick={handleNextPage}
                     className={cn(
                       "cursor-pointer",
-                      currentPage === totalPages && "pointer-events-none opacity-50"
+                      currentPage === totalPages &&
+                        "pointer-events-none opacity-50"
                     )}
                   />
                 </PaginationItem>
@@ -201,6 +301,6 @@ export default function Janitors() {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

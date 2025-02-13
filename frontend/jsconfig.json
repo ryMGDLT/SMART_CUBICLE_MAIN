@@ -3,7 +3,12 @@
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"]
-    }
+    },
+    "checkJs": false,
+    "jsx": "react",
+    "module": "commonjs",
+    "target": "es6"
   },
+  "exclude": ["node_modules", "build"],
   "include": ["src"]
 }
