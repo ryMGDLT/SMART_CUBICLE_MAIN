@@ -1,18 +1,8 @@
-import React, { useState, useMemo } from "react";
-import { USERS_DATA } from "../../../data/placeholderData";
-import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import { Input } from "../../../components/ui/input";
-import { cn } from "../../../lib/utils";
-import { getColumns } from "../../../components/tables/user/user-column";
-import { Card } from "../../../components/utils/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../../components/ui/table";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
+import { Button } from "../../../Components/ui/button";
+import { Input } from "../../../Components/ui/input";
+import { DataTable } from "../../../Components/ui/data-table";
 import {
   Pagination,
   PaginationContent,
@@ -21,110 +11,313 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../components/ui/pagination";
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
-const TABS = ["All", "Requests", "Accepted", "Declined"];
+} from "../../../Components/ui/pagination";
+import { cn } from "../../../lib/utils";
+import { getColumns } from "../../../Components/table/userColumns";
+import Swal from "sweetalert2";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 10;
+  const itemsPerPage = 10; // Set to show 10 items per page
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [usersData, setUsersData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filter logic
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/users`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Fetched data:", data);
+        setUsersData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [backendUrl]);
+
   const filteredData = useMemo(() => {
-    return USERS_DATA.filter((user) => {
-      const matchesTab =
-        activeTab === "All" ||
-        (activeTab === "Requests" && user.status === "Pending") ||
-        (activeTab === "Accepted" && user.status === "Accepted") ||
-        (activeTab === "Declined" && user.status === "Declined");
+    return usersData
+      .filter((user) => {
+        const matchesTab =
+          activeTab === "All" ||
+          (activeTab === "Requests" && user.status === "Pending") ||
+          (activeTab === "Accepted" && user.status === "Accepted") ||
+          (activeTab === "Declined" && user.status === "Declined");
 
-      const matchesSearch = Object.values(user).some((value) =>
-        String(value).toLowerCase().includes(searchTerm.toLowerCase())
-      );
+        const matchesSearch = Object.values(user).some((value) =>
+          String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
-      return matchesTab && matchesSearch;
-    });
-  }, [searchTerm, activeTab]);
+        return matchesTab && matchesSearch;
+      })
+      .sort((a, b) => {
+        if (a.status === "Pending" && b.status !== "Pending") {
+          return -1;
+        } else if (a.status !== "Pending" && b.status === "Pending") {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+  }, [searchTerm, activeTab, usersData]);
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = useMemo(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     return filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  }, [currentPage, filteredData]);
+  }, [filteredData, indexOfFirstItem, indexOfLastItem]);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  const handleSearch = (e) => {
+  const handleSearch = useCallback((e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
+  }, []);
+
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page);
+  }, []);
+
+  const handlePrevPage = useCallback(() => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  }, [currentPage]);
+
+  const handleNextPage = useCallback(() => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  }, [currentPage, totalPages]);
+
+  const handleAccept = async (_id, currentRole, fullName) => {
+    if (!currentRole || currentRole === "User") {
+      Swal.fire({
+        icon: "error",
+        title: "Role Not Selected",
+        text: "Please select a valid role before accepting the user.",
+      });
+      return;
+    }
+
+    const { isConfirmed } = await Swal.fire({
+      title: "Confirm Acceptance",
+      html: `Are you sure you want to accept <strong>${fullName}</strong> and assign them the Position of <strong>${currentRole}</strong>?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, accept",
+      cancelButtonText: "No, cancel",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+    });
+
+    if (isConfirmed) {
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await fetch(`${backendUrl}/users/${_id}/accept`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ role: currentRole, status: "Accepted" }),
+        });
+
+        if (response.ok) {
+          setUsersData((prevData) =>
+            prevData.map((user) =>
+              user._id === _id
+                ? { ...user, role: currentRole, status: "Accepted" }
+                : user
+            )
+          );
+          Swal.fire("Accepted!", "The user has been accepted.", "success");
+        } else {
+          Swal.fire("Error", "Failed to update the user.", "error");
+        }
+      } catch (error) {
+        console.error("Error updating user:", error);
+        Swal.fire("Error", "An error occurred while updating the user.", "error");
+      }
+    }
   };
 
-  const handlePageChange = (page) => setCurrentPage(page);
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(1, prev - 1));
-  const handleNextPage = () =>
-    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+  const handleDecline = useCallback(async (_id) => {
+    const { isConfirmed } = await Swal.fire({
+      title: "Confirm Decline",
+      text: "Are you sure you want to decline this user?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, decline",
+      cancelButtonText: "No, cancel",
+    });
 
-  const handleAccept = (employeeId) => {
-    console.log(`Accepted user ${employeeId}`);
-  };
+    if (isConfirmed) {
+      try {
+        const response = await fetch(`${backendUrl}/users/${_id}/decline`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
-  const handleDecline = (employeeId) => {
-    console.log(`Declined user ${employeeId}`);
-  };
+        if (response.ok) {
+          setUsersData((prevData) =>
+            prevData.map((user) =>
+              user._id === _id ? { ...user, status: "Declined" } : user
+            )
+          );
+          Swal.fire("Declined!", "The user has been declined.", "success");
+        } else {
+          Swal.fire("Error", "Failed to decline the user.", "error");
+        }
+      } catch (error) {
+        console.error("Error declining user:", error);
+        Swal.fire("Error", "An error occurred while declining the user.", "error");
+      }
+    }
+  }, [backendUrl]);
 
-  const table = useReactTable({
-    data: currentItems,
-    columns: getColumns(handleAccept, handleDecline),
-    getCoreRowModel: getCoreRowModel(),
-  });
+  const handleRoleChange = useCallback((employeeId, newRole) => {
+    setUsersData((prevData) =>
+      prevData.map((user) =>
+        user._id === employeeId ? { ...user, role: newRole } : user
+      )
+    );
+    console.log(`Role updated locally for employee ${employeeId} to ${newRole}`);
+  }, []);
+
+  const handleSelectAll = useCallback((e) => {
+    setSelectAll(e.target.checked);
+    if (e.target.checked) {
+      const currentIds = currentItems.map((user) => user.employee_id);
+      setSelectedItems(currentIds);
+    } else {
+      setSelectedItems([]);
+    }
+  }, [currentItems]);
+
+  const handleSelectItem = useCallback((employeeId) => {
+    setSelectedItems((prev) => {
+      if (prev.includes(employeeId)) {
+        const newSelected = prev.filter((id) => id !== employeeId);
+        setSelectAll(newSelected.length === currentItems.length);
+        return newSelected;
+      } else {
+        const newSelected = [...prev, employeeId];
+        setSelectAll(newSelected.length === currentItems.length);
+        return newSelected;
+      }
+    });
+  }, [currentItems]);
+
+  const handleTabChange = useCallback((tab) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+    setSelectedItems([]);
+    setSelectAll(false);
+  }, []);
+
+  const columns = useMemo(() => {
+    const hideActions = activeTab === "Accepted" || activeTab === "Declined";
+    return getColumns(handleAccept, handleDecline, activeTab, handleRoleChange, hideActions);
+  }, [handleAccept, handleDecline, activeTab, handleRoleChange]);
+
+  const shouldShowPagination = filteredData.length > itemsPerPage;
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <Card className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg overflow-hidden">
-      <div className="flex-1 flex flex-col min-h-0 p-2 sm:p-4 gap-2 sm:gap-4">
-        {/* Header Section */}
-        <div className="flex flex-row justify-between items-center shrink-0">
-          {/* Tab Navigation */}
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
-            <TabsList className="bg-transparent gap-6">
-              {TABS.map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className={cn(
-                    "rounded-lg data-[state=active]:shadow-none",
-                    "data-[state=active]:bg-Icpetgreen data-[state=active]:text-white",
-                    "data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500",
-                    "hover:text-gray-700 hover:bg-gray-50"
-                  )}
-                >
-                  {tab}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+    <div className="h-full flex flex-col shadow-md bg-white rounded-lg p-6">
+      {/* Header Section */}
+      <div className="flex flex-row justify-between items-center shrink-0">
+        {/* Tab Navigation */}
+        <div>
+          <div className="sm:hidden">
+            <label htmlFor="userTab" className="sr-only">
+              User Tab
+            </label>
+            <select
+              id="userTab"
+              className="w-full rounded-md border-gray-200"
+              value={activeTab}
+              onChange={(e) => handleTabChange(e.target.value)}
+            >
+              <option>All</option>
+              <option>Requests</option>
+              <option>Accepted</option>
+              <option>Declined</option>
+            </select>
+          </div>
 
-          {/* Search Bar */}
-          <div className="relative w-64">
-            <Input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={handleSearch}
-              className="pl-4 pr-10"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+          <div className="hidden sm:block">
+            <Tabs
+              value={activeTab}
+              onValueChange={handleTabChange}
+              className="w-full"
+            >
+              <TabsList className="bg-transparent gap-6 w-auto">
+                {["All", "Requests", "Accepted", "Declined"].map((tab) => (
+                  <TabsTrigger
+                    key={tab}
+                    value={tab}
+                    className={cn(
+                      "rounded-lg w-24 data-[state=active]:shadow-none",
+                      "data-[state=active]:bg-Icpetgreen data-[state=active]:text-white",
+                      "data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500",
+                      "hover:text-gray-700 hover:bg-gray-50"
+                    )}
+                  >
+                    {tab}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
+        </div>
+        {/* Search Bar */}
+        <div className="relative w-64">
+          <label htmlFor="Search" className="sr-only">
+            Search
+          </label>
+
+          <input
+            type="text"
+            id="Search"
+            value={searchTerm}
+            onChange={handleSearch}
+            placeholder="Search"
+            className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
+          />
+
+          <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
+            <button
+              type="button"
+              className="text-Icpetgreen hover:text-gray-700"
+            >
+              <span className="sr-only">Search</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
@@ -143,122 +336,67 @@ export default function Users() {
           </div>
         </div>
 
-        {/* Table Container */}
-        <div className="flex-1 overflow-hidden shadow-md rounded-lg border border-gray-200">
-          <div className="flex flex-col h-full">
-            {/* Table Contents */}
-            <div className="flex-1 overflow-auto">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id} className="bg-gray-50">
-                      {headerGroup.headers.map((header) => (
-                        <TableHead
-                          key={header.id}
-                          style={{
-                            width: `${header.column.columnDef.size * 100}%`,
-                          }}
-                          className="h-8 px-2 py-2 sm:h-10 sm:px-3 sm:py-3 text-left align-middle font-medium text-gray-900 text-xs sm:text-sm"
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        data-state={row.getIsSelected() && "selected"}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell
-                            key={cell.id}
-                            style={{
-                              width: `${cell.column.columnDef.size * 100}%`,
-                            }}
-                            className="px-2 py-2 sm:px-3 sm:py-3 text-xs sm:text-sm"
-                          >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={table.getAllColumns().length}
-                        className="h-24 text-center"
-                      >
-                        No results found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Pagination */}
-            <div className="border-t border-gray-200 bg-white p-2">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={handlePrevPage}
-                      className={cn(
-                        "cursor-pointer",
-                        currentPage === 1 && "pointer-events-none opacity-50"
-                      )}
-                    />
-                  </PaginationItem>
-
-                  {pageNumbers.map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => handlePageChange(page)}
-                        isActive={currentPage === page}
-                        className={cn(
-                          "cursor-pointer",
-                          currentPage === page &&
-                            "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
-                        )}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-
-                  {totalPages > 7 && currentPage < totalPages - 3 && (
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  )}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={handleNextPage}
-                      className={cn(
-                        "cursor-pointer",
-                        currentPage === totalPages &&
-                          "pointer-events-none opacity-50"
-                      )}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          </div>
+      {/* User Table Container */}
+      <div className="mt-3 flex-1 flex flex-col h-full rounded-lg border border-gray-200 overflow-hidden">
+        <div className="flex-1 overflow-y-auto relative">
+          <DataTable
+            columns={columns}
+            data={currentItems}
+            pageCount={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+            className="min-h-full"
+          />
         </div>
+        {/* Pagination Controls */}
+        {shouldShowPagination && (
+          <div className="border-t border-gray-200 bg-white p-2">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={handlePrevPage}
+                    className={cn(
+                      "cursor-pointer",
+                      currentPage === 1 && "pointer-events-none opacity-50"
+                    )}
+                  />
+                </PaginationItem>
+
+                {pageNumbers.map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(page)}
+                      isActive={currentPage === page}
+                      className={cn(
+                        "cursor-pointer",
+                        currentPage === page && "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
+                      )}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                {totalPages > 7 && currentPage < totalPages - 3 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={handleNextPage}
+                    className={cn(
+                      "cursor-pointer",
+                      currentPage === totalPages && "pointer-events-none opacity-50"
+                    )}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </Card>
   );

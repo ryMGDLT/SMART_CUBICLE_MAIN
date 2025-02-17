@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   BellIcon,
   LogoutIcon,
@@ -8,11 +8,17 @@ import {
   MenuIcon,
   XIcon,
 } from "@heroicons/react/solid";
-import { useAuth } from "../controller/AuthController";
+import { useAuth } from "../Controller/AuthController";
+import { DEFAULT_PROFILE_IMAGE } from "../../data/placeholderData";
+import { axiosInstance } from "../Controller/AuthController";
 
 export default function Nav() {
+  const location = useLocation();
   const [active, setActive] = useState(() => {
-    return localStorage.getItem("activeItem") || "Dashboard";
+    const storedActive = localStorage.getItem("activeItem");
+    return location.pathname === "/user_profile"
+      ? ""
+      : storedActive || "Dashboard";
   });
   const [collapsed, setCollapsed] = useState(() => {
     return (
@@ -28,7 +34,36 @@ export default function Nav() {
     );
   });
   const dropdownRef = useRef(null);
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
+  const [profileImageUrl, setProfileImageUrl] = useState(DEFAULT_PROFILE_IMAGE);
+
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      try {
+        if (!user || !user.token || !user.id) {
+          throw new Error("User is not authenticated.");
+        }
+
+        const response = await axiosInstance.get(`/users/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        if (response.data.profileImage) {
+          setProfileImageUrl(response.data.profileImage);
+        } else {
+          setProfileImageUrl(DEFAULT_PROFILE_IMAGE);
+        }
+      } catch (err) {
+        console.error("Error fetching profile image:", err.message);
+        setProfileImageUrl(DEFAULT_PROFILE_IMAGE);
+      }
+    };
+
+    fetchProfileImage();
+  }, [user]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -65,6 +100,9 @@ export default function Nav() {
 
   const ProfileClick = () => {
     setActive("");
+    if (window.innerWidth < 768) {
+      setIsSidebarVisible(false);
+    }
   };
 
   const toggleSidebar = () => {
@@ -93,6 +131,52 @@ export default function Nav() {
       setIsSidebarVisible(false);
     }
   };
+
+  useEffect(() => {
+    if (location.pathname === "/user_profile") {
+      setActive("");
+    }
+  }, [location.pathname]);
+
+  // Define sidebar navigation items
+  const sidebarItems = [
+    {
+      name: "Dashboard",
+      icon: "/images/dashboard.png",
+      path: "/dashboard",
+      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+    },
+    {
+      name: "Usage Monitor",
+      icon: "/images/desktop windows.png",
+      path: "/usage-monitor",
+      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+    },
+    {
+      name: "Janitors",
+      icon: "/images/supervised user_circle.png",
+      path: "/janitors",
+      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+    },
+    {
+      name: "Resources",
+      icon: "/images/add shopping_cart.png",
+      path: "/resources",
+      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+    },
+    {
+      name: "Settings",
+      icon: "/images/settings.png",
+      path: "/settings",
+      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+    },
+    {
+      name: "Users",
+      icon: "/images/supervisor account.png",
+      path: "/users",
+      roles: ["Admin", "Superadmin"], // Only accessible to admin and superadmin
+    },
+  ];
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -137,7 +221,7 @@ export default function Nav() {
 
         {/* Logo */}
         <div
-          className={`flex items-center justify-center mb-2   mt-5 transition-all duration-500 ease-in-out`}
+          className={`flex items-center justify-center mb-2 mt-5 transition-all duration-500 ease-in-out`}
         >
           <img
             src="/images/ICPET.png"
@@ -150,65 +234,36 @@ export default function Nav() {
 
         {/* Sidebar Navigation */}
         <nav className="flex flex-col space-y-2">
-          {[
-            {
-              name: "Dashboard",
-              icon: "/images/dashboard.png",
-              path: "/dashboard",
-            },
-            {
-              name: "Usage Monitor",
-              icon: "/images/desktop windows.png",
-              path: "/usage-monitor",
-            },
-            {
-              name: "Janitors",
-              icon: "/images/supervised user_circle.png",
-              path: "/janitors",
-            },
-            {
-              name: "Resources",
-              icon: "/images/add shopping_cart.png",
-              path: "/resources",
-            },
-            {
-              name: "Settings",
-              icon: "/images/settings.png",
-              path: "/settings",
-            },
-            {
-              name: "Users",
-              icon: "/images/supervisor account.png",
-              path: "/users",
-            },
-          ].map((item) => (
-            <Link
-              to={item.path}
-              key={item.name}
-              className={`flex items-center p-3 rounded-lg transition-all duration-500 ease-in-out ${
-                active === item.name
-                  ? "bg-Icpetgreen text-white"
-                  : "hover:bg-Icpetgreen1"
-              } hover:scale-105 ${collapsed ? "justify-start" : ""}`}
-              onClick={() => {
-                setActive(item.name);
-                handleSidebarItemClick();
-              }}
-            >
-              <img
-                src={item.icon}
-                alt={item.name}
-                className="w-6 h-6 flex-shrink-0 transition-all duration-500 ease-in-out"
-              />
-              <span
-                className={`whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out ${
-                  collapsed ? "opacity-0 w-0" : "opacity-100 w-auto ml-3"
-                }`}
+          {sidebarItems
+            .filter((item) => item.roles.includes(user?.role))
+            .map((item) => (
+              <Link
+                to={item.path}
+                key={item.name}
+                className={`flex items-center p-3 rounded-lg transition-all duration-500 ease-in-out ${
+                  active === item.name
+                    ? "bg-Icpetgreen text-white"
+                    : "hover:bg-Icpetgreen1"
+                } hover:scale-105 ${collapsed ? "justify-start" : ""}`}
+                onClick={() => {
+                  setActive(item.name);
+                  handleSidebarItemClick();
+                }}
               >
-                {item.name}
-              </span>
-            </Link>
-          ))}
+                <img
+                  src={item.icon}
+                  alt={item.name}
+                  className="w-6 h-6 flex-shrink-0 transition-all duration-500 ease-in-out"
+                />
+                <span
+                  className={`whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out ${
+                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto ml-3"
+                  }`}
+                >
+                  {item.name}
+                </span>
+              </Link>
+            ))}
         </nav>
 
         {/* Logout */}
@@ -320,23 +375,27 @@ export default function Nav() {
             </div>
 
             {/* User Profile */}
-            <div className="flex items-center">
+            <div className="flex items-center ">
               <Link
                 to="/user_profile"
-                className="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-300"
-                onClick={() => {
-                  handleSidebarItemClick();
-                  ProfileClick();
-                }}
+                className="flex items-center space-x-2 mr-4 hover:opacity-80 transition-opacity duration-300"
+                onClick={ProfileClick}
               >
                 <img
-                  className="w-8 h-8 rounded-full border object-cover transition-transform duration-300"
-                  src="/images/bongbong.jpg"
-                  alt="User"
+                  src={profileImageUrl}
+                  alt="Profile"
+                  onError={(e) => {
+                    e.target.src = DEFAULT_PROFILE_IMAGE;
+                  }}
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    marginRight: "8px",
+                  }}
                 />
-                <span className="ml-2 mr-8 font-medium hidden sm:block">
-                  @BongBongBOBO
-                </span>
+                @{user?.username || "Guest"}{" "}
+                {/* Fallback to "Guest" if no username */}
               </Link>
             </div>
           </div>

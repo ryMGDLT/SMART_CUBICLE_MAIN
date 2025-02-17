@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { Card } from "../../../components/utils/card";
-import SummarizedReport from "../../../components/reports/SummarizedCard";
-import { useDropdown } from "../../../components/utils/useDropdown";
-import { toggleMetric } from "../../../components/utils/metricUtils";
+import { Card } from "../../../Components/ui/card";
+import SummarizedReport from "../../../Components/reports/SummarizedCard";
+import { useDropdown } from "../../../Components/ui/dropdown-menu";
+import { toggleMetric } from "../../../Components/utils/metricUtils";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../components/charts/DashboardCharts";
-import CustomCalendar from "../../../components/calendar/asideCalendar";
-import MobileCalendar from "../../../components/calendar/mobileCalendar";
-import Reminders from "../../../components/reminder/Reminder";
+} from "../../../Components/charts/DashboardCharts";
+import CustomCalendar from "../../../Components/calendar/asideCalendar";
+import MobileCalendar from "../../../Components/calendar/mobileCalendar";
+import Reminders from "../../../Components/reminder/Reminder";
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;

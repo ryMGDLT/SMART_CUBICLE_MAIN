@@ -9,6 +9,18 @@ module.exports = {
   ],
   theme: {
     extend: {
+
+      keyframes: {
+        pulseScale: {
+          '0%, 100%': { transform: 'scale(3)', color: 'rgba(239, 68, 68, 0.7)' }, 
+          '50%': { transform: 'scale(4)', color: 'rgba(239, 68, 68, 1)' }, 
+        },
+      },
+
+      animation: {
+        pulseScale: 'pulseScale 1.5s infinite',
+      },
+   
       accentColor: {
         teal: "#0d9488",
       },

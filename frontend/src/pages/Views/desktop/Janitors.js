@@ -1,16 +1,9 @@
-import React, { useState, useMemo } from "react";
-import { Printer } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../../components/ui/table";
+import React, { useState, useMemo, useEffect } from "react";
+import { Printer } from "heroicons-react";
+import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
+import { Button } from "../../../Components/ui/button";
+import { Input } from "../../../Components/ui/input";
+import { DataTable } from "../../../Components/ui/data-table";
 import {
   Pagination,
   PaginationContent,
@@ -21,19 +14,12 @@ import {
   PaginationPrevious,
 } from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { JANITORS_DATA } from "../../../data/placeholderData";
-import { Card } from "../../../components/utils/card";
-
-import { basicColumns } from "../../../components/tables/janitor/basic-columns";
-import { scheduleColumns } from "../../../components/tables/janitor/schedule-columns";
-import { logsReportColumns } from "../../../components/tables/janitor/logs-column";
-import { performanceTrackColumns } from "../../../components/tables/janitor/performance-column";
-import { resourceUsageColumns } from "../../../components/tables/janitor/resource-column";
+import { getColumns } from "../../../Components/table/janitorColumns";
 import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  DEFAULT_PROFILE_IMAGE,
+  JANITORS_DATA,
+} from "../../../data/placeholderData";
+import { useAuth } from "../../../Components/Controller/AuthController";
 
 const TABS = [
   "Basic Details",
@@ -47,31 +33,109 @@ export default function Janitors() {
   const [activeTab, setActiveTab] = useState("Basic Details");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [janitorsData, setJanitorsData] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
   const itemsPerPage = 10;
+  const { user } = useAuth();
+  const userRole = user?.role;
+ 
+
+  useEffect(() => {
+    const fetchJanitors = async () => {
+      try {
+        const response = await fetch("http://192.168.113.78:5000/api/janitors");
+        if (!response.ok) throw new Error("Failed to fetch janitors");
+        const data = await response.json();
+        setJanitorsData(data);
+        console.log("Fetched Janitors Data:", data); 
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJanitors();
+  }, []);
+
+  console.log("Logged-in User:", user); 
+  
+  const mappedJanitorsData = useMemo(() => {
+    return janitorsData.map((janitor) => ({
+      basicDetails: {
+        _id: janitor._id,
+        image: janitor.profileImage || DEFAULT_PROFILE_IMAGE,
+        name: janitor.fullName,
+        employeeId: janitor.employee_id,
+        email: janitor.email || "", 
+        contact: janitor.contact_number,
+      },
+      schedule: {},
+      performanceTrack: {},
+      resourceUsage: {},
+      logsReport: {},
+    }));
+  }, [janitorsData]);
+
+  console.log("Mapped Janitors Data:", mappedJanitorsData); 
 
   const filteredJanitors = useMemo(() => {
-    return JANITORS_DATA.filter((janitor) => {
+    console.log("Debug: Checking filtering logic...");
+    console.log("Logged-in User Role:", userRole);
+    console.log("Logged-in User ID:", user?.id);
+    console.log("Logged-in User Email:", user?.email);
+
+    if (!mappedJanitorsData.length) {
+      console.log("🚨 No janitors data found!");
+      return [];
+    }
+
+   
+    mappedJanitorsData.forEach((janitor) => {
+      console.log("Existing Janitor Email:", janitor.basicDetails.email);
+    });
+
+    if (userRole === "Janitor") {
+      const filtered = mappedJanitorsData.filter(
+        (janitor) => janitor.basicDetails.email === user?.email
+      );
+
+      console.log("Filtered Janitor Data:", filtered);
+      return filtered;
+    }
+
+  
+    return mappedJanitorsData.filter((janitor) => {
       const tabProperty = activeTab.toLowerCase().replace(/\s+/g, "");
       const propertyKey =
-        tabProperty === "basicdetails"
-          ? "basicDetails"
-          : tabProperty === "logsandreport"
-          ? "logsReport"
-          : tabProperty === "performancetrack"
-          ? "performanceTrack"
-          : tabProperty === "resourceusage"
-          ? "resourceUsage"
-          : tabProperty;
+        {
+          basicdetails: "basicDetails",
+          logsandreport: "logsReport",
+          performancetrack: "performanceTrack",
+          resourceusage: "resourceUsage",
+        }[tabProperty] || tabProperty;
 
       const data = janitor[propertyKey];
       if (!data) return false;
 
-      return Object.values(data)
+      const isMatch = Object.values(data)
         .join(" ")
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
+
+      if (isMatch) console.log("✅ Match found:", janitor.basicDetails.name);
+
+      return isMatch;
     });
-  }, [searchTerm, activeTab]);
+  }, [
+    searchTerm,
+    activeTab,
+    mappedJanitorsData,
+    userRole,
+    user?.id,
+    user?.email,
+  ]);
 
   const currentItems = useMemo(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -92,28 +156,13 @@ export default function Janitors() {
   const handleNextPage = () =>
     setCurrentPage((prev) => Math.min(totalPages, prev + 1));
 
-  const getActiveColumns = () => {
-    switch (activeTab) {
-      case "Basic Details":
-        return basicColumns;
-      case "Schedule":
-        return scheduleColumns;
-      case "Performance Track":
-        return performanceTrackColumns;
-      case "Resource Usage":
-        return resourceUsageColumns;
-      case "Logs and Report":
-        return logsReportColumns;
-      default:
-        return basicColumns;
-    }
-  };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  const table = useReactTable({
-    data: currentItems,
-    columns: getActiveColumns(),
-    getCoreRowModel: getCoreRowModel(),
-  });
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <Card className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg overflow-hidden">
@@ -194,7 +243,6 @@ export default function Janitors() {
             </div>
           </div>
 
-          {/* Table Contents */}
           <div className="flex-1 overflow-auto">
             <Table>
               <TableHeader>
@@ -252,52 +300,54 @@ export default function Janitors() {
 
           {/* Pagination Buttons */}
           <div className="border-t border-gray-200 bg-white p-2">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={handlePrevPage}
-                    className={cn(
-                      "cursor-pointer",
-                      currentPage === 1 && "pointer-events-none opacity-50"
-                    )}
-                  />
-                </PaginationItem>
-
-                {pageNumbers.map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => handlePageChange(page)}
-                      isActive={currentPage === page}
+            {filteredJanitors.length > itemsPerPage && (
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={handlePrevPage}
                       className={cn(
                         "cursor-pointer",
-                        currentPage === page &&
-                          "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
+                        currentPage === 1 && "pointer-events-none opacity-50"
                       )}
-                    >
-                      {page}
-                    </PaginationLink>
+                    />
                   </PaginationItem>
-                ))}
 
-                {totalPages > 7 && currentPage < totalPages - 3 && (
+                  {pageNumbers.map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(page)}
+                        isActive={currentPage === page}
+                        className={cn(
+                          "cursor-pointer",
+                          currentPage === page &&
+                            "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
+                        )}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  {totalPages > 7 && currentPage < totalPages - 3 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
                   <PaginationItem>
-                    <PaginationEllipsis />
+                    <PaginationNext
+                      onClick={handleNextPage}
+                      className={cn(
+                        "cursor-pointer",
+                        currentPage === totalPages &&
+                          "pointer-events-none opacity-50"
+                      )}
+                    />
                   </PaginationItem>
-                )}
-
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={handleNextPage}
-                    className={cn(
-                      "cursor-pointer",
-                      currentPage === totalPages &&
-                        "pointer-events-none opacity-50"
-                    )}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+                </PaginationContent>
+              </Pagination>
+            )}
           </div>
         </div>
       </div>
