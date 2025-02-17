@@ -1,5 +1,4 @@
 const sgMail = require('@sendgrid/mail');
-
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendEmail = async (to, subject, text) => {
@@ -10,11 +9,10 @@ const sendEmail = async (to, subject, text) => {
         text,
         trackingSettings: {
             clickTracking: {
-                enable: false, 
+                enable: false,
             },
         },
     };
-
     try {
         await sgMail.send(msg);
         console.log('Email sent successfully');

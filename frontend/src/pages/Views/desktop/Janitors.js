@@ -124,7 +124,7 @@ export default function Janitors() {
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
 
-      if (isMatch) console.log("✅ Match found:", janitor.basicDetails.name);
+      if (isMatch) console.log("Match found:", janitor.basicDetails.name);
 
       return isMatch;
     });
