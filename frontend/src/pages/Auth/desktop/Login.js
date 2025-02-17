@@ -3,21 +3,106 @@ import { useAuth } from "../../../Components/Controller/AuthController";
 import { Link } from "react-router-dom";
 import { Button } from "../../../Components/ui/button";
 import { Input } from "../../../Components/ui/input";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function LoginPage() {
-  const [username, setUsername] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  //const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [showResendLink, setShowResendLink] = React.useState("");
   //const [showPassword, setShowPassword] = React.useState(false);
   const { login } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(username, password);
-  };
+    login(email.trim().toLowerCase(), password.trim())
+      .then((response) => {
+       
+      })
+      .catch((error) => {
+        if (error.response?.status === 403) {
+          const errorMessage = error.response?.data;
 
+          
+          console.log("Error message from backend:", errorMessage);
+
+        
+          if (
+            errorMessage ===
+            "Pending approval. Please contact your employer to approve your signup request."
+          ) {
+            Swal.fire({
+              icon: "warning",
+              title: "Pending Approval", 
+              text: errorMessage,
+            });
+          } else if (
+            errorMessage ===
+            "Your account has been declined. Please contact support for further assistance."
+          ) {
+            Swal.fire({
+              icon: "error",
+              title: "Account Declined", 
+              text: errorMessage,
+            });
+          } else if (
+            errorMessage ===
+            "Email not verified. Please verify your email before logging in."
+          ) {
+            setShowResendLink(true);
+            Swal.fire({
+              icon: "warning",
+              title: "Email Not Verified", 
+              text: errorMessage,
+            });
+          } else if (errorMessage === "Your account is not accepted yet.") {
+            Swal.fire({
+              icon: "warning",
+              title: "Account Not Accepted", 
+              text: errorMessage,
+            });
+          } else {
+           
+            Swal.fire({
+              icon: "error",
+              title: "Login Failed", 
+              text: errorMessage || "An unexpected error occurred.",
+            });
+          }
+        } else {
+      
+          Swal.fire({
+            icon: "error",
+            title: "Login Failed", 
+            text: error.response?.data || "An unexpected error occurred.",
+          });
+        }
+      });
+  };
   // const togglePassword = () => {
   // setShowPassword((prevState) => !prevState);
   //};
+  const handleResendVerificationEmail = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/users/resend-verification-email`,
+        { email }
+      );
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: response.data.message,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data || "Failed to resend verification email.",
+      });
+    }
+  };
+  
 
   return (
     <div className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">
@@ -42,11 +127,11 @@ export default function LoginPage() {
               Email:
             </label>
             <Input
-              type="text"
+              type="email"
               placeholder="Enter your email"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none bg-white"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -78,7 +163,19 @@ export default function LoginPage() {
               )}*/}
             </div>
           </div>
-
+          <div>
+            {showResendLink && (
+              <p className="text-center mt-4 text-sm text-white">
+                Didn't receive a verification email?{" "}
+                <button
+                  onClick={handleResendVerificationEmail}
+                  className="text-Icpetgreen hover:underline font-medium"
+                >
+                  Resend verification email
+                </button>
+              </p>
+            )}
+          </div>
           <div className="text-left mb-2">
             <a href="" className="text-sm text-Icpetgreen hover:underline">
               Forgot Password?

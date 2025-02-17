@@ -2,8 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Pencil, Trash } from "heroicons-react"
-import { Button } from "../../../Components/ui/button"
-import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData"
+import { Button } from "../ui/button"
+import { DEFAULT_PROFILE_IMAGE } from "../../data/placeholderData"
 
 export const getColumns = (handleEdit, handleDelete, activeTab) => {
   switch (activeTab) {
