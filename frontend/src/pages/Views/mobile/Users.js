@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Pencil, Trash, Printer } from "heroicons-react";
+import { Pencil, Trash, Printer } from "lucide-react";
 import {
   USERS_DATA,
   DEFAULT_PROFILE_IMAGE,
@@ -11,10 +11,10 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../components/ui/pagination";
+} from "../../../Components/ui/pagination";
 import { cn } from "../../../lib/utils";
 import { columns } from "./columns";
-import { DataTable } from "../../../components/ui/data-table";
+import { DataTable } from "../../../Components/ui/data-table";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");

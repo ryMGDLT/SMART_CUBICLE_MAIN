@@ -11,9 +11,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { ChevronUp, ChevronDown, Pencil, Printer } from "heroicons-react";
+import { ChevronUp, ChevronDown, Pencil, Printer } from "lucide-react";
 import { RESOURCES_DATA, REMINDERS_DATA } from "../../../data/placeholderData";
-import ReminderCard from "../../../components/reports/reminderCard";
+import ReminderCard from "../../../Components/Reports/reminderCard";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../../styles/datepicker-custom.css";

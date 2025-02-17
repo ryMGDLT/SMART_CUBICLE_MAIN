@@ -8,9 +8,9 @@ import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-} from "../../../components/ui/avatar";
-import { Input } from "../../../components/ui/input";
-import { Button } from "../../../components/ui/button";
+} from "../../../Components/ui/avatar";
+import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../Components/ui/button";
 
 export default function Profile() {
   const profileData = PROFILE_DATA[0]; // Using the first profile data

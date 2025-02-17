@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { Card } from "../../../Components/ui/card";
 import SummarizedReport from "../../../Components/Reports/SummarizedCard";
-import { useDropdown } from "../../../Components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "../../../Components/ui/dropdown-menu";
 import { toggleMetric } from "../../../Components/utils/metricUtils";
 import {
   ResourcesUsageChart,
@@ -40,24 +45,20 @@ export default function Dashboard() {
     "Total Resources Restocked",
     "Recommended Resources",
   ]);
-  const [
-    showSummarizedDropdown,
-    setShowSummarizedDropdown,
-    summarizedDropdownRef,
-  ] = useDropdown(false);
   const [activeButton, setActiveButton] = useState("charts");
+  const [chartType, setChartType] = useState("bar");
+  const [trendsChartType, setTrendsChartType] = useState("line");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [remindersChecked, setRemindersChecked] = useState({
+    cleaningSchedule: true,
+    peakHours: true,
+    resourceRestocking: true,
+  });
+
   const toggleMetricWrapper = (item) => {
     toggleMetric(setSelectedMetrics, item);
   };
-  const [chartType, setChartType] = useState("bar");
-  const [trendsChartType, setTrendsChartType] = useState("line");
-  const [showChartDropdown, setShowChartDropdown, chartDropdownRef] =
-    useDropdown(false);
-  const [showTrendsDropdown, setShowTrendsDropdown, trendsDropdownRef] =
-    useDropdown(false);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDateClick = (date) => {
     setSelectedDate(date);
@@ -67,11 +68,6 @@ export default function Dashboard() {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-  const [remindersChecked, setRemindersChecked] = useState({
-    cleaningSchedule: true,
-    peakHours: true,
-    resourceRestocking: true,
-  });
 
   return (
     <div className="flex flex-col mt-[-10px]">
@@ -101,12 +97,9 @@ export default function Dashboard() {
               </button>
             ))}
           </div>
-          {/* Dropdown Button */}
-          <div className="relative" ref={summarizedDropdownRef}>
-            <button
-              onClick={() => setShowSummarizedDropdown(!showSummarizedDropdown)}
-              className="p-2 hover:bg-gray-100 rounded-full"
-            >
+          {/* Metrics Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="p-2 hover:bg-gray-100 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 text-gray-500"
@@ -115,60 +108,44 @@ export default function Dashboard() {
               >
                 <path d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" />
               </svg>
-            </button>
-            {/* Dropdown Content */}
-            {showSummarizedDropdown && (
-              <div
-                className="absolute right-0 mt-2 w-48 bg-teal-600 rounded-md shadow-lg py-1 z-10"
-                style={{ top: "100%", overflow: "visible" }}
-              >
-                {[
-                  "Usage Peak Hour",
-                  "Total Cleaning Time",
-                  "Recommended Cleaning Time",
-                  "Total Resources Restocked",
-                  "Recommended Resources",
-                ].map((item, index) => (
-                  <div
-                    key={index}
-                    className={`px-4 py-2 hover:bg-teal-700 flex items-center gap-2 cursor-pointer min-h-[40px] ${
-                      index !== 4 ? "border-b border-white" : ""
-                    }`}
-                    onClick={() => toggleMetricWrapper(item)}
-                  >
-                    <label className="inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selectedMetrics.includes(item)}
-                        readOnly
-                        className="hidden"
-                      />
-                      <div
-                        className="w-4 h-4 bg-white rounded-sm flex items-center justify-center"
-                        style={{ border: "1px solid #ccc" }}
-                      >
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-teal-600 p-1">
+              {[
+                "Usage Peak Hour",
+                "Total Cleaning Time",
+                "Recommended Cleaning Time",
+                "Total Resources Restocked",
+                "Recommended Resources",
+              ].map((item, index) => (
+                <DropdownMenuItem
+                  key={index}
+                  onClick={() => toggleMetricWrapper(item)}
+                  className={`px-4 py-2 hover:bg-teal-700 text-white ${
+                    index !== 4 ? "border-b border-white" : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 bg-white rounded-sm flex items-center justify-center"
+                      style={{ border: "1px solid #ccc" }}
+                    >
+                      {selectedMetrics.includes(item) && (
                         <svg
-                          className={`w-4 h-4 ${
-                            selectedMetrics.includes(item)
-                              ? "text-teal-700"
-                              : "text-gray-300"
-                          }`}
+                          className="w-4 h-4 text-teal-700"
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"
                           fill="currentColor"
                         >
-                          {selectedMetrics.includes(item) && (
-                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                          )}
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                         </svg>
-                      </div>
-                    </label>
-                    <span className="text-sm text-white">{item}</span>
+                      )}
+                    </div>
+                    <span className="text-sm">{item}</span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         {/* SummarizedReport Component */}
         <div className="flex overflow-x-auto">
@@ -184,9 +161,8 @@ export default function Dashboard() {
             ]}
             selectedMetrics={selectedMetrics}
             toggleMetric={toggleMetricWrapper}
-            showDropdown={showSummarizedDropdown}
-            setShowDropdown={setShowSummarizedDropdown}
-            dropdownRef={summarizedDropdownRef}
+            showDropdown={true}
+            setShowDropdown={setSelectedMetrics}
             showPeriodSelector={false}
             showMetricsDropdown={false}
             showMetricsCards={true}
@@ -230,20 +206,22 @@ export default function Dashboard() {
                 <div className="flex flex-col gap-4 h-[350px]">
                   <ResourcesUsageChart
                     chartType={chartType}
-                    setShowChartDropdown={setShowChartDropdown}
-                    showChartDropdown={showChartDropdown}
+                    setShowChartDropdown={setSelectedMetrics}
+                    showChartDropdown={selectedMetrics.includes(
+                      "Usage Peak Hour"
+                    )}
                     setChartType={setChartType}
-                    dropdownRef={chartDropdownRef}
                   />
                 </div>
                 <hr className="w-full border-t border-gray-200 mt-5 mb-5 shadow-lg" />
                 <div className="flex flex-col gap-4 h-[350px]">
                   <TrendsOverTimeChart
                     trendsChartType={trendsChartType}
-                    setShowTrendsDropdown={setShowTrendsDropdown}
-                    showTrendsDropdown={showTrendsDropdown}
+                    setShowTrendsDropdown={setSelectedMetrics}
+                    showTrendsDropdown={selectedMetrics.includes(
+                      "Usage Peak Hour"
+                    )}
                     setTrendsChartType={setTrendsChartType}
-                    dropdownRef={trendsDropdownRef}
                   />
                 </div>
                 <hr className="w-full border-t border-gray-200 mt-5 mb-5 shadow-lg" />
