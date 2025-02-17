@@ -1,11 +1,11 @@
 "use client";
 
-import { Badge } from "../../components/ui/badge";
+import { Badge } from "../../Components/ui/badge";
 import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-} from "../../components/ui/avatar";
+} from "../../Components/ui/avatar";
 import { UserRoundIcon } from "lucide-react";
 
 export const logsReportColumns = [

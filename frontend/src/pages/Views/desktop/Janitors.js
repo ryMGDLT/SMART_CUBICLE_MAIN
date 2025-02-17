@@ -3,7 +3,14 @@ import { Printer } from "heroicons-react";
 import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
 import { Button } from "../../../Components/ui/button";
 import { Input } from "../../../Components/ui/input";
-import { DataTable } from "../../../Components/ui/data-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../Components/ui/table";
 import {
   Pagination,
   PaginationContent,
@@ -12,9 +19,21 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../components/ui/pagination";
+} from "../../../Components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { getColumns } from "../../../Components/table/janitorColumns";
+import { Card } from "../../../Components/ui/card";
+
+import { basicColumns } from "../../../Components/tables/janitor/basic-columns";
+import { scheduleColumns } from "../../../Components/tables/janitor/schedule-columns";
+import { performanceTrackColumns } from "../../../Components/tables/janitor/performance-column";
+import { resourceUsageColumns } from "../../../Components/tables/janitor/resource-column";
+import { logsReportColumns } from "../../../Components/tables/janitor/logs-column";
+
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import {
   DEFAULT_PROFILE_IMAGE,
   JANITORS_DATA,
@@ -33,13 +52,37 @@ export default function Janitors() {
   const [activeTab, setActiveTab] = useState("Basic Details");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [janitorsData, setJanitorsData] = useState([]); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null); 
+  const [janitorsData, setJanitorsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const itemsPerPage = 10;
   const { user } = useAuth();
   const userRole = user?.role;
- 
+
+  // Get the appropriate columns based on active tab
+  const getActiveColumns = () => {
+    switch (activeTab) {
+      case "Basic Details":
+        return basicColumns;
+      case "Schedule":
+        return scheduleColumns;
+      case "Performance Track":
+        return performanceTrackColumns;
+      case "Resource Usage":
+        return resourceUsageColumns;
+      case "Logs and Report":
+        return logsReportColumns;
+      default:
+        return basicColumns;
+    }
+  };
+
+  // Create table instance
+  const table = useReactTable({
+    data: currentItems,
+    columns: getActiveColumns(),
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   useEffect(() => {
     const fetchJanitors = async () => {
@@ -48,7 +91,7 @@ export default function Janitors() {
         if (!response.ok) throw new Error("Failed to fetch janitors");
         const data = await response.json();
         setJanitorsData(data);
-        console.log("Fetched Janitors Data:", data); 
+        console.log("Fetched Janitors Data:", data);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -59,8 +102,8 @@ export default function Janitors() {
     fetchJanitors();
   }, []);
 
-  console.log("Logged-in User:", user); 
-  
+  console.log("Logged-in User:", user);
+
   const mappedJanitorsData = useMemo(() => {
     return janitorsData.map((janitor) => ({
       basicDetails: {
@@ -68,7 +111,7 @@ export default function Janitors() {
         image: janitor.profileImage || DEFAULT_PROFILE_IMAGE,
         name: janitor.fullName,
         employeeId: janitor.employee_id,
-        email: janitor.email || "", 
+        email: janitor.email || "",
         contact: janitor.contact_number,
       },
       schedule: {},
@@ -78,7 +121,7 @@ export default function Janitors() {
     }));
   }, [janitorsData]);
 
-  console.log("Mapped Janitors Data:", mappedJanitorsData); 
+  console.log("Mapped Janitors Data:", mappedJanitorsData);
 
   const filteredJanitors = useMemo(() => {
     console.log("Debug: Checking filtering logic...");
@@ -91,7 +134,6 @@ export default function Janitors() {
       return [];
     }
 
-   
     mappedJanitorsData.forEach((janitor) => {
       console.log("Existing Janitor Email:", janitor.basicDetails.email);
     });
@@ -105,7 +147,6 @@ export default function Janitors() {
       return filtered;
     }
 
-  
     return mappedJanitorsData.filter((janitor) => {
       const tabProperty = activeTab.toLowerCase().replace(/\s+/g, "");
       const propertyKey =
@@ -237,13 +278,8 @@ export default function Janitors() {
       {/* Table Container */}
       <div className="flex-1 overflow-hidden shadow-md rounded-lg border border-gray-200 mt-4">
         <div className="flex flex-col h-full">
-          <div className="overflow-x-auto border-b border-gray-200">
-            <div className="min-w-full">
-              <div style={{ height: "1px" }} />
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-auto">
+          {/* Table Header */}
+          <div className="border-b shrink-0">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -267,15 +303,24 @@ export default function Janitors() {
                   </TableRow>
                 ))}
               </TableHeader>
+            </Table>
+          </div>
+
+          {/* Table Body - Scrollable */}
+          <div className="flex-1 overflow-auto">
+            <Table>
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
+                    <TableRow key={row.id} className="hover:bg-gray-50">
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell
+                          key={cell.id}
+                          style={{
+                            width: `${cell.column.columnDef.size * 100}%`,
+                          }}
+                          className="px-2 py-2 sm:px-3 sm:py-3 text-xs sm:text-sm"
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -290,7 +335,7 @@ export default function Janitors() {
                       colSpan={getActiveColumns().length}
                       className="h-24 text-center"
                     >
-                      No results found.
+                      No results.
                     </TableCell>
                   </TableRow>
                 )}
@@ -298,7 +343,7 @@ export default function Janitors() {
             </Table>
           </div>
 
-          {/* Pagination Buttons */}
+          {/* Pagination */}
           <div className="border-t border-gray-200 bg-white p-2">
             {filteredJanitors.length > itemsPerPage && (
               <Pagination>

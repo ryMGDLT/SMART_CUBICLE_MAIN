@@ -3,7 +3,6 @@ import { Card } from "../../../Components/ui/card";
 import CustomCalendar from "../../../Components/Calendar/asideCalendar";
 import "../../../styles/Calendar.css";
 import SummarizedReport from "../../../Components/Reports/SummarizedCard";
-import { useDropdown } from "../../../Components/ui/dropdown-menu";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
@@ -56,17 +55,6 @@ export default function Dashboard() {
     "Total Resources Restocked",
     "Recommended Resources",
   ]);
-
-  // Dropdown handlers
-  const [
-    showSummarizedDropdown,
-    setShowSummarizedDropdown,
-    summarizedDropdownRef,
-  ] = useDropdown(false);
-  const [showChartDropdown, setShowChartDropdown, chartDropdownRef] =
-    useDropdown(false);
-  const [showTrendsDropdown, setShowTrendsDropdown, trendsDropdownRef] =
-    useDropdown(false);
 
   const showOtherCards = !showDateCard;
 
@@ -189,9 +177,6 @@ export default function Dashboard() {
                 ]}
                 selectedMetrics={selectedMetrics}
                 toggleMetric={toggleMetricWrapper}
-                showDropdown={showSummarizedDropdown}
-                setShowDropdown={setShowSummarizedDropdown}
-                dropdownRef={summarizedDropdownRef}
                 showPeriodSelector={true}
                 showMetricsDropdown={true}
                 showMetricsCards={true}
@@ -204,19 +189,13 @@ export default function Dashboard() {
               <Card className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4 flex-1 h-auto md:h-[400px]">
                 <ResourcesUsageChart
                   chartType={chartType}
-                  setShowChartDropdown={setShowChartDropdown}
-                  showChartDropdown={showChartDropdown}
                   setChartType={setChartType}
-                  dropdownRef={chartDropdownRef}
                 />
               </Card>
               <Card className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4 flex-1 h-auto md:h-[400px]">
                 <TrendsOverTimeChart
                   trendsChartType={trendsChartType}
-                  setShowTrendsDropdown={setShowTrendsDropdown}
-                  showTrendsDropdown={showTrendsDropdown}
                   setTrendsChartType={setTrendsChartType}
-                  dropdownRef={trendsDropdownRef}
                 />
               </Card>
             </div>

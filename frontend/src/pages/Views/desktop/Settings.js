@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Switch } from "../../../components/ui/switch";
-import { Input } from "../../../components/ui/input";
-import { Button } from "../../../components/ui/button";
+import { Switch } from "../../../Components/ui/switch";
+import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../Components/ui/button";
 import { cn } from "../../../lib/utils";
 
 export default function Settings() {

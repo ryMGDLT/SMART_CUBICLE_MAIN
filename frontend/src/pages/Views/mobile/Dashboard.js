@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { Card } from "../../../Components/ui/card";
-import SummarizedReport from "../../../Components/reports/SummarizedCard";
+import SummarizedReport from "../../../Components/Reports/SummarizedCard";
 import { useDropdown } from "../../../Components/ui/dropdown-menu";
 import { toggleMetric } from "../../../Components/utils/metricUtils";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../Components/charts/DashboardCharts";
-import CustomCalendar from "../../../Components/calendar/asideCalendar";
-import MobileCalendar from "../../../Components/calendar/mobileCalendar";
-import Reminders from "../../../Components/reminder/Reminder";
+} from "../../../Components/Charts/DashboardCharts";
+import CustomCalendar from "../../../Components/Calendar/asideCalendar";
+import MobileCalendar from "../../../Components/Calendar/mobileCalendar";
+import Reminders from "../../../Components/Reminder/Reminder";
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;

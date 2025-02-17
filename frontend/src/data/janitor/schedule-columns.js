@@ -4,8 +4,8 @@ import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-} from "../../components/ui/avatar";
-import { Badge } from "../../components/ui/badge";
+} from "../../Components/ui/avatar";
+import { Badge } from "../../Components/ui/badge";
 import { UserRoundIcon } from "lucide-react";
 
 export const scheduleColumns = [
