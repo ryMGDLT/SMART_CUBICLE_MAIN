@@ -16,7 +16,9 @@ export default function Nav() {
   const location = useLocation();
   const [active, setActive] = useState(() => {
     const storedActive = localStorage.getItem("activeItem");
-    return location.pathname === "/user_profile" ? "" : storedActive || "Dashboard";
+    return location.pathname === "/user_profile"
+      ? ""
+      : storedActive || "Dashboard";
   });
   const [collapsed, setCollapsed] = useState(() => {
     return (
@@ -233,7 +235,7 @@ export default function Nav() {
         {/* Sidebar Navigation */}
         <nav className="flex flex-col space-y-2">
           {sidebarItems
-            .filter((item) => item.roles.includes(user?.role)) 
+            .filter((item) => item.roles.includes(user?.role))
             .map((item) => (
               <Link
                 to={item.path}
