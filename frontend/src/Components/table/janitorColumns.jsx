@@ -1,10 +1,8 @@
-"use client"
-
-import { ColumnDef } from "@tanstack/react-table"
-import { Pencil, Trash } from "heroicons-react"
-import { Button } from "../../../Components/ui/button"
-import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData"
-import { Badge } from "../../../Components/ui/badge"
+import { ColumnDef } from "@tanstack/react-table";
+import { Pencil, Trash } from "heroicons-react";
+import { Button } from "../ui/button";
+import { DEFAULT_PROFILE_IMAGE } from "../../data/placeholderData";
+import { Badge } from "../ui/badge";
 
 export const getColumns = (handleEdit, handleDelete, activeTab) => {
   const basicDetailsColumns = [
@@ -35,32 +33,7 @@ export const getColumns = (handleEdit, handleDelete, activeTab) => {
       accessorKey: "basicDetails.contact",
       header: "Contact",
     },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => (
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-Icpetgreen hover:text-Icpetgreen/90"
-            onClick={() => handleEdit(row.original.basicDetails.employeeId)}
-          >
-            <Pencil className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-red-500 hover:text-red-500/90"
-            onClick={() => handleDelete(row.original.basicDetails.employeeId)}
-          >
-            <Trash className="w-4 h-4" />
-          </Button>
-        </div>
-      ),
-    },
-  ]
-
+  ];
   const scheduleColumns = [
     {
       accessorKey: "schedule.image",

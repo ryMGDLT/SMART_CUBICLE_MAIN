@@ -104,3 +104,22 @@
 }
 
 
+/*signup swal*/
+
+
+.custom-swal-popup {
+  text-align: left !important; 
+  margin: 10 !important;
+}
+
+.custom-swal-popup .swal2-title {
+  text-align: left !important; 
+  margin: 10 !important; 
+  padding: 10 !important; 
+  padding-top: 20px !important;
+  margin-top: 10px !important;
+}
+
+.custom-swal-popup .swal2-html-container {
+  text-align: left !important; 
+}

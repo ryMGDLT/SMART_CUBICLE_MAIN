@@ -1,8 +1,9 @@
 import "./styles/App.css";
 import "./styles/Calendar.css";
 import Nav from "./Components/utils/Nav";
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route, Outlet } from "react-router-dom";
 import PrivateRoute from "./pages/Auth/PrivateRoute";
+import PublicRoute from "./pages/Auth/PublicRoute";
 
 // Context Providers
 import { AuthProvider } from "./Components/Controller/AuthController";
@@ -11,6 +12,7 @@ import ViewController from "./Components/Controller/ViewController";
 // Authentication Pages
 import LoginDesktop from "./pages/Auth/desktop/Login";
 import SignupDesktop from "./pages/Auth/desktop/Signup";
+import VerifyEmailPage from "./pages/Auth/VerifyEmailPage";
 import LoginMobile from "./pages/Auth/mobile/Login";
 import SignupMobile from "./pages/Auth/mobile/Signup";
 
@@ -40,20 +42,105 @@ function App() {
             <Route path="/" element={<Navigate to="/login" replace />} />
 
             {/* Authentication Routes */}
-            <Route path="/login" element={<ViewController desktopComponent={LoginDesktop} mobileComponent={LoginMobile} />} />
-            <Route path="/signup" element={<ViewController desktopComponent={SignupDesktop} mobileComponent={SignupMobile} />} />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <ViewController
+                    desktopComponent={LoginDesktop}
+                    mobileComponent={LoginMobile}
+                  />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <PublicRoute>
+                  <ViewController
+                    desktopComponent={SignupDesktop}
+                    mobileComponent={SignupMobile}
+                  />
+                </PublicRoute>
+              }
+            />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
 
-            {/* Private Routes - Only Accessible After Logging In */}
-            <Route element={<PrivateRoute />}>
-              <Route path="/" element={<Nav />}>
-                <Route path="dashboard" element={<ViewController desktopComponent={DashboardDesktop} mobileComponent={DashboardMobile} />} />
-                <Route path="usage-monitor" element={<ViewController desktopComponent={UsageMonitorDesktop} mobileComponent={UsageMonitorMobile} />} />
-                <Route path="janitors" element={<ViewController desktopComponent={JanitorsDesktop} mobileComponent={JanitorsMobile} />} />
-                <Route path="resources" element={<ViewController desktopComponent={ResourcesDesktop} mobileComponent={ResourcesMobile} />} />
-                <Route path="settings" element={<ViewController desktopComponent={SettingsDesktop} mobileComponent={SettingsMobile} />} />
-                <Route path="users" element={<ViewController desktopComponent={UsersDesktop} mobileComponent={UsersMobile} />} />
-                <Route path="user_profile" element={<ViewController desktopComponent={ProfileDesktop} mobileComponent={ProfileMobile} />} />
-              </Route>
+            {/* Private Routes */}
+            <Route
+              element={
+                <PrivateRoute roles={["Admin", "Superadmin", "Janitor"]} status="Accepted" verified={true}>
+                  <LayoutWithNav />
+                </PrivateRoute>
+              }
+            >
+              <Route
+                path="/dashboard"
+                element={
+                  <ViewController
+                    desktopComponent={DashboardDesktop}
+                    mobileComponent={DashboardMobile}
+                  />
+                }
+              />
+              <Route
+                path="/usage-monitor"
+                element={
+                  <ViewController
+                    desktopComponent={UsageMonitorDesktop}
+                    mobileComponent={UsageMonitorMobile}
+                  />
+                }
+              />
+              <Route
+                path="/janitors"
+                element={
+                  <ViewController
+                    desktopComponent={JanitorsDesktop}
+                    mobileComponent={JanitorsMobile}
+                  />
+                }
+              />
+              <Route
+                path="/resources"
+                element={
+                  <ViewController
+                    desktopComponent={ResourcesDesktop}
+                    mobileComponent={ResourcesMobile}
+                  />
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ViewController
+                    desktopComponent={SettingsDesktop}
+                    mobileComponent={SettingsMobile}
+                  />
+                }
+              />
+              <Route
+                path="/users"
+                element={
+                  <PrivateRoute roles={["Admin", "Superadmin"]} status="Accepted" verified={true}>
+                    <ViewController
+                      desktopComponent={UsersDesktop}
+                      mobileComponent={UsersMobile}
+                    />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/user_profile"
+                element={
+                  <PrivateRoute roles={["Janitor", "Admin", "Superadmin"]} status="Accepted" verified={true}>
+                    <ViewController
+                      desktopComponent={ProfileDesktop}
+                      mobileComponent={ProfileMobile}
+                    />
+                  </PrivateRoute>
+                }
+              />
             </Route>
 
             {/* Catch-All Redirects Unauthenticated Users to Login */}
@@ -62,6 +149,17 @@ function App() {
         </div>
       </AuthProvider>
     </BrowserRouter>
+  );
+}
+
+
+function LayoutWithNav() {
+  return (
+    <div className="layout">
+      <Nav />
+      <div className="content">
+      </div>
+    </div>
   );
 }
 

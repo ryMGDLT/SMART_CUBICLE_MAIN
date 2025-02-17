@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from "react";
-import { USERS_DATA } from "../../../data/placeholderData";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
 import { Button } from "../../../Components/ui/button";
 import { Input } from "../../../Components/ui/input";
@@ -7,13 +6,15 @@ import { DataTable } from "../../../Components/ui/data-table";
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "../../../Components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { getColumns } from "./userColumns";
+import { getColumns } from "../../../Components/table/userColumns";
+import Swal from "sweetalert2";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
@@ -22,103 +23,231 @@ export default function Users() {
   const itemsPerPage = 10; // Set to show 10 items per page
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [usersData, setUsersData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Update filteredData to include both search and tab filtering
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/users`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Fetched data:", data);
+        setUsersData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [backendUrl]);
+
   const filteredData = useMemo(() => {
-    return USERS_DATA.filter((user) => {
-      const matchesTab =
-        activeTab === "All" ||
-        (activeTab === "Requests" && user.status === "Pending") ||
-        (activeTab === "Accepted" && user.status === "Accepted") ||
-        (activeTab === "Declined" && user.status === "Declined");
+    return usersData
+      .filter((user) => {
+        const matchesTab =
+          activeTab === "All" ||
+          (activeTab === "Requests" && user.status === "Pending") ||
+          (activeTab === "Accepted" && user.status === "Accepted") ||
+          (activeTab === "Declined" && user.status === "Declined");
 
-      const matchesSearch = Object.values(user).some((value) =>
-        String(value).toLowerCase().includes(searchTerm.toLowerCase())
-      );
+        const matchesSearch = Object.values(user).some((value) =>
+          String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
-      return matchesTab && matchesSearch;
-    });
-  }, [searchTerm, activeTab]);
+        return matchesTab && matchesSearch;
+      })
+      .sort((a, b) => {
+        if (a.status === "Pending" && b.status !== "Pending") {
+          return -1;
+        } else if (a.status !== "Pending" && b.status === "Pending") {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+  }, [searchTerm, activeTab, usersData]);
 
-  // Calculate pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const currentItems = useMemo(() => {
+    return filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  }, [filteredData, indexOfFirstItem, indexOfLastItem]);
 
-  // Generate page numbers array dynamically
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  const handleSearch = (e) => {
+  const handleSearch = useCallback((e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
-  };
+    setCurrentPage(1);
+  }, []);
 
-  const handlePageChange = (page) => {
+  const handlePageChange = useCallback((page) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  const handlePrevPage = () => {
+  const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
-  };
+  }, [currentPage]);
 
-  const handleNextPage = () => {
+  const handleNextPage = useCallback(() => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
-  };
+  }, [currentPage, totalPages]);
 
-  const handleAccept = (employeeId) => {
-    // Update user status logic here
-    console.log(`Accepted user ${employeeId}`);
-  };
+  const handleAccept = async (_id, currentRole, fullName) => {
+    if (!currentRole || currentRole === "User") {
+      Swal.fire({
+        icon: "error",
+        title: "Role Not Selected",
+        text: "Please select a valid role before accepting the user.",
+      });
+      return;
+    }
 
-  const handleDecline = (employeeId) => {
-    // Update user status logic here
-    console.log(`Declined user ${employeeId}`);
-  };
+    const { isConfirmed } = await Swal.fire({
+      title: "Confirm Acceptance",
+      html: `Are you sure you want to accept <strong>${fullName}</strong> and assign them the Position of <strong>${currentRole}</strong>?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, accept",
+      cancelButtonText: "No, cancel",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+    });
 
-  // Handle select all checkbox
-  const handleSelectAll = (e) => {
-    setSelectAll(e.target.checked);
-    if (e.target.checked) {
-      // Select all items currently visible on the page
-      const currentIds = currentItems.map((user) => user.employeeId);
-      setSelectedItems(currentIds);
-    } else {
-      // Deselect all items
-      setSelectedItems([]);
+    if (isConfirmed) {
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await fetch(`${backendUrl}/users/${_id}/accept`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ role: currentRole, status: "Accepted" }),
+        });
+
+        if (response.ok) {
+          setUsersData((prevData) =>
+            prevData.map((user) =>
+              user._id === _id
+                ? { ...user, role: currentRole, status: "Accepted" }
+                : user
+            )
+          );
+          Swal.fire("Accepted!", "The user has been accepted.", "success");
+        } else {
+          Swal.fire("Error", "Failed to update the user.", "error");
+        }
+      } catch (error) {
+        console.error("Error updating user:", error);
+        Swal.fire("Error", "An error occurred while updating the user.", "error");
+      }
     }
   };
 
-  // Handle individual item selection
-  const handleSelectItem = (employeeId) => {
+  const handleDecline = useCallback(async (_id) => {
+    const { isConfirmed } = await Swal.fire({
+      title: "Confirm Decline",
+      text: "Are you sure you want to decline this user?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, decline",
+      cancelButtonText: "No, cancel",
+    });
+
+    if (isConfirmed) {
+      try {
+        const response = await fetch(`${backendUrl}/users/${_id}/decline`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.ok) {
+          setUsersData((prevData) =>
+            prevData.map((user) =>
+              user._id === _id ? { ...user, status: "Declined" } : user
+            )
+          );
+          Swal.fire("Declined!", "The user has been declined.", "success");
+        } else {
+          Swal.fire("Error", "Failed to decline the user.", "error");
+        }
+      } catch (error) {
+        console.error("Error declining user:", error);
+        Swal.fire("Error", "An error occurred while declining the user.", "error");
+      }
+    }
+  }, [backendUrl]);
+
+  const handleRoleChange = useCallback((employeeId, newRole) => {
+    setUsersData((prevData) =>
+      prevData.map((user) =>
+        user._id === employeeId ? { ...user, role: newRole } : user
+      )
+    );
+    console.log(`Role updated locally for employee ${employeeId} to ${newRole}`);
+  }, []);
+
+  const handleSelectAll = useCallback((e) => {
+    setSelectAll(e.target.checked);
+    if (e.target.checked) {
+      const currentIds = currentItems.map((user) => user.employee_id);
+      setSelectedItems(currentIds);
+    } else {
+      setSelectedItems([]);
+    }
+  }, [currentItems]);
+
+  const handleSelectItem = useCallback((employeeId) => {
     setSelectedItems((prev) => {
       if (prev.includes(employeeId)) {
-        // Remove item if already selected
         const newSelected = prev.filter((id) => id !== employeeId);
-        // Update selectAll state
         setSelectAll(newSelected.length === currentItems.length);
         return newSelected;
       } else {
-        // Add item if not selected
         const newSelected = [...prev, employeeId];
-        // Update selectAll state
         setSelectAll(newSelected.length === currentItems.length);
         return newSelected;
       }
     });
-  };
+  }, [currentItems]);
 
-  // Reset pagination when changing tabs
-  const handleTabChange = (tab) => {
+  const handleTabChange = useCallback((tab) => {
     setActiveTab(tab);
-    setCurrentPage(1); // Reset to first page when changing tabs
-    setSelectedItems([]); // Clear selected items
-    setSelectAll(false); // Reset select all checkbox
-  };
+    setCurrentPage(1);
+    setSelectedItems([]);
+    setSelectAll(false);
+  }, []);
+
+  const columns = useMemo(() => {
+    const hideActions = activeTab === "Accepted" || activeTab === "Declined";
+    return getColumns(handleAccept, handleDecline, activeTab, handleRoleChange, hideActions);
+  }, [handleAccept, handleDecline, activeTab, handleRoleChange]);
+
+  const shouldShowPagination = filteredData.length > itemsPerPage;
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="h-full flex flex-col shadow-md bg-white rounded-lg p-6">
@@ -126,7 +255,6 @@ export default function Users() {
       <div className="flex flex-row justify-between items-center shrink-0">
         {/* Tab Navigation */}
         <div>
-          {/* Mobile view - keep the select for small screens */}
           <div className="sm:hidden">
             <label htmlFor="userTab" className="sr-only">
               User Tab
@@ -144,7 +272,6 @@ export default function Users() {
             </select>
           </div>
 
-          {/* Desktop view - use shadcn Tabs */}
           <div className="hidden sm:block">
             <Tabs
               value={activeTab}
@@ -152,9 +279,9 @@ export default function Users() {
               className="w-full"
             >
               <TabsList className="bg-transparent gap-6 w-auto">
-              {["All", "Requests", "Accepted", "Declined"].map((tab) => (
+                {["All", "Requests", "Accepted", "Declined"].map((tab) => (
                   <TabsTrigger
-                  key={tab}
+                    key={tab}
                     value={tab}
                     className={cn(
                       "rounded-lg w-24 data-[state=active]:shadow-none",
@@ -162,10 +289,10 @@ export default function Users() {
                       "data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500",
                       "hover:text-gray-700 hover:bg-gray-50"
                     )}
-                >
-                  {tab}
+                  >
+                    {tab}
                   </TabsTrigger>
-              ))}
+                ))}
               </TabsList>
             </Tabs>
           </div>
@@ -214,7 +341,7 @@ export default function Users() {
       <div className="mt-3 flex-1 flex flex-col h-full rounded-lg border border-gray-200 overflow-hidden">
         <div className="flex-1 overflow-y-auto relative">
           <DataTable
-            columns={getColumns(handleAccept, handleDecline, activeTab)}
+            columns={columns}
             data={currentItems}
             pageCount={totalPages}
             currentPage={currentPage}
@@ -222,6 +349,55 @@ export default function Users() {
             className="min-h-full"
           />
         </div>
+        {/* Pagination Controls */}
+        {shouldShowPagination && (
+          <div className="border-t border-gray-200 bg-white p-2">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={handlePrevPage}
+                    className={cn(
+                      "cursor-pointer",
+                      currentPage === 1 && "pointer-events-none opacity-50"
+                    )}
+                  />
+                </PaginationItem>
+
+                {pageNumbers.map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(page)}
+                      isActive={currentPage === page}
+                      className={cn(
+                        "cursor-pointer",
+                        currentPage === page && "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
+                      )}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                {totalPages > 7 && currentPage < totalPages - 3 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={handleNextPage}
+                    className={cn(
+                      "cursor-pointer",
+                      currentPage === totalPages && "pointer-events-none opacity-50"
+                    )}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );

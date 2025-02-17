@@ -3,26 +3,98 @@ import { useAuth } from "../../../Components/Controller/AuthController";
 import { Link } from "react-router-dom";
 import { Input } from "../../../Components/ui/input";
 import { Button } from "../../../Components/ui/button";
+import Swal from "sweetalert2";
 
-export default function LoginPage() {
-  const [fullname, setFullname] = React.useState("");
-  const [employeeid, setEmployeeid] = React.useState("");
-  const [username, setUsername] = React.useState("");
+export default function SignUpPage() {
+  const [fullName, setFullName] = React.useState("");
+  //const [username, setUsername] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [phoneNum, setPhoneNum] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
-  //const [showPassword, setShowPassword] = React.useState(false);
-  const { login } = useAuth();
+  const [employeeId, setEmployeeId] = React.useState("");
+  const [contactNumber, setContactNumber] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const { signup } = useAuth();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    login(username, password);
+  //validate Email
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
-  //const togglePassword = () => {
-  //setShowPassword((prevState) => !prevState);
-  //};
+  //validate password strength
+  const isStrongPassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+  
+    // Trim whitespace from both password fields
+    const trimmedPassword = password.trim();
+    const trimmedConfirmPassword = confirmPassword.trim();
+  
+    // Validate email
+    if (!isValidEmail(email)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Email",
+        text: "Please enter a valid email address!",
+      });
+      setLoading(false);
+      return;
+    }
+  
+    // Validate passwords
+    if (trimmedPassword !== trimmedConfirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Mismatch",
+        text: "Passwords do not match!",
+      });
+      setLoading(false);
+      return;
+    }
+  
+    // Validate password strength
+    if (!isStrongPassword(trimmedPassword)) {
+      Swal.fire({
+        icon: "error",
+        title: "Weak Password",
+        text: "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters!",
+      });
+      setLoading(false);
+      return;
+    }
+  
+    // Create the user data object
+    const userData = {
+      fullName,
+      password: trimmedPassword,
+      confirmPassword: trimmedConfirmPassword,
+      employee_id: employeeId,
+      contact_number: contactNumber,
+      email,
+      role: "User",
+    };
+  
+    try {
+      await signup(userData); 
+    } catch (error) {
+      console.error("Signup error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Signup Failed",
+        text: "An error occurred during signup. Please try again later.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">
       <img
@@ -49,11 +121,11 @@ export default function LoginPage() {
               </label>
               <Input
                 type="text"
-                placeholder="Nathan Drake"
+                placeholder="Full Name"
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
-                value={fullname}
+                value={fullName}
                 required
-                onChange={(e) => setFullname(e.target.value)}
+                onChange={(e) => setFullName(e.target.value)}
               />
             </div>
             {/*Employee ID*/}
@@ -65,9 +137,9 @@ export default function LoginPage() {
                 type="text"
                 placeholder="TUPM-21-XXXX"
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
-                value={employeeid}
+                value={employeeId}
                 required
-                onChange={(e) => setEmployeeid(e.target.value)}
+                onChange={(e) => setEmployeeId(e.target.value)}
               />
             </div>
           </div>
@@ -79,10 +151,10 @@ export default function LoginPage() {
               </label>
               <Input
                 type="text"
-                placeholder="nathandrake@mail.com"
+                placeholder="email@email.com"
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -92,38 +164,61 @@ export default function LoginPage() {
                 Contact Number
               </label>
               <Input
-                type="tel"
-                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                placeholder="+63 XXX-XXX-XXXX"
+                type="text"
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
-                value={phoneNum}
+                value={contactNumber}
+                placeholder="+63-9xx-xxx-xxxx"
                 onChange={(e) => {
                   let value = e.target.value;
-
-                  // Remove the prefix if it exists
-                  if (value.startsWith("+63 ")) {
-                    value = value.substring(4);
-                  }
 
                   // Remove all non-digits
                   value = value.replace(/\D/g, "");
 
-                  // Handle empty/backspace case
-                  if (!value || value.length === 0) {
-                    setPhoneNum("");
+                  // Remove the "+63" prefix for processing
+                  if (value.startsWith("63")) {
+                    value = value.substring(2);
+                  }
+
+                  // Remove leading zero if it exists
+                  if (value.startsWith("0")) {
+                    value = value.substring(1);
+                  }
+
+                  // Ensure the number starts with "9"
+                  if (value.length > 0 && value[0] !== "9") {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Invalid Contact Number",
+                      text: "Contact number must start with 9!",
+                    });
                     return;
                   }
 
-                  // Format the number
-                  if (value.length <= 10) {
-                    const formattedNumber = value
-                      .substring(0, 10)
-                      .replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
-                    setPhoneNum("+63 " + formattedNumber);
+                  // Limit the input to 10 digits
+                  if (value.length > 10) {
+                    value = value.substring(0, 10);
                   }
+
+                  let formattedNumber = "+63 ";
+                  if (value.length > 0) {
+                    if (value.length <= 3) {
+                      formattedNumber += value;
+                    } else if (value.length <= 6) {
+                      formattedNumber += value.replace(
+                        /(\d{3})(\d{0,3})/,
+                        "$1-$2"
+                      );
+                    } else {
+                      formattedNumber += value.replace(
+                        /(\d{3})(\d{3})(\d{0,4})/,
+                        "$1-$2-$3"
+                      );
+                    }
+                  }
+
+                  setContactNumber(formattedNumber);
                 }}
                 maxLength="17"
-                required
               />
             </div>
           </div>
@@ -136,13 +231,14 @@ export default function LoginPage() {
                   Password
                 </label>
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
                   value={password}
                   required
                   onChange={(e) => setPassword(e.target.value)}
                 />
+
                 {/* {password && ( 
                   <button
                     type="button"
@@ -152,6 +248,13 @@ export default function LoginPage() {
                     <i className={`fa ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
                   </button>
                 )} */}
+                <button
+                  type="button"
+                  className="absolute right-2 top-10 text-sm text-Icpetgreen hover:underline"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
               </div>
             </div>
             {/*confirm password*/}
@@ -161,7 +264,7 @@ export default function LoginPage() {
                   Confirm Password
                 </label>
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white  "
                   value={confirmPassword}
@@ -177,10 +280,17 @@ export default function LoginPage() {
                     <i className={`fa ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
                   </button>
                 )} */}
+                <button
+                  type="button"
+                  className="absolute right-2 top-10 text-sm text-Icpetgreen hover:underline"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
               </div>
             </div>
           </div>
-          <div className="text-center mt-2">  
+          <div className="text-center mt-2">
             <Button
               type="submit"
               variant="link"
@@ -189,15 +299,16 @@ export default function LoginPage() {
               <Link to="/login">Log In</Link>
             </Button>
           </div>
-        </form>
 
-        <Button
-          type="submit"
-          variant="default"
-          className="w-1/4 mx-auto block mt-4"
-        >
-          Sign Up
-        </Button>
+          <Button
+            type="submit"
+            variant="default"
+            className="w-1/4 mx-auto block mt-4"
+            disabled={loading}
+          >
+            {loading ? "Signing Up..." : "Sign Up"}
+          </Button>
+        </form>
       </div>
     </div>
   );
