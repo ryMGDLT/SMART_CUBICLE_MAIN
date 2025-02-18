@@ -33,13 +33,12 @@ export default function Janitors() {
   const [activeTab, setActiveTab] = useState("Basic Details");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [janitorsData, setJanitorsData] = useState([]); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null); 
+  const [janitorsData, setJanitorsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const itemsPerPage = 10;
   const { user } = useAuth();
   const userRole = user?.role;
- 
 
   useEffect(() => {
     const fetchJanitors = async () => {
@@ -48,7 +47,7 @@ export default function Janitors() {
         if (!response.ok) throw new Error("Failed to fetch janitors");
         const data = await response.json();
         setJanitorsData(data);
-        console.log("Fetched Janitors Data:", data); 
+        console.log("Fetched Janitors Data:", data);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -59,8 +58,8 @@ export default function Janitors() {
     fetchJanitors();
   }, []);
 
-  console.log("Logged-in User:", user); 
-  
+  console.log("Logged-in User:", user);
+
   const mappedJanitorsData = useMemo(() => {
     return janitorsData.map((janitor) => ({
       basicDetails: {
@@ -68,7 +67,7 @@ export default function Janitors() {
         image: janitor.profileImage || DEFAULT_PROFILE_IMAGE,
         name: janitor.fullName,
         employeeId: janitor.employee_id,
-        email: janitor.email || "", 
+        email: janitor.email || "",
         contact: janitor.contact_number,
       },
       schedule: {},
@@ -78,7 +77,7 @@ export default function Janitors() {
     }));
   }, [janitorsData]);
 
-  console.log("Mapped Janitors Data:", mappedJanitorsData); 
+  console.log("Mapped Janitors Data:", mappedJanitorsData);
 
   const filteredJanitors = useMemo(() => {
     console.log("Debug: Checking filtering logic...");
@@ -91,7 +90,6 @@ export default function Janitors() {
       return [];
     }
 
-   
     mappedJanitorsData.forEach((janitor) => {
       console.log("Existing Janitor Email:", janitor.basicDetails.email);
     });
@@ -105,7 +103,6 @@ export default function Janitors() {
       return filtered;
     }
 
-  
     return mappedJanitorsData.filter((janitor) => {
       const tabProperty = activeTab.toLowerCase().replace(/\s+/g, "");
       const propertyKey =
@@ -124,7 +121,7 @@ export default function Janitors() {
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
 
-      if (isMatch) console.log("✅ Match found:", janitor.basicDetails.name);
+      if (isMatch) console.log("Match found:", janitor.basicDetails.name);
 
       return isMatch;
     });
