@@ -1,9 +1,8 @@
 const sgMail = require('@sendgrid/mail');
 
-// Load environment variables
+
 require('dotenv').config();
 
-// Set the SendGrid API key
 if (!process.env.SENDGRID_API_KEY || !process.env.SENDGRID_API_KEY.startsWith('SG.')) {
     console.error('Invalid SendGrid API Key. Please check your .env file.');
     process.exit(1); 
@@ -12,7 +11,7 @@ if (!process.env.SENDGRID_API_KEY || !process.env.SENDGRID_API_KEY.startsWith('S
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const msg = {
-    to: 'recipient@example.com', /
+    to: 'recipient@example.com', 
     from: process.env.FROM_EMAIL,
     subject: 'Test Email',
     text: 'This is a test email sent using SendGrid.',

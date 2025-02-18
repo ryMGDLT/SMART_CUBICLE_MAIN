@@ -59,31 +59,6 @@ export default function Janitors() {
   const { user } = useAuth();
   const userRole = user?.role;
 
-  // Get the appropriate columns based on active tab
-  const getActiveColumns = () => {
-    switch (activeTab) {
-      case "Basic Details":
-        return basicColumns;
-      case "Schedule":
-        return scheduleColumns;
-      case "Performance Track":
-        return performanceTrackColumns;
-      case "Resource Usage":
-        return resourceUsageColumns;
-      case "Logs and Report":
-        return logsReportColumns;
-      default:
-        return basicColumns;
-    }
-  };
-
-  // Create table instance
-  const table = useReactTable({
-    data: currentItems,
-    columns: getActiveColumns(),
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   useEffect(() => {
     const fetchJanitors = async () => {
       try {
@@ -165,7 +140,7 @@ export default function Janitors() {
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
 
-      if (isMatch) console.log("✅ Match found:", janitor.basicDetails.name);
+      if (isMatch) console.log("Match found:", janitor.basicDetails.name);
 
       return isMatch;
     });
