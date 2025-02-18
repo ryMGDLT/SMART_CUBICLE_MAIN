@@ -14,7 +14,7 @@ export const JANITORS_DATA = [
     },
     schedule: {
       image: "/images/sadGato.jpg",
-      name: "John Doe",
+      name: "Maria Santos",
       date: "2024-03-15",
       shift: "Morning",
       timeIn: "08:00 AM",
@@ -25,7 +25,7 @@ export const JANITORS_DATA = [
     },
     performanceTrack: {
       image: "/images/sadGato.jpg",
-      name: "John Doe",
+      name: "Maria Santos",
       today: 8,
       thisWeek: 40,
       thisMonth: 160,
@@ -35,7 +35,7 @@ export const JANITORS_DATA = [
     },
     resourceUsage: {
       image: "/images/sadGato.jpg",
-      name: "John Doe",
+      name: "Maria Santos",
       resource: "Cleaning Supplies",
       amountUsed: "5 units",
       remaining: "15 units",
@@ -45,7 +45,7 @@ export const JANITORS_DATA = [
     },
     logsReport: {
       image: "/images/sadGato.jpg",
-      name: "John Doe",
+      name: "Maria Santos",
       date: "2024-03-15",
       startTime: "08:00 AM",
       endTime: "05:00 PM",
