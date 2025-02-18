@@ -78,7 +78,7 @@ app.post(
     });
 
     // Construct the absolute URL for the uploaded image
-    const serverUrl = process.env.BACKEND_URL || "http://172.20.10.4:5000";
+    const serverUrl = process.env.BACKEND_URL || "http://192.168.1.8:5000";
     res.json({
       profileImage: `${serverUrl}/uploads/profile-images/${newFileName}`,
     });

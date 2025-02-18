@@ -3,6 +3,7 @@
 import { Checkbox } from "../../ui/checkbox";
 import { Badge } from "../../ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
+import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 import { UserRoundIcon } from "lucide-react";
 import { cn } from "../../../lib/utils";
 
@@ -14,7 +15,7 @@ export const getColumns = (handleAccept, handleDecline) => [
       return (
         <div className="flex items-center gap-2 max-w-[180px]">
           <Avatar>
-            <AvatarImage src={row.original.image || "/images/sadGato.jpg"} />
+            <AvatarImage src={DEFAULT_PROFILE_IMAGE} />
             <AvatarFallback>
               <UserRoundIcon className="w-4 h-4" />
             </AvatarFallback>

@@ -13,9 +13,10 @@ import {
   PaginationPrevious,
 } from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { getColumns } from "../../../components/table/userColumns";
+import { getColumns } from "../../../components/tables/user/user-column";
 import Swal from "sweetalert2";
 import { Card } from "../../../components/ui/card";
+import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
