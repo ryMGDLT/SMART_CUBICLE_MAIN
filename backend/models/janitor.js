@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const janitorSchema = new mongoose.Schema({
   basicDetails: {
     image: { type: String },
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     employeeId: { type: String, required: true, unique: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
     contact: { type: String, required: true }
   },
   schedule: {

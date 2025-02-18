@@ -53,6 +53,43 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+// UPDATE janitor schedule status
+router.put('/:id/schedule/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const janitorId = req.params.id;
+    
+    if (!status) {
+      return res.status(400).json({ message: 'Status is required' });
+    }
+
+    // Validate status
+    const validStatuses = ['Early', 'On Time', 'Over Time'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
+
+    const janitor = await Janitor.findById(janitorId);
+    
+    if (!janitor) {
+      return res.status(404).json({ message: 'Janitor not found' });
+    }
+
+    // Update the schedule status
+    janitor.schedule.status = status;
+    const updatedJanitor = await janitor.save();
+
+    res.json({ 
+      message: 'Status updated successfully',
+      status: updatedJanitor.schedule.status 
+    });
+
+  } catch (error) {
+    console.error('Error updating schedule status:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // DELETE a janitor
 router.delete('/:id', async (req, res) => {
   try {

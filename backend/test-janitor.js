@@ -9,158 +9,158 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
         const janitors = [
             {
                 basicDetails: {
-                    image: "/images/sadGato.jpg",
-                    name: "Rafael Mendoza",
-                    employeeId: "TUPM-22-0002",
-                    email: "rafael.mendoza@tup.edu.ph",
-                    contact: "+639222333444"
+                    image: "/images/janitor1.jpg",
+                    name: "Sofia Reyes",
+                    employeeId: "TUPM-23-0008",
+                    email: "sofia.reyes@tup.edu.ph",
+                    contact: "+639234567890"
                 },
                 schedule: {
-                    image: "/images/sadGato.jpg",
-                    name: "Rafael Mendoza",
-                    date: "2024-03-15",
+                    image: "/images/janitor1.jpg",
+                    name: "Sofia Reyes",
+                    date: "2024-05-21",
                     shift: "Morning",
-                    timeIn: "08:00 AM",
-                    timeOut: "05:00 PM",
-                    cleaningHour: "8 hours",
+                    timeIn: "07:00 AM",
+                    timeOut: "04:00 PM",
+                    cleaningHour: "9 hours",
                     task: "General Cleaning",
                     status: "On Time"
                 },
                 performanceTrack: {
-                    image: "/images/sadGato.jpg",
-                    name: "Rafael Mendoza",
-                    today: 7,
-                    thisWeek: 35,
-                    thisMonth: 140,
-                    thisYear: 1680,
-                    status: "Good",
-                    employeeId: "JAN-002"
-                },
-                resourceUsage: {
-                    image: "/images/sadGato.jpg",
-                    name: "Rafael Mendoza",
-                    resource: "Cleaning Supplies",
-                    amountUsed: "4 units",
-                    remaining: "16 units",
-                    restocked: "Yes",
-                    note: "Normal Usage",
-                    employeeId: "JAN-002"
-                },
-                logsReport: {
-                    image: "/images/sadGato.jpg",
-                    name: "Rafael Mendoza",
-                    date: "2024-03-15",
-                    startTime: "08:00 AM",
-                    endTime: "05:00 PM",
-                    duration: 8,
-                    task: "General Cleaning",
-                    beforePicture: "/images/before2.jpg",
-                    afterPicture: "/images/after2.jpg",
-                    status: "Done"
-                }
-            },
-            {
-                basicDetails: {
-                    image: "/images/sadGato.jpg",
-                    name: "Carmen Ramos",
-                    employeeId: "TUPM-22-0003",
-                    email: "carmen.ramos@tup.edu.ph",
-                    contact: "+639333444555"
-                },
-                schedule: {
-                    image: "/images/sadGato.jpg",
-                    name: "Carmen Ramos",
-                    date: "2024-03-15",
-                    shift: "Afternoon",
-                    timeIn: "02:00 PM",
-                    timeOut: "10:00 PM",
-                    cleaningHour: "8 hours",
-                    task: "Deep Cleaning",
-                    status: "On Time"
-                },
-                performanceTrack: {
-                    image: "/images/sadGato.jpg",
-                    name: "Carmen Ramos",
+                    image: "/images/janitor1.jpg",
+                    name: "Sofia Reyes",
                     today: 8,
-                    thisWeek: 40,
-                    thisMonth: 160,
-                    thisYear: 1920,
+                    thisWeek: 42,
+                    thisMonth: 168,
+                    thisYear: 2016,
                     status: "Excellent",
-                    employeeId: "JAN-003"
+                    employeeId: "JAN-008"
                 },
                 resourceUsage: {
-                    image: "/images/sadGato.jpg",
-                    name: "Carmen Ramos",
-                    resource: "Disinfectant",
+                    image: "/images/janitor1.jpg",
+                    name: "Sofia Reyes",
+                    resource: "Glass Cleaner",
                     amountUsed: "2 liters",
                     remaining: "8 liters",
                     restocked: "No",
-                    note: "Low Usage",
-                    employeeId: "JAN-003"
+                    note: "Normal Usage",
+                    employeeId: "JAN-008"
                 },
                 logsReport: {
-                    image: "/images/sadGato.jpg",
-                    name: "Carmen Ramos",
-                    date: "2024-03-15",
-                    startTime: "02:00 PM",
-                    endTime: "10:00 PM",
-                    duration: 8,
-                    task: "Deep Cleaning",
-                    beforePicture: "/images/before3.jpg",
-                    afterPicture: "/images/after3.jpg",
-                    status: "Done"
+                    image: "/images/janitor1.jpg",
+                    name: "Sofia Reyes",
+                    date: "2024-05-21",
+                    startTime: "07:00 AM",
+                    endTime: "04:00 PM",
+                    duration: 9,
+                    task: "General Cleaning",
+                    beforePicture: "/images/before8.jpg",
+                    afterPicture: "/images/after8.jpg",
+                    status: "Completed"
                 }
             },
             {
                 basicDetails: {
-                    image: "/images/sadGato.jpg",
-                    name: "Antonio Santos",
-                    employeeId: "TUPM-22-0004",
-                    email: "antonio.santos@tup.edu.ph",
-                    contact: "+639444555666"
+                    image: "/images/janitor2.jpg",
+                    name: "Carlos Mendoza",
+                    employeeId: "TUPM-23-0009",
+                    email: "carlos.mendoza@tup.edu.ph",
+                    contact: "+639345678901"
                 },
                 schedule: {
-                    image: "/images/sadGato.jpg",
-                    name: "Antonio Santos",
-                    date: "2024-03-15",
+                    image: "/images/janitor2.jpg",
+                    name: "Carlos Mendoza",
+                    date: "2024-05-21",
+                    shift: "Afternoon",
+                    timeIn: "12:30 PM",
+                    timeOut: "08:30 PM",
+                    cleaningHour: "8 hours",
+                    task: "Waste Management",
+                    status: "Early"
+                },
+                performanceTrack: {
+                    image: "/images/janitor2.jpg",
+                    name: "Carlos Mendoza",
+                    today: 9,
+                    thisWeek: 40,
+                    thisMonth: 160,
+                    thisYear: 1920,
+                    status: "Outstanding",
+                    employeeId: "JAN-009"
+                },
+                resourceUsage: {
+                    image: "/images/janitor2.jpg",
+                    name: "Carlos Mendoza",
+                    resource: "Trash Bags",
+                    amountUsed: "50 pieces",
+                    remaining: "150 pieces",
+                    restocked: "Yes",
+                    note: "High Usage",
+                    employeeId: "JAN-009"
+                },
+                logsReport: {
+                    image: "/images/janitor2.jpg",
+                    name: "Carlos Mendoza",
+                    date: "2024-05-21",
+                    startTime: "12:30 PM",
+                    endTime: "08:30 PM",
+                    duration: 8,
+                    task: "Waste Management",
+                    beforePicture: "/images/before9.jpg",
+                    afterPicture: "/images/after9.jpg",
+                    status: "Finished"
+                }
+            },
+            {
+                basicDetails: {
+                    image: "/images/janitor3.jpg",
+                    name: "Gabriela Santos",
+                    employeeId: "TUPM-23-0010",
+                    email: "gabriela.santos@tup.edu.ph",
+                    contact: "+639456789012"
+                },
+                schedule: {
+                    image: "/images/janitor3.jpg",
+                    name: "Gabriela Santos",
+                    date: "2024-05-21",
                     shift: "Night",
                     timeIn: "10:00 PM",
                     timeOut: "06:00 AM",
                     cleaningHour: "8 hours",
-                    task: "Night Cleaning",
+                    task: "Disinfection",
                     status: "On Time"
                 },
                 performanceTrack: {
-                    image: "/images/sadGato.jpg",
-                    name: "Antonio Santos",
-                    today: 6,
-                    thisWeek: 30,
-                    thisMonth: 120,
-                    thisYear: 1440,
-                    status: "Good",
-                    employeeId: "JAN-004"
+                    image: "/images/janitor3.jpg",
+                    name: "Gabriela Santos",
+                    today: 8,
+                    thisWeek: 39,
+                    thisMonth: 156,
+                    thisYear: 1872,
+                    status: "Very Good",
+                    employeeId: "JAN-010"
                 },
                 resourceUsage: {
-                    image: "/images/sadGato.jpg",
-                    name: "Antonio Santos",
-                    resource: "Floor Wax",
-                    amountUsed: "3 liters",
-                    remaining: "7 liters",
+                    image: "/images/janitor3.jpg",
+                    name: "Gabriela Santos",
+                    resource: "Disinfectant",
+                    amountUsed: "4 liters",
+                    remaining: "6 liters",
                     restocked: "No",
-                    note: "Medium Usage",
-                    employeeId: "JAN-004"
+                    note: "Normal Usage",
+                    employeeId: "JAN-010"
                 },
                 logsReport: {
-                    image: "/images/sadGato.jpg",
-                    name: "Antonio Santos",
-                    date: "2024-03-15",
+                    image: "/images/janitor3.jpg",
+                    name: "Gabriela Santos",
+                    date: "2024-05-21",
                     startTime: "10:00 PM",
                     endTime: "06:00 AM",
                     duration: 8,
-                    task: "Night Cleaning",
-                    beforePicture: "/images/before4.jpg",
-                    afterPicture: "/images/after4.jpg",
-                    status: "Done"
+                    task: "Disinfection",
+                    beforePicture: "/images/before10.jpg",
+                    afterPicture: "/images/after10.jpg",
+                    status: "Completed"
                 }
             }
         ];

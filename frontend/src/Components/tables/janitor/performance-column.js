@@ -7,22 +7,33 @@ import { UserRoundIcon } from "lucide-react";
 
 export const performanceTrackColumns = [
   {
+    accessorKey: "performanceTrack.image",
+    header: "Profile Pic",
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center px-2">
+          <Avatar>
+            <AvatarImage src={DEFAULT_PROFILE_IMAGE} alt={row.original.performanceTrack.name} />
+            <AvatarFallback>
+              <UserRoundIcon className="w-4 h-4" />
+            </AvatarFallback>
+          </Avatar>
+        </div>
+      );
+    },
+    size: 0.1,
+  },
+  {
     accessorKey: "performanceTrack.name",
     header: "Name",
     cell: ({ row }) => (
-      <div className="flex items-center gap-2 max-w-[180px]">
-        <Avatar>
-          <AvatarImage src={DEFAULT_PROFILE_IMAGE} />
-          <AvatarFallback>
-            <UserRoundIcon className="w-4 h-4" />
-          </AvatarFallback>
-        </Avatar>
+      <div className="truncate px-2">
         <p className="text-sm font-medium truncate">
           {row.original.performanceTrack.name}
         </p>
       </div>
     ),
-    size: 0.25,
+    size: 0.2,
   },
   {
     accessorKey: "performanceTrack.today",

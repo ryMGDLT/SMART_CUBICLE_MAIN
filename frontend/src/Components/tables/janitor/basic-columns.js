@@ -6,17 +6,28 @@ import { UserRoundIcon } from "lucide-react";
 
 export const basicColumns = [
   {
-    accessorKey: "basicDetails.name",
-    header: "Name",
+    accessorKey: "basicDetails.image",
+    header: "Profile Pic",
     cell: ({ row }) => {
       return (
-        <div className="flex items-center gap-2 max-w-[180px]">
+        <div className="flex items-center max-w-[180px] px-2">
           <Avatar>
-            <AvatarImage src={DEFAULT_PROFILE_IMAGE} />
+            <AvatarImage src={row.original.basicDetails.image} alt={row.original.basicDetails.name} />
             <AvatarFallback>
               <UserRoundIcon className="w-4 h-4" />
             </AvatarFallback>
           </Avatar>
+        </div>
+      );
+    },
+    size: 0.1,
+  },
+  {
+    accessorKey: "basicDetails.name",
+    header: "Name",
+    cell: ({ row }) => {
+      return (
+        <div className="truncate">
           <p className="text-sm font-medium truncate">
             {row.original.basicDetails.name}
           </p>
@@ -43,7 +54,7 @@ export const basicColumns = [
   },
   {
     accessorKey: "basicDetails.contact",
-    header: "Contact",
+    header: "Contact Information",
     cell: ({ row }) => (
       <div className="truncate">{row.original.basicDetails.contact}</div>
     ),

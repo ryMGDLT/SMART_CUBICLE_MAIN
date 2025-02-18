@@ -78,6 +78,7 @@ export default function Janitors() {
 
   const mappedJanitorsData = useMemo(() => {
     return janitorsData.map((janitor) => ({
+      _id: janitor._id,
       basicDetails: {
         _id: janitor._id,
         image: janitor.basicDetails?.image || DEFAULT_PROFILE_IMAGE,
@@ -87,6 +88,7 @@ export default function Janitors() {
         contact: janitor.basicDetails?.contact || "",
       },
       schedule: {
+        _id: janitor._id,
         image: janitor.schedule?.image || DEFAULT_PROFILE_IMAGE,
         name: janitor.schedule?.name || "",
         date: janitor.schedule?.date || "",
