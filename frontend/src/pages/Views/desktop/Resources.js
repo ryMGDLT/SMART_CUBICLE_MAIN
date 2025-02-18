@@ -20,20 +20,20 @@ import {
   ChevronRight,
 } from "heroicons-react";
 import { RESOURCES_DATA } from "../../../data/placeholderData";
-import ReminderCard from "../../../Components/Reports/reminderCard";
+import ReminderCard from "../../../components/reports/reminderCard";
 import { REMINDERS_DATA } from "../../../data/placeholderData";
-import { Button } from "../../../Components/ui/button";
+import { Button } from "../../../components/ui/button";
 import { cn } from "../../../lib/utils";
-import { Calendar } from "../../../Components/ui/calendar";
+import { Calendar } from "../../../components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../../Components/ui/popover";
+} from "../../../components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { format, setDefaultOptions } from "date-fns";
 import { enUS } from "date-fns/locale";
-import { MonthPicker } from "../../../Components/ui/month-picker";
+import { MonthPicker } from "../../../components/ui/month-picker";
 
 // Register ChartJS components
 ChartJS.register(

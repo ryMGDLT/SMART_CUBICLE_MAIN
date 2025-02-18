@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Printer } from "heroicons-react";
-import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
-import { Button } from "../../../Components/ui/button";
-import { Input } from "../../../Components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../Components/ui/table";
+} from "../../../components/ui/table";
 import {
   Pagination,
   PaginationContent,
@@ -19,26 +19,23 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../Components/ui/pagination";
+} from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { Card } from "../../../Components/ui/card";
+import { Card } from "../../../components/ui/card";
 
-import { basicColumns } from "../../../Components/tables/janitor/basic-columns";
-import { scheduleColumns } from "../../../Components/tables/janitor/schedule-columns";
-import { performanceTrackColumns } from "../../../Components/tables/janitor/performance-column";
-import { resourceUsageColumns } from "../../../Components/tables/janitor/resource-column";
-import { logsReportColumns } from "../../../Components/tables/janitor/logs-column";
+import { basicColumns } from "../../../components/tables/janitor/basic-columns";
+import { scheduleColumns } from "../../../components/tables/janitor/schedule-columns";
+import { performanceTrackColumns } from "../../../components/tables/janitor/performance-column";
+import { resourceUsageColumns } from "../../../components/tables/janitor/resource-column";
+import { logsReportColumns } from "../../../components/tables/janitor/logs-column";
 
 import {
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  DEFAULT_PROFILE_IMAGE,
-  JANITORS_DATA,
-} from "../../../data/placeholderData";
-import { useAuth } from "../../../Components/Controller/AuthController";
+import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
+import { useAuth } from "../../../components/controller/AuthController";
 
 const TABS = [
   "Basic Details",
@@ -62,7 +59,7 @@ export default function Janitors() {
   useEffect(() => {
     const fetchJanitors = async () => {
       try {
-        const response = await fetch("http://192.168.113.78:5000/api/janitors");
+        const response = await fetch("http://172.20.10.4:5000/api/janitors");
         if (!response.ok) throw new Error("Failed to fetch janitors");
         const data = await response.json();
         setJanitorsData(data);
@@ -171,6 +168,29 @@ export default function Janitors() {
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(1, prev - 1));
   const handleNextPage = () =>
     setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+
+  const getActiveColumns = () => {
+    switch (activeTab) {
+      case "Basic Details":
+        return basicColumns;
+      case "Schedule":
+        return scheduleColumns;
+      case "Performance Track":
+        return performanceTrackColumns;
+      case "Resource Usage":
+        return resourceUsageColumns;
+      case "Logs and Report":
+        return logsReportColumns;
+      default:
+        return basicColumns;
+    }
+  };
+
+  const table = useReactTable({
+    data: currentItems,
+    columns: getActiveColumns(),
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   if (loading) {
     return <div>Loading...</div>;

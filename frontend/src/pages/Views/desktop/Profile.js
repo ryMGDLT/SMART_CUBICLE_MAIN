@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Camera } from "lucide-react";
 import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
-import { Avatar, AvatarImage, AvatarFallback } from "../../../Components/ui/avatar";
-import { Input } from "../../../Components/ui/input";
-import { Button } from "../../../Components/ui/button";
-import { useAuth } from "../../../Components/Controller/AuthController";
-import { axiosInstance } from "../../../Components/Controller/AuthController";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from "../../../components/ui/avatar";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
+import { useAuth } from "../../../components/controller/AuthController";
+import { axiosInstance } from "../../../components/controller/AuthController";
 import Swal from "sweetalert2";
 
 export default function Profile() {
@@ -15,9 +19,10 @@ export default function Profile() {
   const [editMode, setEditMode] = useState(false);
   const [tempUserData, setTempUserData] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
-  const { user, setUser } = useAuth(); 
+  const { user, setUser } = useAuth();
 
-  const serverUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.5.45:5000";
+  const serverUrl =
+    process.env.REACT_APP_BACKEND_URL || "http://192.168.1.8:5000";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -27,7 +32,6 @@ export default function Profile() {
           throw new Error("User is not authenticated.");
         }
 
-       
         const response = await axiosInstance.get(`/users/${user.id}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -36,7 +40,7 @@ export default function Profile() {
 
         console.log("User data fetched successfully:", response.data);
         setUserData(response.data);
-        setTempUserData(response.data); 
+        setTempUserData(response.data);
       } catch (err) {
         console.error("Error fetching user data:", err.message);
         setError(err.message);
@@ -56,7 +60,6 @@ export default function Profile() {
   const handleEditClick = async () => {
     console.log("Edit/Save button clicked");
     if (editMode) {
-      
       const result = await Swal.fire({
         title: "Are you sure?",
         text: "Do you want to save the changes?",
@@ -71,7 +74,7 @@ export default function Profile() {
       if (result.isConfirmed) {
         try {
           console.log("Preparing to save changes...");
-        
+
           const updatedData = {
             fullName: tempUserData.fullName,
             email: tempUserData.email,
@@ -79,7 +82,6 @@ export default function Profile() {
             role: tempUserData.role,
           };
 
-       
           if (selectedImage) {
             console.log("Uploading new profile image...");
             const formData = new FormData();
@@ -95,21 +97,24 @@ export default function Profile() {
               }
             );
 
-         
             setTempUserData((prev) => ({
               ...prev,
               profileImage: imageResponse.data.profileImage,
             }));
 
-            console.log("Profile image uploaded successfully:", imageResponse.data);
-            updatedData.profileImage = imageResponse.data.profileImage; 
+            console.log(
+              "Profile image uploaded successfully:",
+              imageResponse.data
+            );
+            updatedData.profileImage = imageResponse.data.profileImage;
 
-       
-            const updatedUser = { ...user, profileImage: imageResponse.data.profileImage };
-            setUser(updatedUser); 
+            const updatedUser = {
+              ...user,
+              profileImage: imageResponse.data.profileImage,
+            };
+            setUser(updatedUser);
           }
 
-       
           console.log("Updating user data...");
           const response = await axiosInstance.put(
             `/users/${user.id}`,
@@ -123,14 +128,12 @@ export default function Profile() {
 
           console.log("User data updated successfully:", response.data);
 
-       
           setUserData(response.data);
-          setTempUserData(response.data); 
+          setTempUserData(response.data);
 
           setEditMode(false);
-          setSelectedImage(null); 
+          setSelectedImage(null);
 
-        
           Swal.fire({
             icon: "success",
             title: "Profile Updated",
@@ -146,9 +149,8 @@ export default function Profile() {
           });
         }
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-      
         setEditMode(false);
-        setSelectedImage(null); 
+        setSelectedImage(null);
         console.log("Edit mode exited without saving changes.");
       }
     } else {
@@ -173,18 +175,15 @@ export default function Profile() {
       console.log("Selected file:", file);
       setSelectedImage(file);
 
-    
       const reader = new FileReader();
       reader.onloadend = () => {
         console.log("File read successfully:", reader.result);
 
-      
         setTempUserData((prev) => ({
           ...prev,
-          profileImage: reader.result, 
+          profileImage: reader.result,
         }));
 
- 
         console.log("Updated profileImage:", reader.result);
       };
       reader.readAsDataURL(file);
@@ -206,12 +205,15 @@ export default function Profile() {
                 <AvatarImage
                   src={
                     tempUserData.profileImage
-                      ? tempUserData.profileImage 
+                      ? tempUserData.profileImage
                       : DEFAULT_PROFILE_IMAGE
                   }
                   alt={tempUserData.fullName}
                   onError={(e) => {
-                    console.error("Failed to load profile image:", e.target.src);
+                    console.error(
+                      "Failed to load profile image:",
+                      e.target.src
+                    );
                     e.target.src = DEFAULT_PROFILE_IMAGE;
                   }}
                 />
@@ -225,7 +227,11 @@ export default function Profile() {
                     type="file"
                     id="profileImage"
                     accept="image/*"
-                    style={{ opacity: "0", position: "absolute", left: "-40px" }}
+                    style={{
+                      opacity: "0",
+                      position: "absolute",
+                      left: "-40px",
+                    }}
                     onChange={handleImageChange}
                   />
                   <label
@@ -274,7 +280,9 @@ export default function Profile() {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col">
-                <label className="text-sm text-gray-600 mb-1">Employee ID</label>
+                <label className="text-sm text-gray-600 mb-1">
+                  Employee ID
+                </label>
                 <Input
                   type="text"
                   name="employee_id"

@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
+import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 import { UserRoundIcon } from "lucide-react";
 
 export const resourceUsageColumns = [
@@ -10,7 +11,7 @@ export const resourceUsageColumns = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2 max-w-[180px]">
         <Avatar>
-          <AvatarImage src={row.original.resourceUsage.image} />
+          <AvatarImage src={DEFAULT_PROFILE_IMAGE} />
           <AvatarFallback>
             <UserRoundIcon className="w-4 h-4" />
           </AvatarFallback>

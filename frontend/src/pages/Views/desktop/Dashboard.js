@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Card } from "../../../Components/ui/card";
-import CustomCalendar from "../../../Components/Calendar/asideCalendar";
+import { Card } from "../../../components/ui/card";
+import CustomCalendar from "../../../components/calendar/asideCalendar";
 import "../../../styles/Calendar.css";
-import SummarizedReport from "../../../Components/Reports/SummarizedCard";
+import SummarizedReport from "../../../components/reports/SummarizedCard";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../Components/Charts/DashboardCharts";
-import { toggleMetric } from "../../../Components/utils/metricUtils";
-import { handleReminderChange } from "../../../Components/utils/reminderUtils";
-import Reminders from "../../../Components/Reminder/Reminder";
+} from "../../../components/charts/DashboardCharts";
+import { toggleMetric } from "../../../components/utils/metricUtils";
+import { handleReminderChange } from "../../../components/utils/reminderUtils";
+import Reminders from "../../../components/reminder/Reminder";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,7 +23,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { DateCard } from "../../../Components/Calendar/dateCard";
+import { DateCard } from "../../../components/calendar/dateCard";
 
 // Register Chart.js components
 ChartJS.register(

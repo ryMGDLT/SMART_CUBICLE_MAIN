@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
-import { Button } from "../../../Components/ui/button";
-import { Input } from "../../../Components/ui/input";
-import { DataTable } from "../../../Components/ui/data-table";
+import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { DataTable } from "../../../components/ui/data-table";
 import {
   Pagination,
   PaginationContent,
@@ -11,11 +11,11 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../Components/ui/pagination";
+} from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { getColumns } from "../../../Components/table/userColumns";
+import { getColumns } from "../../../components/table/userColumns";
 import Swal from "sweetalert2";
-import { Card } from "../../../Components/ui/card";
+import { Card } from "../../../components/ui/card";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");

@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../../Components/Controller/AuthController";
+import { useAuth } from "../../../components/controller/AuthController";
 import { Link } from "react-router-dom";
 
 function Login() {

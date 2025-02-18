@@ -4,7 +4,7 @@ import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-} from "../../Components/ui/avatar";
+} from "../../components/ui/avatar";
 import { DEFAULT_PROFILE_IMAGE } from "../../data/placeholderData";
 import { UserRoundIcon } from "lucide-react";
 

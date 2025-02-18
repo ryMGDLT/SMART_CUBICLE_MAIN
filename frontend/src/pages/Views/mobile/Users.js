@@ -11,10 +11,10 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../Components/ui/pagination";
+} from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
 import { columns } from "./columns";
-import { DataTable } from "../../../Components/ui/data-table";
+import { DataTable } from "../../../components/ui/data-table";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");

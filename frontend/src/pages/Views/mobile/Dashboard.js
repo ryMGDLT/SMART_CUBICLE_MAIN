@@ -1,21 +1,21 @@
 import React, { useState } from "react";
-import { Card } from "../../../Components/ui/card";
-import SummarizedReport from "../../../Components/Reports/SummarizedCard";
+import { Card } from "../../../components/ui/card";
+import SummarizedReport from "../../../components/reports/SummarizedCard";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "../../../Components/ui/dropdown-menu";
-import { toggleMetric } from "../../../Components/utils/metricUtils";
+} from "../../../components/ui/dropdown-menu";
+import { toggleMetric } from "../../../components/utils/metricUtils";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../Components/Charts/DashboardCharts";
-import CustomCalendar from "../../../Components/Calendar/asideCalendar";
-import MobileCalendar from "../../../Components/Calendar/mobileCalendar";
-import Reminders from "../../../Components/Reminder/Reminder";
+} from "../../../components/charts/DashboardCharts";
+import CustomCalendar from "../../../components/calendar/asideCalendar";
+import MobileCalendar from "../../../components/calendar/mobileCalendar";
+import Reminders from "../../../components/reminder/Reminder";
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;

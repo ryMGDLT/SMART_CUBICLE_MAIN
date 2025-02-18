@@ -12,7 +12,7 @@ export const basicColumns = [
       return (
         <div className="flex items-center gap-2 max-w-[180px]">
           <Avatar>
-            <AvatarImage src={row.original.basicDetails.image} />
+            <AvatarImage src={DEFAULT_PROFILE_IMAGE} />
             <AvatarFallback>
               <UserRoundIcon className="w-4 h-4" />
             </AvatarFallback>
