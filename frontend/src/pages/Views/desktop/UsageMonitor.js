@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UsageMonitoringChart } from "../../../components/charts/DashboardCharts";
+import { UsageMonitoringChart } from "../../../components/charts/mainCharts";
 import {
   Chart as ChartJS,
   CategoryScale,

@@ -7,7 +7,7 @@ import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../components/charts/DashboardCharts";
+} from "../../../components/charts/mainCharts";
 import { toggleMetric } from "../../../components/utils/metricUtils";
 import { handleReminderChange } from "../../../components/utils/reminderUtils";
 import Reminders from "../../../components/reminder/Reminder";

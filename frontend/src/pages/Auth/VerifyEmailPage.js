@@ -24,7 +24,7 @@ export default function VerifyEmailPage() {
 
         // Send token to backend for verification
         const response = await axios.post(
-          "http://192.168.1.8:5000/users/verify-email",
+          "http://192.168.8.168:5000/users/verify-email",
           { token }
         );
 

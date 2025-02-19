@@ -1,3 +1,5 @@
+const { getIPAddress } = require("./utils/getIP");
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -24,7 +26,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://192.168.1.8:3000"],
+    origin: ["http://localhost:3000", "http://192.168.8.168:3000"],
     credentials: true,
   })
 );
@@ -34,8 +36,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {
     console.error("MongoDB connection error:", err.message);
     process.exit(1);
@@ -78,7 +80,7 @@ app.post(
     });
 
     // Construct the absolute URL for the uploaded image
-    const serverUrl = process.env.BACKEND_URL || "http://192.168.1.8:5000";
+    const serverUrl = process.env.BACKEND_URL || "http://192.168.8.168:5000";
     res.json({
       profileImage: `${serverUrl}/uploads/profile-images/${newFileName}`,
     });
@@ -93,20 +95,8 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend server running at http://localhost:${PORT}`);
   console.log(
-    `Backend server accessible on the network at http://${getIPAddress()}:${PORT}`
+    `Backend server accessible on the network at http://${getIPAddress}:${PORT}`
   );
 });
 
-// Function to get the server's IP address
-function getIPAddress() {
-  const interfaces = require("os").networkInterfaces();
-  for (const interfaceName in interfaces) {
-    const iface = interfaces[interfaceName];
-    for (const alias of iface) {
-      if (alias.family === "IPv4" && !alias.internal) {
-        return alias.address;
-      }
-    }
-  }
-  return "127.0.0.1"; // Fallback to localhost
-}
+

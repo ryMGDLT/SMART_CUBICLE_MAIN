@@ -59,7 +59,7 @@ export default function Janitors() {
   useEffect(() => {
     const fetchJanitors = async () => {
       try {
-        const response = await fetch("http://192.168.1.8:5000/api/janitors");
+        const response = await fetch("http://192.168.8.168:5000/api/janitors");
         if (!response.ok) throw new Error("Failed to fetch janitors");
         const data = await response.json();
         setJanitorsData(data);

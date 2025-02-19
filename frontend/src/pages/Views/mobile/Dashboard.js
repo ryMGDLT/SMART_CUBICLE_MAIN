@@ -12,7 +12,7 @@ import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../components/charts/DashboardCharts";
+} from "../../../components/charts/mainCharts";
 import CustomCalendar from "../../../components/calendar/asideCalendar";
 import MobileCalendar from "../../../components/calendar/mobileCalendar";
 import Reminders from "../../../components/reminder/Reminder";

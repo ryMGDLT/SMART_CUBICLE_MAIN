@@ -35,7 +35,7 @@ import { Card, CardHeader, CardContent } from "../../../components/ui/card";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
-} from "../../../components/charts/DashboardCharts";
+} from "../../../components/charts/mainCharts";
 
 // Register ChartJS components
 ChartJS.register(
