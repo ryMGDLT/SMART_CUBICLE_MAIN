@@ -54,10 +54,10 @@ const StatusCell = ({ status: initialStatus }) => {
 export const scheduleColumns = [
   {
     accessorKey: "schedule.image",
-    header: "Profile Pic",
+    header: () => <div className="text-center">Profile Pic</div>,
     cell: ({ row }) => {
       return (
-        <div className="flex items-center px-2">
+        <div className="flex items-center justify-center px-2">
           <Avatar>
             <AvatarImage src={row.original.schedule.image} alt={row.original.schedule.name} />
             <AvatarFallback>
@@ -71,10 +71,10 @@ export const scheduleColumns = [
   },
   {
     accessorKey: "schedule.name",
-    header: "Name",
+    header: () => <div className="text-center">Name</div>,
     cell: ({ row }) => (
       <div className="truncate px-2">
-        <p className="text-sm font-medium truncate">
+        <p className="text-sm font-medium truncate text-center">
           {row.original.schedule.name}
         </p>
       </div>
@@ -115,10 +115,10 @@ export const scheduleColumns = [
   },
   {
     accessorKey: "schedule.status",
-    header: "Status",
+    header: () => <div className="text-center">Status</div>,
     cell: ({ row }) => {
       const status = row.original.schedule.status;
-      return <StatusCell status={status} />;
+      return <div className="flex justify-center"><StatusCell status={status} /></div>;
     },
     size: 0.23,
   },

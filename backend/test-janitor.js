@@ -9,14 +9,14 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
         const janitors = [
             {
                 basicDetails: {
-                    image: "/images/janitor1.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Sofia Reyes",
                     employeeId: "TUPM-23-0008",
                     email: "sofia.reyes@tup.edu.ph",
                     contact: "+639234567890"
                 },
                 schedule: {
-                    image: "/images/janitor1.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Sofia Reyes",
                     date: "2024-05-21",
                     shift: "Morning",
@@ -27,17 +27,19 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
                     status: "On Time"
                 },
                 performanceTrack: {
-                    image: "/images/janitor1.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Sofia Reyes",
                     today: 8,
                     thisWeek: 42,
                     thisMonth: 168,
                     thisYear: 2016,
+                    maxCleaningHour: 9,
+                    minCleaningHour: 8,
                     status: "Excellent",
                     employeeId: "JAN-008"
                 },
                 resourceUsage: {
-                    image: "/images/janitor1.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Sofia Reyes",
                     resource: "Glass Cleaner",
                     amountUsed: "2 liters",
@@ -47,7 +49,7 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
                     employeeId: "JAN-008"
                 },
                 logsReport: {
-                    image: "/images/janitor1.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Sofia Reyes",
                     date: "2024-05-21",
                     startTime: "07:00 AM",
@@ -61,14 +63,14 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
             },
             {
                 basicDetails: {
-                    image: "/images/janitor2.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Carlos Mendoza",
                     employeeId: "TUPM-23-0009",
                     email: "carlos.mendoza@tup.edu.ph",
                     contact: "+639345678901"
                 },
                 schedule: {
-                    image: "/images/janitor2.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Carlos Mendoza",
                     date: "2024-05-21",
                     shift: "Afternoon",
@@ -79,17 +81,19 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
                     status: "Early"
                 },
                 performanceTrack: {
-                    image: "/images/janitor2.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Carlos Mendoza",
                     today: 9,
                     thisWeek: 40,
                     thisMonth: 160,
                     thisYear: 1920,
+                    maxCleaningHour: 9,
+                    minCleaningHour: 8,
                     status: "Outstanding",
                     employeeId: "JAN-009"
                 },
                 resourceUsage: {
-                    image: "/images/janitor2.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Carlos Mendoza",
                     resource: "Trash Bags",
                     amountUsed: "50 pieces",
@@ -99,7 +103,7 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
                     employeeId: "JAN-009"
                 },
                 logsReport: {
-                    image: "/images/janitor2.jpg",
+                    image: "/images/sadGato.jpg",
                     name: "Carlos Mendoza",
                     date: "2024-05-21",
                     startTime: "12:30 PM",
@@ -137,6 +141,8 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
                     thisWeek: 39,
                     thisMonth: 156,
                     thisYear: 1872,
+                    maxCleaningHour: 8,
+                    minCleaningHour: 8,
                     status: "Very Good",
                     employeeId: "JAN-010"
                 },
@@ -166,6 +172,10 @@ mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")
         ];
 
         try {
+            // Clear existing data
+            await Janitor.deleteMany({});
+            console.log("Existing janitors cleared.");
+
             // Insert new data without clearing existing data
             for (const janitor of janitors) {
                 const newJanitor = new Janitor(janitor);

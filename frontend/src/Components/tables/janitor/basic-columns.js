@@ -1,16 +1,15 @@
 "use client";
 
 import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
-import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 import { UserRoundIcon } from "lucide-react";
 
 export const basicColumns = [
   {
     accessorKey: "basicDetails.image",
-    header: "Profile Pic",
+    header: () => <div className="text-center">Profile Pic</div>,
     cell: ({ row }) => {
       return (
-        <div className="flex items-center max-w-[180px] px-2">
+        <div className="flex items-center justify-center px-2">
           <Avatar>
             <AvatarImage src={row.original.basicDetails.image} alt={row.original.basicDetails.name} />
             <AvatarFallback>
@@ -24,39 +23,37 @@ export const basicColumns = [
   },
   {
     accessorKey: "basicDetails.name",
-    header: "Name",
-    cell: ({ row }) => {
-      return (
-        <div className="truncate">
-          <p className="text-sm font-medium truncate">
-            {row.original.basicDetails.name}
-          </p>
-        </div>
-      );
-    },
+    header: () => <div className="text-center">Name</div>,
+    cell: ({ row }) => (
+      <div className="truncate px-2">
+        <p className="text-sm font-medium truncate text-center">
+          {row.original.basicDetails.name}
+        </p>
+      </div>
+    ),
     size: 0.25,
   },
   {
     accessorKey: "basicDetails.employeeId",
-    header: "Employee ID",
+    header: () => <div className="text-center">Employee ID</div>,
     cell: ({ row }) => (
-      <div className="truncate">{row.original.basicDetails.employeeId}</div>
+      <div className="truncate text-center">{row.original.basicDetails.employeeId}</div>
     ),
     size: 0.2,
   },
   {
     accessorKey: "basicDetails.email",
-    header: "Email",
+    header: () => <div className="text-center">Email</div>,
     cell: ({ row }) => (
-      <div className="truncate">{row.original.basicDetails.email}</div>
+      <div className="truncate text-center">{row.original.basicDetails.email}</div>
     ),
     size: 0.3,
   },
   {
     accessorKey: "basicDetails.contact",
-    header: "Contact Information",
+    header: () => <div className="text-center">Contact Information</div>,
     cell: ({ row }) => (
-      <div className="truncate">{row.original.basicDetails.contact}</div>
+      <div className="truncate text-center">{row.original.basicDetails.contact}</div>
     ),
     size: 0.25,
   },

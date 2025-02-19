@@ -1,16 +1,61 @@
 "use client";
 
+import { useState } from "react";
 import { Badge } from "../../ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
-import { UserRoundIcon } from "lucide-react";
+import { UserRoundIcon, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../ui/dropdown-menu";
+
+const StatusCell = ({ status: initialStatus }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [status, setStatus] = useState(initialStatus);
+  
+  const variant =
+    status === "Done"
+      ? "success"
+      : status === "Pending"
+      ? "warning"
+      : "destructive";
+
+  const handleStatusChange = (newStatus) => {
+    setStatus(newStatus);
+    // Here you can add API call to update the status in the backend
+  };
+
+  return (
+    <DropdownMenu onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger asChild>
+        <div>
+          <Badge
+            variant={variant}
+            className="w-full px-2 cursor-pointer justify-between max-w-[95px]"
+          >
+            {status}
+            {isOpen ? <ChevronUp className="w-4 h-4 text-white" /> : <ChevronDown className="w-4 h-4 text-white" />}
+          </Badge>
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-[120px]">
+        <DropdownMenuItem onClick={() => handleStatusChange("Done")}>Done</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleStatusChange("Pending")}>Pending</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleStatusChange("Cancelled")}>Cancelled</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 export const logsReportColumns = [
   {
     accessorKey: "logsReport.image",
-    header: "Profile Pic",
+    header: () => <div className="text-center">Profile Pic</div>,
     cell: ({ row }) => {
       return (
-        <div className="flex items-center px-2">
+        <div className="flex items-center justify-center px-2">
           <Avatar>
             <AvatarImage src={row.original.logsReport.image} alt={row.original.logsReport.name} />
             <AvatarFallback>
@@ -24,10 +69,10 @@ export const logsReportColumns = [
   },
   {
     accessorKey: "logsReport.name",
-    header: "Name",
+    header: () => <div className="text-center">Name</div>,
     cell: ({ row }) => (
       <div className="truncate px-2">
-        <p className="text-sm font-medium truncate">
+        <p className="text-sm font-medium truncate text-center">
           {row.original.logsReport.name}
         </p>
       </div>
@@ -36,9 +81,9 @@ export const logsReportColumns = [
   },
   {
     accessorKey: "logsReport.date",
-    header: "Date",
+    header: () => <div className="text-center">Date</div>,
     cell: ({ row }) => (
-      <div className="truncate">{row.original.logsReport.date}</div>
+      <div className="truncate text-center">{row.original.logsReport.date}</div>
     ),
     size: 0.15,
   },
@@ -68,20 +113,10 @@ export const logsReportColumns = [
   },
   {
     accessorKey: "logsReport.status",
-    header: "Status",
+    header: () => <div className="text-center">Status</div>,
     cell: ({ row }) => {
       const status = row.original.logsReport.status;
-      const variant =
-        status === "Done"
-          ? "success"
-          : status === "Pending"
-          ? "warning"
-          : "destructive";
-      return (
-        <Badge variant={variant} className="w-fit">
-          {status}
-        </Badge>
-      );
+      return <div className="flex justify-center"><StatusCell status={status} /></div>;
     },
     size: 0.2,
   },

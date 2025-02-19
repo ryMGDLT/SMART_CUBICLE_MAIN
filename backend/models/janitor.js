@@ -26,6 +26,8 @@ const janitorSchema = new mongoose.Schema({
     thisWeek: { type: Number },
     thisMonth: { type: Number },
     thisYear: { type: Number },
+    maxCleaningHour: { type: Number },
+    minCleaningHour: { type: Number },
     status: { type: String },
     employeeId: { type: String }
   },

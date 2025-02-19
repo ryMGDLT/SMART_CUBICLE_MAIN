@@ -106,6 +106,8 @@ export default function Janitors() {
         thisWeek: janitor.performanceTrack?.thisWeek || 0,
         thisMonth: janitor.performanceTrack?.thisMonth || 0,
         thisYear: janitor.performanceTrack?.thisYear || 0,
+        maxCleaningHour: janitor.performanceTrack?.maxCleaningHour || 0,
+        minCleaningHour: janitor.performanceTrack?.minCleaningHour || 0,
         status: janitor.performanceTrack?.status || "",
         employeeId: janitor.performanceTrack?.employeeId || "",
       },
