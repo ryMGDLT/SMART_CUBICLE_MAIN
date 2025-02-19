@@ -1,13 +1,11 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { Bar, Line } from "react-chartjs-2";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, Ellipsis } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
   LineElement,
   PointElement,
   Title,
@@ -34,6 +32,10 @@ import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-tabl
 import { inventoryColumns } from "../../../components/tables/resources/inventory-column";
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext, PaginationLink } from "../../../components/ui/pagination";
 import { Card, CardHeader, CardContent } from "../../../components/ui/card";
+import {
+  ResourcesUsageChart,
+  TrendsOverTimeChart,
+} from "../../../components/charts/DashboardCharts";
 
 // Register ChartJS components
 ChartJS.register(
@@ -54,6 +56,8 @@ export default function ResourceManagement() {
   const [searchTerm] = useState("");
   const itemsPerPage = 10;
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [chartType, setChartType] = useState("bar");
+  const [trendsChartType, setTrendsChartType] = useState("line");
 
   // Handler for printing
   const handlePrint = () => {
@@ -102,79 +106,6 @@ export default function ResourceManagement() {
     [totalPages]
   );
 
-  // Bar chart data
-  const barData = {
-    labels: [
-      "Water Usage",
-      "Bleach (Toilet)",
-      "Bleach (Walls & Floor)",
-      "Detergent",
-    ],
-    datasets: [
-      {
-        label: "Actual Usage",
-        data: [6, 4, 8, 8],
-        backgroundColor: "rgba(54, 162, 235, 0.8)",
-      },
-      {
-        label: "Recommended",
-        data: [4, 8, 4, 6],
-        backgroundColor: "rgba(75, 192, 192, 0.8)",
-      },
-    ],
-  };
-
-  // Line chart data
-  const lineData = {
-    labels: ["1st Week", "2nd Week", "3rd Week", "4th Week", "5th Week"],
-    datasets: [
-      {
-        label: "Cleaning Pattern",
-        data: [2, 3, 4, 4.5, 5],
-        borderColor: "rgba(54, 162, 235, 0.8)",
-        tension: 0.4,
-      },
-      {
-        label: "Resources Consumed",
-        data: [2, 2.5, 3, 3.5, 4],
-        borderColor: "rgba(75, 192, 192, 0.8)",
-        tension: 0.4,
-      },
-    ],
-  };
-
-  // Chart options
-  const barOptions = {
-    maintainAspectRatio: false,
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "bottom",
-      },
-      title: {
-        display: false,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
-
-  const lineOptions = {
-    maintainAspectRatio: false,
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "bottom",
-      },
-      title: {
-        display: false,
-      },
-    },
-  };
-
   const handleMonthChange = (increment) => {
     const newDate = new Date(selectedDate);
     newDate.setMonth(newDate.getMonth() + increment);
@@ -206,37 +137,19 @@ export default function ResourceManagement() {
             <div className="grid grid-cols-2 gap-3 h-full">
               {/* Resources Usage Chart */}
               <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 flex flex-col">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-semibold text-md">Resources Usage</h2>
-                  <button className="text-gray-400 hover:text-gray-600">
-                    ...
-                  </button>
-                </div>
                 <div className="flex-1 min-h-0">
-                  <Bar
-                    data={barData}
-                    options={{
-                      ...barOptions,
-                      maintainAspectRatio: false,
-                    }}
+                  <ResourcesUsageChart
+                    chartType={chartType}
+                    setChartType={setChartType}
                   />
                 </div>
               </div>
               {/* Trends Chart */}
               <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 flex flex-col">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-semibold text-md">Trends Over Time</h2>
-                  <button className="text-gray-400 hover:text-gray-600">
-                    ...
-                  </button>
-                </div>
                 <div className="flex-1 min-h-0">
-                  <Line
-                    data={lineData}
-                    options={{
-                      ...lineOptions,
-                      maintainAspectRatio: false,
-                    }}
+                  <TrendsOverTimeChart
+                    trendsChartType={trendsChartType}
+                    setTrendsChartType={setTrendsChartType}
                   />
                 </div>
               </div>
