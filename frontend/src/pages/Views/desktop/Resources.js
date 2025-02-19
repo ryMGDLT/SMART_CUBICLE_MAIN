@@ -33,12 +33,12 @@ import {
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { inventoryColumns } from "../../../components/tables/resources/inventory-column";
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext, PaginationLink } from "../../../components/ui/pagination";
+import { Card, CardHeader, CardContent } from "../../../components/ui/card";
 
 // Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
   LineElement,
   PointElement,
   Title,
@@ -49,10 +49,10 @@ ChartJS.register(
 // Set default locale for date-fns
 setDefaultOptions({ locale: enUS });
 
-export default function Resources() {
+export default function ResourceManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm] = useState("");
-  const itemsPerPage = 4;
+  const itemsPerPage = 10;
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Handler for printing
@@ -307,11 +307,11 @@ export default function Resources() {
               </div>
             </div>
             {/* Table Container */}
-            <div className="flex-1 overflow-hidden shadow-md rounded-lg border border-gray-200">
-              <div className="flex flex-col h-full">
+            <div className="flex-1 overflow-auto border border-gray-200 rounded-lg shadow-md">
+              <div className="flex flex-col min-w-full h-full">
                 {/* Table Header */}
-                <div className="border-b shrink-0">
-                  <Table>
+                <div className="border-b">
+                  <Table className="min-w-full">
                     <TableHeader>
                       {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id} className="bg-gray-50">
@@ -339,7 +339,7 @@ export default function Resources() {
 
                 {/* Inventory Table Body*/}
                 <div className="flex-1 overflow-auto">
-                  <Table>
+                  <Table className="min-w-full">
                     <TableBody>
                       {table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
@@ -425,19 +425,16 @@ export default function Resources() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="min-w-[300px] flex-[1] flex flex-col gap-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-4 h-full flex flex-col">
-            {/* Header - Fixed */}
-            <div className="flex justify-between items-center mb-4 shrink-0">
+        <div className="max-w-[360px] flex-[1] flex flex-col gap-6">
+          <Card className="h-full flex flex-col">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 shrink-0">
               <h2 className="font-bold text-2xl">Reminder</h2>
               <button className="text-sm text-green-600 bg-green-100 px-3 py-1.5 rounded-lg hover:bg-green-200">
                 Janitors Usage
               </button>
-            </div>
-
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto min-h-0 pr-2">
-              <div className="space-y-4">
+            </CardHeader>
+            <CardContent className="flex-1 overflow-y-auto min-h-0">
+              <div className="space-y-4 pr-2">
                 {REMINDERS_DATA.map((reminderSection, idx) => (
                   <ReminderCard
                     key={idx}
@@ -446,8 +443,8 @@ export default function Resources() {
                   />
                 ))}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

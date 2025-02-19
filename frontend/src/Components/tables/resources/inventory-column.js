@@ -25,75 +25,67 @@ const StatusCell = ({status}) => {
 export const inventoryColumns = [
   {
     accessorKey: "resources",
-    header: () => <div className="text-center">Resources</div>,
+    header: () => <div className="text-center border-gray-200 min-w-[120px]">Resources</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">{row.original.resources}</div>
+      <div className="truncate text-center border-gray-200 min-w-[120px]">{row.original.resources}</div>
     ),
-    size: 0.15,
+    size: 0.2,
   },
   {
     accessorKey: "currentStock",
-    header: () => <div className="text-center">Current Stock</div>,
+    header: () => <div className="text-center border-gray-200 min-w-[80px]">Current Stock</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">{row.original.currentStock}</div>
+      <div className="truncate text-center border-gray-200 min-w-[80px]">{row.original.currentStock}</div>
     ),
     size: 0.1,
   },
   {
     accessorKey: "restockThreshold",
-    header: () => <div className="text-center">Restock Threshold</div>,
+    header: () => <div className="text-center border-gray-200 min-w-[100px]">Restock Threshold</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">
-        {row.original.restockThreshold}
-      </div>
+      <div className="truncate text-center border-gray-200 min-w-[100px]">{row.original.restockThreshold}</div>
     ),
-    size: 0.1,
+    size: 0.15,
   },
   {
     accessorKey: "recommendedRestockingTime",
-    header: () => <div className="text-center">Restocking Time</div>,
+    header: () => <div className="text-center border-gray-200 min-w-[100px]">Restocking Time</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">
-        {row.original.recommendedRestockingTime}
-      </div>
+      <div className="truncate text-center border-gray-200 min-w-[100px]">{row.original.recommendedRestockingTime}</div>
     ),
     size: 0.15,
   },
   {
     accessorKey: "recommendedRestock",
-    header: () => <div className="text-center">Restock</div>,
+    header: () => <div className="text-center border-gray-200 min-w-[90px]">Restock</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">
-        {row.original.recommendedRestock}
-      </div>
+      <div className="truncate text-center border-gray-200 min-w-[90px]">{row.original.recommendedRestock}</div>
     ),
     size: 0.1,
   },
   {
     accessorKey: "lastRestocked",
-    header: () => <div className="text-center">Last Restocked</div>,
+    header: () => <div className="text-center border-gray-200 min-w-[100px]">Last Restocked</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">{row.original.lastRestocked}</div>
+      <div className="truncate text-center border-gray-200 min-w-[100px]">{row.original.lastRestocked}</div>
     ),
-    size: 0.1,
+    size: 0.15,
   },
   {
     accessorKey: "nextRestockingDate",
-    header: () => <div className="text-center">Next Restocking Date</div>,
+    header: () => <div className="text-center border-gray-200 min-w-[100px]">Next Restocking Date</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">
-        {row.original.nextRestockingDate}
-      </div>
+      <div className="truncate text-center border-gray-200 min-w-[100px]">{row.original.nextRestockingDate}</div>
     ),
     size: 0.15,
   },
   {
     id: "status",
-    header: () => <div className="text-center">Status</div>,
+    header: () => <div className="text-center border-gray-200 min-w-[80px]">Status</div>,
     cell: ({ row }) => (
-        <div className="flex items-center justify-center px-2">
-            <StatusCell status={row.original.status} />
-        </div>
+      <div className="flex items-center justify-center px-2 border-gray-200 min-w-[80px]">
+        <StatusCell status={row.original.status} />
+      </div>
     ),
     size: 0.1,
   },
