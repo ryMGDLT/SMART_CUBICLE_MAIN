@@ -1,5 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Bar, Line } from "react-chartjs-2";
+import { ChevronUp, ChevronDown } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,29 +14,25 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import {
-  ChevronUp,
-  ChevronDown,
-  Pencil,
-  Printer,
-  ChevronLeft,
-  ChevronRight,
-} from "heroicons-react";
 import { RESOURCES_DATA } from "../../../data/placeholderData";
 import ReminderCard from "../../../components/reports/reminderCard";
 import { REMINDERS_DATA } from "../../../data/placeholderData";
 import { Button } from "../../../components/ui/button";
 import { cn } from "../../../lib/utils";
-import { Calendar } from "../../../components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../../components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format, setDefaultOptions } from "date-fns";
+import { PencilIcon, Printer } from "lucide-react";
+import { setDefaultOptions } from "date-fns";
 import { enUS } from "date-fns/locale";
-import { MonthPicker } from "../../../components/ui/month-picker";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { inventoryColumns } from "../../../components/tables/resources/inventory-column";
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext, PaginationLink } from "../../../components/ui/pagination";
 
 // Register ChartJS components
 ChartJS.register(
@@ -52,11 +51,9 @@ setDefaultOptions({ locale: enUS });
 
 export default function Resources() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
   const itemsPerPage = 4;
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [chartType, setChartType] = useState("bar");
-  const [trendsType, setTrendsType] = useState("line");
 
   // Handler for printing
   const handlePrint = () => {
@@ -78,30 +75,32 @@ export default function Resources() {
     );
   }, [searchTerm]);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  }, [currentPage, filteredData]);
+
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // Add pagination handlers
-  const handlePageChange = (page) => {
+  // Simplified pagination handlers
+  const handlePageChange = useCallback((page) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const handlePrevPage = useCallback(() => {
+    setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev));
+  }, []);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  const handleNextPage = useCallback(() => {
+    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
+  }, [totalPages]);
 
-  // Generate page numbers array
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // Memoize page numbers array
+  const pageNumbers = useMemo(() => 
+    Array.from({ length: totalPages }, (_, i) => i + 1),
+    [totalPages]
+  );
 
   // Bar chart data
   const barData = {
@@ -176,33 +175,35 @@ export default function Resources() {
     },
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Excessive Usage":
-        return "text-red-500";
-      case "Higher than Average":
-        return "text-yellow-500";
-      default:
-        return "text-gray-700";
-    }
-  };
-
   const handleMonthChange = (increment) => {
     const newDate = new Date(selectedDate);
     newDate.setMonth(newDate.getMonth() + increment);
     setSelectedDate(newDate);
   };
 
+  const table = useReactTable({
+    data: currentItems,
+    columns: inventoryColumns,
+    getCoreRowModel: getCoreRowModel(),
+    pageCount: totalPages,
+    state: {
+      pagination: {
+        pageIndex: currentPage - 1,
+        pageSize: itemsPerPage,
+      },
+    },
+  });
+
   return (
     <div className="h-full flex flex-col">
       {/* Main Container */}
-      <div className="flex-1 flex flex-row gap-6 p-6 overflow-hidden bg-white shadow-md rounded-lg">
+      <div className="flex-1 flex flex-row gap-3 p-6 overflow-hidden bg-white shadow-md rounded-lg">
         {/* Left Content Area */}
-        <div className="flex-[3] flex flex-col gap-6 min-w-0">
+        <div className="flex-[3] flex flex-col gap-3 min-w-0">
           {/* Charts Grid */}
 
           <div className="h-[320px] shrink-0">
-            <div className="grid grid-cols-2 gap-6 h-full">
+            <div className="grid grid-cols-2 gap-3 h-full">
               {/* Resources Usage Chart */}
               <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 flex flex-col">
                 <div className="flex justify-between items-center mb-4">
@@ -241,36 +242,48 @@ export default function Resources() {
               </div>
             </div>
           </div>
-          {/* Table Section */}
+          {/* Inventory Table Section */}
           <div className="flex-1 flex flex-col min-h-0">
-            {/* Table Header */}
+            {/* Inventory Table Header */}
             <div className="flex items-center justify-between py-4">
               <h2 className="font-bold text-2xl">Inventory</h2>
-              <div className="flex items-center justify-between relative w-1/6">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[280px] justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? (
-                        format(selectedDate, "MMM yyyy")
-                      ) : (
-                        <span>Pick a month</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <MonthPicker
-                      selectedMonth={selectedDate}
-                      onMonthSelect={setSelectedDate}
-                    />
-                  </PopoverContent>
-                </Popover>
+              <div className="flex items-center justify-between relative w-full sm:w-[200px]">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => handleMonthChange(1)}
+                >
+                  <ChevronUp className="h-5 w-5 text-gray-500" />
+                </Button>
+                <div className="relative inline-block">
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    dateFormat="MMMM yyyy"
+                    showMonthYearPicker
+                    showPopperArrow={false}
+                    popperContainer={({ children }) => (
+                      <div className="absolute z-[9999] mt-2">{children}</div>
+                    )}
+                    customInput={
+                      <span className="text-gray-700 font-medium cursor-pointer">
+                        {selectedDate.toLocaleString("default", {
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </span>
+                    }
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => handleMonthChange(-1)}
+                >
+                  <ChevronDown className="h-5 w-5 text-gray-500" />
+                </Button>
               </div>
 
               <div className="flex items-center gap-4">
@@ -280,7 +293,7 @@ export default function Resources() {
                   onClick={handleGenerate}
                   className="flex items-center gap-2 bg-Icpetgreen hover:bg-Icpetgreen/90"
                 >
-                  <Pencil className="w-4 h-4" />
+                  <PencilIcon className="w-4 h-4" />
                   Generate Report
                 </Button>
                 <Button
@@ -294,163 +307,125 @@ export default function Resources() {
               </div>
             </div>
             {/* Table Container */}
-            <div className="flex-1 overflow-y-auto bg-white rounded-lg border border-gray-200">
-              {/* Sticky Header */}
-              <div className="sticky top-0 z-10 bg-gray-50 border-b border-gray-200">
-                <table className="min-w-full table-fixed divide-y divide-gray-200 text-sm">
-                  <thead>
-                    <tr>
-                      <th className="w-40 py-4 text-center font-medium text-gray-900">
-                        Resources
-                      </th>
-                      <th className="w-24 py-4 text-center font-medium text-gray-900">
-                        Current Stock
-                      </th>
-                      <th className="w-24 py-4 text-center font-medium text-gray-900">
-                        Restock Threshold
-                      </th>
-                      <th className="w-40 py-4 text-center font-medium text-gray-900">
-                        Restocking Time
-                      </th>
-                      <th className="w-32 py-4 text-center font-medium text-gray-900">
-                        Restock
-                      </th>
-                      <th className="w-32 py-4 text-center font-medium text-gray-900">
-                        Last Restocked
-                      </th>
-                      <th className="w-40 py-4 text-center font-medium text-gray-900">
-                        Next Restocking Date
-                      </th>
-                      <th className="w-28 py-4 text-center font-medium text-gray-900">
-                        Status
-                      </th>
-                      <th className="w-16 py-4"></th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-              {/* Scrollable Body */}
-              <div className="flex-1 overflow-y-auto">
-                <table className="min-w-full table-fixed divide-y divide-gray-200 text-sm">
-                  <tbody className="divide-y divide-gray-200">
-                    {currentItems.map((row, index) => (
-                      <tr key={index}>
-                        <td className="w-40 py-4 text-center text-gray-700">
-                          {row.resources}
-                        </td>
-                        <td className="w-24 py-4 text-center text-gray-700">
-                          {row.currentStock}
-                        </td>
-                        <td className="w-24 py-4 text-center text-gray-700">
-                          {row.restockThreshold}
-                        </td>
-                        <td className="w-40 py-4 text-center text-gray-700">
-                          {row.recommendedRestockingTime}
-                        </td>
-                        <td className="w-32 py-4 text-center text-gray-700">
-                          {row.recommendedRestock}
-                        </td>
-                        <td className="w-32 py-4 text-center text-gray-700">
-                          {row.lastRestocked}
-                        </td>
-                        <td className="w-40 py-4 text-center text-gray-700">
-                          {row.nextRestockingDate}
-                        </td>
-                        <td className="w-28 py-4 text-center">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                              row.status
-                            )}`}
-                          >
-                            {row.status}
-                          </span>
-                        </td>
-                        <td className="w-16 py-4">
-                          <div className="flex justify-center">
-                            <Button
-                              variant="link"
-                              size="sm"
-                              className="text-Icpetgreen hover:text-Icpetgreen/90"
+            <div className="flex-1 overflow-hidden shadow-md rounded-lg border border-gray-200">
+              <div className="flex flex-col h-full">
+                {/* Table Header */}
+                <div className="border-b shrink-0">
+                  <Table>
+                    <TableHeader>
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id} className="bg-gray-50">
+                          {headerGroup.headers.map((header) => (
+                            <TableHead
+                              key={header.id}
+                              style={{
+                                width: `${header.column.columnDef.size * 100}%`,
+                              }}
+                              className="h-8 px-2 py-2 sm:h-10 sm:px-3 sm:py-3 text-left align-middle font-medium text-gray-900 text-xs sm:text-sm"
                             >
-                              View Details
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {/* Sticky Pagination */}
-              <div className="sticky bottom-0 bg-white border-t border-gray-200 p-2">
-                <ol className="flex justify-center gap-1 text-xs font-medium">
-                  <li>
-                    <button
-                      onClick={handlePrevPage}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
-                      disabled={currentPage === 1}
-                    >
-                      <span className="sr-only">Prev Page</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </li>
-                  {pageNumbers.map((page) => (
-                    <li key={page}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(page)}
-                        className={cn(
-                          currentPage === page
-                            ? "bg-Icpetgreen text-white hover:bg-Icpetgreen/90 border-Icpetgreen"
-                            : "hover:bg-gray-50",
-                          "h-8 w-8 p-0"
-                        )}
-                      >
-                        {page}
-                      </Button>
-                    </li>
-                  ))}
-                  <li>
-                    <button
-                      onClick={handleNextPage}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white rtl:rotate-180 hover:bg-gray-50"
-                      disabled={currentPage === totalPages}
-                    >
-                      <span className="sr-only">Next Page</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </li>
-                </ol>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+                  </Table>
+                </div>
+
+                {/* Inventory Table Body*/}
+                <div className="flex-1 overflow-auto">
+                  <Table>
+                    <TableBody>
+                      {table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row) => (
+                          <TableRow key={row.id} className="hover:bg-gray-50">
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell
+                                key={cell.id}
+                                style={{
+                                  width: `${cell.column.columnDef.size * 100}%`,
+                                }}
+                                className="px-2 py-2 sm:px-3 sm:py-3 text-xs sm:text-sm"
+                              >
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={inventoryColumns.length}
+                            className="h-24 text-center"
+                          >
+                            No results.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                {/* Pagination */}
+                <div className="border-t border-gray-200 bg-white p-2">
+                  {totalPages > 1 && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={handlePrevPage}
+                            className={cn(
+                              "cursor-pointer select-none",
+                              currentPage === 1 && "pointer-events-none opacity-50"
+                            )}
+                          />
+                        </PaginationItem>
+
+                        {pageNumbers.map((page) => (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => handlePageChange(page)}
+                              isActive={currentPage === page}
+                              className={cn(
+                                "cursor-pointer select-none",
+                                currentPage === page &&
+                                  "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
+                              )}
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={handleNextPage}
+                            className={cn(
+                              "cursor-pointer select-none",
+                              currentPage === totalPages &&
+                                "pointer-events-none opacity-50"
+                            )}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-[400px] shrink-0">
+        <div className="min-w-[300px] flex-[1] flex flex-col gap-6">
           <div className="bg-white rounded-lg border border-gray-200 p-4 h-full flex flex-col">
             {/* Header - Fixed */}
             <div className="flex justify-between items-center mb-4 shrink-0">
