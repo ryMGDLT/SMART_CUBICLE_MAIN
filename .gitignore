@@ -30,8 +30,6 @@ frontend/node_modules/.cache/
 .env
 .env.*
 !.env.example
-
-# Backend specific
 backend/.env
 backend/.env.*
 backend/config/*.env
