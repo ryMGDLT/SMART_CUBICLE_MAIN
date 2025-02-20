@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Bar, Line } from "react-chartjs-2";
+import { EllipsisIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -18,31 +19,33 @@ import {
 } from "../../data/ChartData";
 
 // Resources Usage Chart Component
-export const ResourcesUsageChart = ({ chartType, setChartType }) => {
+export const ResourcesUsageChart = () => {
+  const [resourceChartType, setResourceChartType] = useState("bar");
+
   return (
     <div className="flex flex-col space-y-4 h-full">
-      {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Resources Usage</h2>
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
-            {chartType === "bar" ? "Bar Chart" : "Line Chart"}
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 border border-gray-200">
+              <EllipsisIcon className="w-4 h-4" />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setChartType("bar")}>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setResourceChartType("bar")}>
               Bar Chart
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setChartType("line")}>
+            <DropdownMenuItem onClick={() => setResourceChartType("line")}>
               Line Chart
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {/* Chart Section */}
       <div className="w-full h-full flex-grow overflow-hidden">
-        {chartType === "bar" ? (
+        {resourceChartType === "bar" ? (
           <Bar
-            data={resourcesChartData(chartType)}
+            data={resourcesChartData(resourceChartType)}
             options={{
               ...resourcesChartOptions,
               responsive: true,
@@ -51,7 +54,7 @@ export const ResourcesUsageChart = ({ chartType, setChartType }) => {
           />
         ) : (
           <Line
-            data={resourcesChartData(chartType)}
+            data={resourcesChartData(resourceChartType)}
             options={{
               ...resourcesChartOptions,
               responsive: true,
@@ -81,20 +84,20 @@ export const ResourcesUsageChart = ({ chartType, setChartType }) => {
 };
 
 // Trends Over Time Chart Component
-export const TrendsOverTimeChart = ({
-  trendsChartType,
-  setTrendsChartType,
-}) => {
+export const TrendsOverTimeChart = () => {
+  const [trendsChartType, setTrendsChartType] = useState("line");
+
   return (
     <div className="flex flex-col space-y-4 h-full">
-      {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Trends Over Time</h2>
+        <h2 className="text-lg font-semibold">Trends Over Time</h2>
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
-            {trendsChartType === "bar" ? "Bar Chart" : "Line Chart"}
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 border border-gray-200">
+              <EllipsisIcon className="w-4 h-4" />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => setTrendsChartType("bar")}>
               Bar Chart
             </DropdownMenuItem>
@@ -104,7 +107,6 @@ export const TrendsOverTimeChart = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {/* Chart Section */}
       <div className="w-full h-full flex-grow overflow-hidden">
         {trendsChartType === "bar" ? (
           <Bar
@@ -130,7 +132,6 @@ export const TrendsOverTimeChart = ({
                   borderWidth: 2,
                   fill: true,
                   backgroundColor: "transparent",
-
                   borderColor: (context) => {
                     const chart = context.chart;
                     const { datasetIndex } = context.dataPoint;
@@ -148,71 +149,35 @@ export const TrendsOverTimeChart = ({
 };
 
 // Usage Monitoring Chart Component
-export const UsageMonitoringChart = ({ showHeading = true }) => {
+export const UsageMonitoringChart = () => {
+  const [usageChartType, setUsageChartType] = useState("line");
+
   return (
     <div className="flex flex-col h-full">
-      {showHeading && (
-        <h2 className="text-xl font-bold mb-5">Usage Monitoring</h2>
-      )}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Usage Monitor</h2>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 border border-gray-200">
+              <EllipsisIcon className="w-4 h-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setUsageChartType("bar")}>
+              Bar Chart
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setUsageChartType("line")}>
+              Line Chart
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <div className="relative w-full h-full">
-        <Line
-          data={usageData}
-          options={{
-            ...chartOptions,
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-              padding: {
-                top: 20,
-                right: 20,
-                bottom: 10,
-                left: 10,
-              },
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                grid: {
-                  drawBorder: false,
-                },
-                ticks: {
-                  padding: 10,
-                },
-              },
-              x: {
-                grid: {
-                  drawBorder: false,
-                },
-                ticks: {
-                  padding: 10,
-                },
-              },
-            },
-            elements: {
-              point: {
-                radius: 4,
-                hoverRadius: 6,
-                hitRadius: 8,
-                borderWidth: 2,
-                backgroundColor: "white",
-              },
-              line: {
-                tension: 0.3,
-              },
-            },
-            plugins: {
-              legend: {
-                display: true,
-                position: "bottom",
-                labels: {
-                  boxWidth: 15,
-                  padding: 15,
-                  usePointStyle: true,
-                },
-              },
-            },
-          }}
-        />
+        {usageChartType === "bar" ? (
+          <Bar data={usageData(usageChartType)} options={chartOptions} />
+        ) : (
+          <Line data={usageData(usageChartType)} options={chartOptions} />
+        )}
       </div>
     </div>
   );

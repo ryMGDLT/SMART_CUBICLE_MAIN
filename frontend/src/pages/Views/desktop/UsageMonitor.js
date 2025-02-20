@@ -87,22 +87,6 @@ export default function UsageMonitor() {
         >
           {/* Usage Monitor Chart */}
           <Card className="w-full lg:w-2/3 flex flex-col h-full overflow-hidden">
-            <CardHeader className="border-b shrink-0 p-4 space-y-0 flex flex-row items-center justify-between">
-              <CardTitle className="text-xl font-semibold">
-                Usage Monitor
-              </CardTitle>
-              <div className="flex items-center gap-4">
-                <Button
-                  variant="default"
-                  className="bg-Icpetgreen hover:bg-opacity-90"
-                >
-                  Generate Graph
-                </Button>
-                <Button variant="outline" size="icon" className="h-10 w-10">
-                  <Printer className="h-5 w-5 text-Icpetgreen" />
-                </Button>
-              </div>
-            </CardHeader>
             <CardContent className="flex-1 p-4 flex flex-col min-h-0">
               <div className="relative flex-1 w-full min-h-0">
                 <UsageMonitoringChart showHeading={false} />
