@@ -81,6 +81,7 @@ export default function Janitors() {
       _id: janitor._id,
       basicDetails: {
         _id: janitor._id,
+ jb_patch
         image: janitor.basicDetails?.image || DEFAULT_PROFILE_IMAGE,
         name: janitor.basicDetails?.name || "",
         employeeId: janitor.basicDetails?.employeeId || "",
@@ -132,6 +133,13 @@ export default function Janitors() {
         beforePicture: janitor.logsReport?.beforePicture || "",
         afterPicture: janitor.logsReport?.afterPicture || "",
         status: janitor.logsReport?.status || "",
+
+        image: janitor.profileImage || DEFAULT_PROFILE_IMAGE,
+        name: janitor.fullName,
+        employeeId: janitor.employee_id,
+        email: janitor.email || "",
+        contact: janitor.contact_number,
+ main
       },
     }));
   }, [janitorsData]);
