@@ -1,16 +1,13 @@
 import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../../Components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 
 const ReminderCard = ({ date, items }) => {
   return (
     <Card className="bg-white rounded-lg shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium text-gray-900">{date}</CardTitle>
+        <CardTitle className="text-lg font-medium text-gray-900">
+          {date}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
@@ -29,4 +26,4 @@ const ReminderCard = ({ date, items }) => {
   );
 };
 
-export default ReminderCard; 
+export default ReminderCard;

@@ -4,9 +4,13 @@ import {
   PROFILE_DATA,
   DEFAULT_PROFILE_IMAGE,
 } from "../../../data/placeholderData";
-import { Avatar, AvatarImage, AvatarFallback } from "../../../Components/ui/avatar";
-import { Input } from "../../../Components/ui/input";
-import { Button } from "../../../Components/ui/button";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from "../../../components/ui/avatar";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 
 export default function Profile() {
   const profileData = PROFILE_DATA[0]; // Using the first profile data
@@ -77,7 +81,7 @@ export default function Profile() {
 
         {/* Save Button - Full Width */}
         <div className="mt-6">
-          <Button 
+          <Button
             variant="default"
             className="w-full py-6 bg-Icpetgreen hover:bg-Icpetgreen/90 text-base font-medium"
           >

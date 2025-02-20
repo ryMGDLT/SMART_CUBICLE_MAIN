@@ -11,13 +11,13 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { ChevronUp, ChevronDown, Printer } from "heroicons-react";
+import { ChevronUp, ChevronDown, Printer } from "lucide-react";
 import {
   JANITOR_SCHEDULE_DATA,
   DEFAULT_PROFILE_IMAGE,
   USAGE_MONITOR_DATA,
 } from "../../../data/placeholderData";
-import CardUsageReport from "../../../Components/Reports/cardUsageReport";
+import CardUsageReport from "../../../components/reports/cardUsageReport";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 

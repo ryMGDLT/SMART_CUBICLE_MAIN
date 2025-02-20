@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Card } from "../../../Components/utils/card";
-import CustomCalendar from "../../../Components/Calendar/asideCalendar";
+import { Card } from "../../../components/ui/card";
+import CustomCalendar from "../../../components/calendar/asideCalendar";
 import "../../../styles/Calendar.css";
-import SummarizedReport from "../../../Components/Reports/SummarizedCard";
-import { useDropdown } from "../../../Components/utils/useDropdown";
+import SummarizedReport from "../../../components/reports/SummarizedCard";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
   UsageMonitoringChart,
-} from "../../../Components/Charts/DashboardCharts";
-import { toggleMetric } from "../../../Components/utils/metricUtils";
-import { handleReminderChange } from "../../../Components/utils/reminderUtils";
-import Reminders from "../../../Components/Reminder/Reminder";
+} from "../../../components/charts/mainCharts";
+import { toggleMetric } from "../../../components/utils/metricUtils";
+import { handleReminderChange } from "../../../components/utils/reminderUtils";
+import Reminders from "../../../components/reminder/Reminder";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,7 +23,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { DateCard } from "../../../Components/Calendar/dateCard";
+import { DateCard } from "../../../components/calendar/dateCard";
 
 // Register Chart.js components
 ChartJS.register(
@@ -57,14 +56,7 @@ export default function Dashboard() {
     "Recommended Resources",
   ]);
 
-  // Dropdown handlers
-  const [showSummarizedDropdown, setShowSummarizedDropdown, summarizedDropdownRef] = useDropdown(false);
-  const [showChartDropdown, setShowChartDropdown, chartDropdownRef] = useDropdown(false);
-  const [showTrendsDropdown, setShowTrendsDropdown, trendsDropdownRef] = useDropdown(false);
-
-
   const showOtherCards = !showDateCard;
-
 
   const handleReminderChangeWrapper = (key) => {
     handleReminderChange(setRemindersChecked, key);
@@ -103,7 +95,10 @@ export default function Dashboard() {
 
           {/* Reminders Section */}
           <div>
-          <Reminders remindersChecked={remindersChecked} setRemindersChecked={setRemindersChecked} />
+            <Reminders
+              remindersChecked={remindersChecked}
+              setRemindersChecked={setRemindersChecked}
+            />
           </div>
           <hr className="w-full border-t border-gray-200 mt-5 mb-5 shadow-lg" />
 
@@ -170,48 +165,37 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 gap-6">
             {/* Summarized Report */}
             <Card className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4">
-            <SummarizedReport
-            selectedPeriod={selectedPeriod}
-            setSelectedPeriod={setPeriod}
-            allMetrics={[
-              "Usage Peak Hour",
-              "Total Cleaning Time",
-              "Recommended Cleaning Time",
-              "Total Resources Restocked",
-              "Recommended Resources",
-            ]}
-            selectedMetrics={selectedMetrics}
-            toggleMetric={toggleMetricWrapper}
-            showDropdown={showSummarizedDropdown}
-            setShowDropdown={setShowSummarizedDropdown}
-            dropdownRef={summarizedDropdownRef}
-            showPeriodSelector={true}
-            showMetricsDropdown={true}
-            showMetricsCards={true}
-            showHeader={true}
-
-          />
+              <SummarizedReport
+                selectedPeriod={selectedPeriod}
+                setSelectedPeriod={setPeriod}
+                allMetrics={[
+                  "Usage Peak Hour",
+                  "Total Cleaning Time",
+                  "Recommended Cleaning Time",
+                  "Total Resources Restocked",
+                  "Recommended Resources",
+                ]}
+                selectedMetrics={selectedMetrics}
+                toggleMetric={toggleMetricWrapper}
+                showPeriodSelector={true}
+                showMetricsDropdown={true}
+                showMetricsCards={true}
+                showHeader={true}
+              />
             </Card>
-
 
             {/* Charts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4 flex-1 h-auto md:h-[400px]">
                 <ResourcesUsageChart
                   chartType={chartType}
-                  setShowChartDropdown={setShowChartDropdown}
-                  showChartDropdown={showChartDropdown}
                   setChartType={setChartType}
-                  dropdownRef={chartDropdownRef}
                 />
               </Card>
               <Card className="bg-white shadow-lg outline outline-gray-200 outline-1 p-4 flex-1 h-auto md:h-[400px]">
                 <TrendsOverTimeChart
                   trendsChartType={trendsChartType}
-                  setShowTrendsDropdown={setShowTrendsDropdown}
-                  showTrendsDropdown={showTrendsDropdown}
                   setTrendsChartType={setTrendsChartType}
-                  dropdownRef={trendsDropdownRef}
                 />
               </Card>
             </div>

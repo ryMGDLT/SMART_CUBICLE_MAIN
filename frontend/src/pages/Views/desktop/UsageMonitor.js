@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UsageMonitoringChart } from "../../../Components/Charts/DashboardCharts";
+import { UsageMonitoringChart } from "../../../components/charts/mainCharts";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,7 +18,7 @@ import {
   JANITOR_SCHEDULE_DATA,
   USAGE_MONITOR_DATA,
 } from "../../../data/placeholderData";
-import CardUsageReport from "../../../Components/Reports/cardUsageReport";
+import CardUsageReport from "../../../components/reports/cardUsageReport";
 import {
   flexRender,
   getCoreRowModel,
@@ -31,16 +31,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../Components/ui/table";
-import { inventoryColumns } from "../../../data/usage-monitor/inventory-columns";
-import { janitorColumns } from "../../../data/usage-monitor/janitor-columns";
+} from "../../../components/ui/table";
+import { inventoryColumns } from "../../../components/tables/usage-monitor/inventory-columns";
+import { janitorColumns } from "../../../components/tables/usage-monitor/janitor-columns";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-} from "../../../Components/ui/card";
-import { Button } from "../../../Components/ui/button";
+} from "../../../components/ui/card";
+import { Button } from "../../../components/ui/button";
 
 // Register ChartJS components
 ChartJS.register(
@@ -87,22 +87,6 @@ export default function UsageMonitor() {
         >
           {/* Usage Monitor Chart */}
           <Card className="w-full lg:w-2/3 flex flex-col h-full overflow-hidden">
-            <CardHeader className="border-b shrink-0 p-4 space-y-0 flex flex-row items-center justify-between">
-              <CardTitle className="text-xl font-semibold">
-                Usage Monitor
-              </CardTitle>
-              <div className="flex items-center gap-4">
-                <Button
-                  variant="default"
-                  className="bg-Icpetgreen hover:bg-opacity-90"
-                >
-                  Generate Graph
-                </Button>
-                <Button variant="outline" size="icon" className="h-10 w-10">
-                  <Printer className="h-5 w-5 text-Icpetgreen" />
-                </Button>
-              </div>
-            </CardHeader>
             <CardContent className="flex-1 p-4 flex flex-col min-h-0">
               <div className="relative flex-1 w-full min-h-0">
                 <UsageMonitoringChart showHeading={false} />

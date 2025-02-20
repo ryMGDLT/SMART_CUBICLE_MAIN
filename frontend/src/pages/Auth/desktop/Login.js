@@ -1,8 +1,8 @@
 import React from "react";
-import { useAuth } from "../../../Components/Controller/AuthController";
+import { useAuth } from "../../../components/controller/AuthController";
 import { Link } from "react-router-dom";
-import { Button } from "../../../Components/ui/button";
-import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -17,24 +17,20 @@ export default function LoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     login(email.trim().toLowerCase(), password.trim())
-      .then((response) => {
-       
-      })
+      .then((response) => {})
       .catch((error) => {
         if (error.response?.status === 403) {
           const errorMessage = error.response?.data;
 
-          
           console.log("Error message from backend:", errorMessage);
 
-        
           if (
             errorMessage ===
             "Pending approval. Please contact your employer to approve your signup request."
           ) {
             Swal.fire({
               icon: "warning",
-              title: "Pending Approval", 
+              title: "Pending Approval",
               text: errorMessage,
             });
           } else if (
@@ -43,7 +39,7 @@ export default function LoginPage() {
           ) {
             Swal.fire({
               icon: "error",
-              title: "Account Declined", 
+              title: "Account Declined",
               text: errorMessage,
             });
           } else if (
@@ -53,28 +49,26 @@ export default function LoginPage() {
             setShowResendLink(true);
             Swal.fire({
               icon: "warning",
-              title: "Email Not Verified", 
+              title: "Email Not Verified",
               text: errorMessage,
             });
           } else if (errorMessage === "Your account is not accepted yet.") {
             Swal.fire({
               icon: "warning",
-              title: "Account Not Accepted", 
+              title: "Account Not Accepted",
               text: errorMessage,
             });
           } else {
-           
             Swal.fire({
               icon: "error",
-              title: "Login Failed", 
+              title: "Login Failed",
               text: errorMessage || "An unexpected error occurred.",
             });
           }
         } else {
-      
           Swal.fire({
             icon: "error",
-            title: "Login Failed", 
+            title: "Login Failed",
             text: error.response?.data || "An unexpected error occurred.",
           });
         }
@@ -102,7 +96,6 @@ export default function LoginPage() {
       });
     }
   };
-  
 
   return (
     <div className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">

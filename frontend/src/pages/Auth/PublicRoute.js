@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../Components/Controller/AuthController";
+import { useAuth } from "../../components/controller/AuthController";
 
 const PublicRoute = ({ children }) => {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    
     if (user) {
       navigate("/dashboard", { replace: true });
     }

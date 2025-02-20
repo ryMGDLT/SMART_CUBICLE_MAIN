@@ -1,8 +1,8 @@
 import React from "react";
-import { useAuth } from "../../../Components/Controller/AuthController";
+import { useAuth } from "../../../components/controller/AuthController";
 import { Link } from "react-router-dom";
-import { Input } from "../../../Components/ui/input";
-import { Button } from "../../../Components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 import Swal from "sweetalert2";
 
 export default function SignUpPage() {
@@ -33,11 +33,11 @@ export default function SignUpPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     // Trim whitespace from both password fields
     const trimmedPassword = password.trim();
     const trimmedConfirmPassword = confirmPassword.trim();
-  
+
     // Validate email
     if (!isValidEmail(email)) {
       Swal.fire({
@@ -48,7 +48,7 @@ export default function SignUpPage() {
       setLoading(false);
       return;
     }
-  
+
     // Validate passwords
     if (trimmedPassword !== trimmedConfirmPassword) {
       Swal.fire({
@@ -59,7 +59,7 @@ export default function SignUpPage() {
       setLoading(false);
       return;
     }
-  
+
     // Validate password strength
     if (!isStrongPassword(trimmedPassword)) {
       Swal.fire({
@@ -70,7 +70,7 @@ export default function SignUpPage() {
       setLoading(false);
       return;
     }
-  
+
     // Create the user data object
     const userData = {
       fullName,
@@ -81,9 +81,9 @@ export default function SignUpPage() {
       email,
       role: "User",
     };
-  
+
     try {
-      await signup(userData); 
+      await signup(userData);
     } catch (error) {
       console.error("Signup error:", error);
       Swal.fire({

@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { Tabs, TabsList, TabsTrigger } from "../../../Components/ui/tabs";
-import { Button } from "../../../Components/ui/button";
-import { Input } from "../../../Components/ui/input";
-import { DataTable } from "../../../Components/ui/data-table";
+import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { DataTable } from "../../../components/ui/data-table";
 import {
   Pagination,
   PaginationContent,
@@ -11,10 +11,12 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../../Components/ui/pagination";
+} from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { getColumns } from "../../../Components/table/userColumns";
+import { getColumns } from "../../../components/tables/user/user-column";
 import Swal from "sweetalert2";
+import { Card } from "../../../components/ui/card";
+import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
@@ -156,47 +158,58 @@ export default function Users() {
         }
       } catch (error) {
         console.error("Error updating user:", error);
-        Swal.fire("Error", "An error occurred while updating the user.", "error");
+        Swal.fire(
+          "Error",
+          "An error occurred while updating the user.",
+          "error"
+        );
       }
     }
   };
 
-  const handleDecline = useCallback(async (_id) => {
-    const { isConfirmed } = await Swal.fire({
-      title: "Confirm Decline",
-      text: "Are you sure you want to decline this user?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, decline",
-      cancelButtonText: "No, cancel",
-    });
+  const handleDecline = useCallback(
+    async (_id) => {
+      const { isConfirmed } = await Swal.fire({
+        title: "Confirm Decline",
+        text: "Are you sure you want to decline this user?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, decline",
+        cancelButtonText: "No, cancel",
+      });
 
-    if (isConfirmed) {
-      try {
-        const response = await fetch(`${backendUrl}/users/${_id}/decline`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+      if (isConfirmed) {
+        try {
+          const response = await fetch(`${backendUrl}/users/${_id}/decline`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
 
-        if (response.ok) {
-          setUsersData((prevData) =>
-            prevData.map((user) =>
-              user._id === _id ? { ...user, status: "Declined" } : user
-            )
+          if (response.ok) {
+            setUsersData((prevData) =>
+              prevData.map((user) =>
+                user._id === _id ? { ...user, status: "Declined" } : user
+              )
+            );
+            Swal.fire("Declined!", "The user has been declined.", "success");
+          } else {
+            Swal.fire("Error", "Failed to decline the user.", "error");
+          }
+        } catch (error) {
+          console.error("Error declining user:", error);
+          Swal.fire(
+            "Error",
+            "An error occurred while declining the user.",
+            "error"
           );
-          Swal.fire("Declined!", "The user has been declined.", "success");
-        } else {
-          Swal.fire("Error", "Failed to decline the user.", "error");
         }
-      } catch (error) {
-        console.error("Error declining user:", error);
-        Swal.fire("Error", "An error occurred while declining the user.", "error");
       }
-    }
-  }, [backendUrl]);
+    },
+    [backendUrl]
+  );
 
   const handleRoleChange = useCallback((employeeId, newRole) => {
     setUsersData((prevData) =>
@@ -204,32 +217,40 @@ export default function Users() {
         user._id === employeeId ? { ...user, role: newRole } : user
       )
     );
-    console.log(`Role updated locally for employee ${employeeId} to ${newRole}`);
+    console.log(
+      `Role updated locally for employee ${employeeId} to ${newRole}`
+    );
   }, []);
 
-  const handleSelectAll = useCallback((e) => {
-    setSelectAll(e.target.checked);
-    if (e.target.checked) {
-      const currentIds = currentItems.map((user) => user.employee_id);
-      setSelectedItems(currentIds);
-    } else {
-      setSelectedItems([]);
-    }
-  }, [currentItems]);
-
-  const handleSelectItem = useCallback((employeeId) => {
-    setSelectedItems((prev) => {
-      if (prev.includes(employeeId)) {
-        const newSelected = prev.filter((id) => id !== employeeId);
-        setSelectAll(newSelected.length === currentItems.length);
-        return newSelected;
+  const handleSelectAll = useCallback(
+    (e) => {
+      setSelectAll(e.target.checked);
+      if (e.target.checked) {
+        const currentIds = currentItems.map((user) => user.employee_id);
+        setSelectedItems(currentIds);
       } else {
-        const newSelected = [...prev, employeeId];
-        setSelectAll(newSelected.length === currentItems.length);
-        return newSelected;
+        setSelectedItems([]);
       }
-    });
-  }, [currentItems]);
+    },
+    [currentItems]
+  );
+
+  const handleSelectItem = useCallback(
+    (employeeId) => {
+      setSelectedItems((prev) => {
+        if (prev.includes(employeeId)) {
+          const newSelected = prev.filter((id) => id !== employeeId);
+          setSelectAll(newSelected.length === currentItems.length);
+          return newSelected;
+        } else {
+          const newSelected = [...prev, employeeId];
+          setSelectAll(newSelected.length === currentItems.length);
+          return newSelected;
+        }
+      });
+    },
+    [currentItems]
+  );
 
   const handleTabChange = useCallback((tab) => {
     setActiveTab(tab);
@@ -240,7 +261,13 @@ export default function Users() {
 
   const columns = useMemo(() => {
     const hideActions = activeTab === "Accepted" || activeTab === "Declined";
-    return getColumns(handleAccept, handleDecline, activeTab, handleRoleChange, hideActions);
+    return getColumns(
+      handleAccept,
+      handleDecline,
+      activeTab,
+      handleRoleChange,
+      hideActions
+    );
   }, [handleAccept, handleDecline, activeTab, handleRoleChange]);
 
   const shouldShowPagination = filteredData.length > itemsPerPage;
@@ -250,7 +277,7 @@ export default function Users() {
   }
 
   return (
-    <div className="h-full flex flex-col shadow-md bg-white rounded-lg p-6">
+    <Card className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg overflow-hidden">
       {/* Header Section */}
       <div className="flex flex-row justify-between items-center shrink-0">
         {/* Tab Navigation */}
@@ -298,42 +325,30 @@ export default function Users() {
           </div>
         </div>
         {/* Search Bar */}
-        <div className="relative w-64">
-          <label htmlFor="Search" className="sr-only">
-            Search
-          </label>
-
-          <input
+        <div className="relative w-96">
+          <Input
             type="text"
-            id="Search"
+            placeholder="Search"
             value={searchTerm}
             onChange={handleSearch}
-            placeholder="Search"
-            className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
+            className="pl-4 pr-10"
           />
-
-          <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
-            <button
-              type="button"
-              className="text-Icpetgreen hover:text-gray-700"
+          <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <span className="sr-only">Search</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="h-4 w-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </button>
-          </span>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -371,7 +386,8 @@ export default function Users() {
                       isActive={currentPage === page}
                       className={cn(
                         "cursor-pointer",
-                        currentPage === page && "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
+                        currentPage === page &&
+                          "bg-Icpetgreen text-white hover:bg-Icpetgreen/90"
                       )}
                     >
                       {page}
@@ -390,7 +406,8 @@ export default function Users() {
                     onClick={handleNextPage}
                     className={cn(
                       "cursor-pointer",
-                      currentPage === totalPages && "pointer-events-none opacity-50"
+                      currentPage === totalPages &&
+                        "pointer-events-none opacity-50"
                     )}
                   />
                 </PaginationItem>
@@ -399,6 +416,6 @@ export default function Users() {
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

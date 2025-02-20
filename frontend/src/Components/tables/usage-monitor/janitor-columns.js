@@ -1,12 +1,8 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "../../Components/ui/avatar";
-import { DEFAULT_PROFILE_IMAGE } from "../placeholderData";
-import { Badge } from "../../Components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
+import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
+import { Badge } from "../../ui/badge";
 
 export const janitorColumns = [
   {

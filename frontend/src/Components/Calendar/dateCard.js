@@ -1,8 +1,12 @@
 import React from "react";
-import { Card } from "../utils/card";
+import { Card } from "../ui/card";
 import CalendarComponent from "./customCalendar";
 
-export const DateCard = ({ showDateCard, setShowDateCard, remindersChecked }) => {
+export const DateCard = ({
+  showDateCard,
+  setShowDateCard,
+  remindersChecked,
+}) => {
   return (
     <Card
       className="bg-white shadow-lg outline outline-gray-200 mt-1 outline-1 p-4 flex-1 relative mr-1 ml-[-1px] h-full flex flex-col"

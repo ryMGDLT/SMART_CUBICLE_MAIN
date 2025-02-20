@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const User = require('./models/User');
 
-mongoose.connect('mongodb://localhost:6969/Smart_Cubicle')
+// Before executing the script check the port number and database name
+mongoose.connect('mongodb://localhost:27017/Smart_Cubicle')
   .then(async () => {
     console.log('MongoDB connected');
 

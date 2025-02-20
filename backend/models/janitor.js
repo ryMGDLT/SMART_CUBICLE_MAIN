@@ -1,22 +1,58 @@
 const mongoose = require('mongoose');
 
 const janitorSchema = new mongoose.Schema({
-  username: { type: String, unique: true, trim: true },
-  fullName: { type: String, required: true, trim: true },
-  password: { type: String, required: true, minlength: 8 },
-  employee_id: { type: String, required: true, unique: true, trim: true },
-  contact_number: { type: String, required: true, trim: true },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email'],
+  basicDetails: {
+    image: { type: String },
+    name: { type: String, required: true, unique: true },
+    employeeId: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    contact: { type: String, required: true }
   },
-  role: { type: String, default: 'Janitor' },
-  status: { type: String, default: 'Accepted' },
-  profileImage: { type: String, default: "" },
-  verified: { type: Boolean, default: true },
+  schedule: {
+    image: { type: String },
+    name: { type: String },
+    date: { type: String },
+    shift: { type: String },
+    timeIn: { type: String },
+    timeOut: { type: String },
+    cleaningHour: { type: String },
+    task: { type: String },
+    status: { type: String }
+  },
+  performanceTrack: {
+    image: { type: String },
+    name: { type: String },
+    today: { type: Number },
+    thisWeek: { type: Number },
+    thisMonth: { type: Number },
+    thisYear: { type: Number },
+    maxCleaningHour: { type: Number },
+    minCleaningHour: { type: Number },
+    status: { type: String },
+    employeeId: { type: String }
+  },
+  resourceUsage: {
+    image: { type: String },
+    name: { type: String },
+    resource: { type: String },
+    amountUsed: { type: String },
+    remaining: { type: String },
+    restocked: { type: String },
+    note: { type: String },
+    employeeId: { type: String }
+  },
+  logsReport: {
+    image: { type: String },
+    name: { type: String },
+    date: { type: String },
+    startTime: { type: String },
+    endTime: { type: String },
+    duration: { type: Number },
+    task: { type: String },
+    beforePicture: { type: String },
+    afterPicture: { type: String },
+    status: { type: String }
+  }
 });
 
 const Janitor = mongoose.model('Janitor', janitorSchema);
