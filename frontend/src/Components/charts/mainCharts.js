@@ -24,7 +24,7 @@ export const ResourcesUsageChart = () => {
 
   return (
     <div className="flex flex-col space-y-4 h-full">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-1">
         <h2 className="text-lg font-semibold">Resources Usage</h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -89,7 +89,7 @@ export const TrendsOverTimeChart = () => {
 
   return (
     <div className="flex flex-col space-y-4 h-full">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-1">
         <h2 className="text-lg font-semibold">Trends Over Time</h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -154,7 +154,7 @@ export const UsageMonitoringChart = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-1">
         <h2 className="text-lg font-semibold">Usage Monitor</h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

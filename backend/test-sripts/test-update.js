@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('./models/User');
+const User = require('../models/User');
 
 mongoose.connect('mongodb://localhost:6969/Smart_Cubicle')
   .then(async () => {

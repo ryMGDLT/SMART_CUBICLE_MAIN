@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const janitorRoutes = require('./routes/janitor');
+const janitorRoutes = require('../routes/janitor');
 
 const app = express();
 

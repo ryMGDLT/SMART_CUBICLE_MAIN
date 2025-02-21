@@ -1,8 +1,12 @@
+// React and Hooks
 import React, { useState, useMemo, useEffect } from "react";
-import { Printer } from "heroicons-react";
+
+// UI Components
+import { Printer, Search } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { Card } from "../../../components/ui/card";
 import {
   Table,
   TableBody,
@@ -21,8 +25,8 @@ import {
   PaginationPrevious,
 } from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { Card } from "../../../components/ui/card";
 
+// Data columns for the table
 import { basicColumns } from "../../../components/tables/janitor/basic-columns";
 import { scheduleColumns } from "../../../components/tables/janitor/schedule-columns";
 import { performanceTrackColumns } from "../../../components/tables/janitor/performance-column";
@@ -56,10 +60,11 @@ export default function Janitors() {
   const { user } = useAuth();
   const userRole = user?.role;
 
+  // Call and fetch all the data in the janitors API database
   useEffect(() => {
     const fetchJanitors = async () => {
       try {
-        const response = await fetch("http://192.168.8.168:5000/api/janitors");
+        const response = await fetch(`http://192.168.1.8:5000/api/janitors`); // Get the data from the API using the URL and the default port from the backend
         if (!response.ok) throw new Error("Failed to fetch janitors");
         const data = await response.json();
         setJanitorsData(data);
@@ -76,12 +81,11 @@ export default function Janitors() {
 
   console.log("Logged-in User:", user);
 
+  // Mapping the janitors data to the table
   const mappedJanitorsData = useMemo(() => {
     return janitorsData.map((janitor) => ({
       _id: janitor._id,
       basicDetails: {
-        _id: janitor._id,
- jb_patch
         image: janitor.basicDetails?.image || DEFAULT_PROFILE_IMAGE,
         name: janitor.basicDetails?.name || "",
         employeeId: janitor.basicDetails?.employeeId || "",
@@ -89,7 +93,6 @@ export default function Janitors() {
         contact: janitor.basicDetails?.contact || "",
       },
       schedule: {
-        _id: janitor._id,
         image: janitor.schedule?.image || DEFAULT_PROFILE_IMAGE,
         name: janitor.schedule?.name || "",
         date: janitor.schedule?.date || "",
@@ -133,19 +136,14 @@ export default function Janitors() {
         beforePicture: janitor.logsReport?.beforePicture || "",
         afterPicture: janitor.logsReport?.afterPicture || "",
         status: janitor.logsReport?.status || "",
-
-        image: janitor.profileImage || DEFAULT_PROFILE_IMAGE,
-        name: janitor.fullName,
-        employeeId: janitor.employee_id,
-        email: janitor.email || "",
-        contact: janitor.contact_number,
- main
       },
     }));
   }, [janitorsData]);
 
+  // Check if the janitor data is mapped
   console.log("Mapped Janitors Data:", mappedJanitorsData);
 
+  // Filter the janitors data based on the search term and the active tab
   const filteredJanitors = useMemo(() => {
     console.log("Debug: Checking filtering logic...");
     console.log("Logged-in User Role:", userRole);
@@ -178,6 +176,7 @@ export default function Janitors() {
           logsandreport: "logsReport",
           performancetrack: "performanceTrack",
           resourceusage: "resourceUsage",
+          schedule: "schedule",
         }[tabProperty] || tabProperty;
 
       const data = janitor[propertyKey];
@@ -200,6 +199,7 @@ export default function Janitors() {
     user?.id,
     user?.email,
   ]);
+
 
   const currentItems = useMemo(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -252,33 +252,19 @@ export default function Janitors() {
   }
 
   return (
-    <Card className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg overflow-hidden">
+    <Card className="flex flex-col p-4 h-full bg-white shadow-md rounded-lg overflow-hidden">
       {/* Search and Buttons Row */}
       <div className="flex flex-row justify-between items-center shrink-0">
+        {/* Search Bar */}
         <div className="relative w-96">
           <Input
             type="text"
             placeholder="Search"
             value={searchTerm}
             onChange={handleSearch}
-            className="pl-4 pr-10"
+            className="pl-10 pr-4"
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </span>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
         </div>
 
         <div className="flex items-center gap-3">
@@ -290,7 +276,7 @@ export default function Janitors() {
             Generate Schedule
           </Button>
           <Button
-            variant="outline"
+            variant="outline" 
             size="icon"
             onClick={() => console.log("Print")}
           >
@@ -299,7 +285,7 @@ export default function Janitors() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs Navigation */}
       <div className="mt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-transparent gap-6">
@@ -311,7 +297,8 @@ export default function Janitors() {
                   "rounded-lg data-[state=active]:shadow-none",
                   "data-[state=active]:bg-Icpetgreen data-[state=active]:text-white",
                   "data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500",
-                  "hover:text-gray-700 hover:bg-gray-50"
+                  "hover:text-gray-700 hover:bg-gray-50",
+                  "transition-colors duration-200 ease-in-out",
                 )}
               >
                 {tab}

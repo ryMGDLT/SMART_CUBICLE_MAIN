@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Janitor = require("./models/janitor");
+const Janitor = require("../models/janitor");
 
 // Before executing the script check the port number and database name
 mongoose.connect("mongodb://localhost:27017/Smart_Cubicle")

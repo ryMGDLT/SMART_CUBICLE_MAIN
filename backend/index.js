@@ -1,4 +1,4 @@
-const { getIPAddress } = require("./utils/getIP");
+const {getIPAddress, getPortBackend, getPortFrontend} = require("./utils/getIPPORT");
 
 require("dotenv").config();
 const express = require("express");
@@ -9,6 +9,9 @@ const janitorRoutes = require("./routes/janitorRoutes");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const localIP = getIPAddress();
+const portBack = getPortBackend();
+const portFront = getPortFrontend();
 
 console.log("SendGrid API Key:", process.env.SENDGRID_API_KEY);
 console.log("From Email:", process.env.FROM_EMAIL);
@@ -26,7 +29,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://192.168.8.168:3000"],
+    origin: ["http://localhost:3000", `http://${localIP}:${portFront}`],
     credentials: true,
   })
 );
@@ -36,7 +39,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {
     console.error("MongoDB connection error:", err.message);
@@ -80,7 +83,7 @@ app.post(
     });
 
     // Construct the absolute URL for the uploaded image
-    const serverUrl = process.env.BACKEND_URL || "http://192.168.8.168:5000";
+    const serverUrl = process.env.BACKEND_URL || `http://${localIP}:${portBack}`;
     res.json({
       profileImage: `${serverUrl}/uploads/profile-images/${newFileName}`,
     });
@@ -91,11 +94,10 @@ app.use("/users", userRoutes);
 app.use("/api", janitorRoutes);
 
 // Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Backend server running at http://localhost:${PORT}`);
+app.listen(portBack, "0.0.0.0", () => {
+  console.log(`Backend server running at http://localhost:${portBack}`);
   console.log(
-    `Backend server accessible on the network at http://${getIPAddress}:${PORT}`
+    `Backend server accessible on the network at http://${localIP}:${portBack}`
   );
 });
 

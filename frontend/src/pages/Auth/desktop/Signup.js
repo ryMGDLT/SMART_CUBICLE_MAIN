@@ -76,8 +76,8 @@ export default function SignUpPage() {
       fullName,
       password: trimmedPassword,
       confirmPassword: trimmedConfirmPassword,
-      employee_id: employeeId,
-      contact_number: contactNumber,
+      employeeId: employeeId,
+      contactNumber: contactNumber,
       email,
       role: "User",
     };

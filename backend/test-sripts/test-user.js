@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('./models/User');
+const User = require('../models/User');
 
 // Before executing the script check the port number and database name
 mongoose.connect('mongodb://localhost:27017/Smart_Cubicle')
@@ -11,8 +11,8 @@ mongoose.connect('mongodb://localhost:27017/Smart_Cubicle')
       username: 'Cha',
       fullName: 'Charlin Infante',
       password: 'P@ssw0rd',
-      employee_id: 'TUPM-212-1w245',
-      contact_number: '123d425ee6789',
+      employeeId: 'TUPM-212-1w245',
+      contactNumber: '123d425ee6789',
       email: 'dev06@gmail.com',
       role: 'User',
       status: 'Pending', 
