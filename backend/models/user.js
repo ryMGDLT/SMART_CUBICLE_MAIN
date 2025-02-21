@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema({
     username: { type: String, unique: true, trim: true },
     fullName: { type: String, required: true, trim: true },
     password: { type: String, required: true, minlength: 8 },
-    employee_id: { type: String, required: true, unique: true, trim: true },
-    contact_number: { type: String, required: true, trim: true },
+    employeeId: { type: String, required: true, unique: true, trim: true },
+    contactNumber: { type: String, required: true, trim: true },
     email: {
         type: String,
         required: true,
@@ -43,8 +43,8 @@ userSchema.post('save', async function (doc) {
                     username: doc.username,
                     fullName: doc.fullName,
                     password: doc.password,
-                    employee_id: doc.employee_id,
-                    contact_number: doc.contact_number,
+                    employeeId: doc.employeeId,
+                    contactNumber: doc.contactNumber,
                     email: doc.email,
                     role: doc.role,
                     status: doc.status,
@@ -82,9 +82,9 @@ userSchema.post('findOneAndUpdate', async function () {
                 // Update the janitor document with the latest user details
                 existingJanitor.username = updatedUser.username;
                 existingJanitor.fullName = updatedUser.fullName;
-                existingJanitor.contact_number = updatedUser.contact_number;
+                existingJanitor.contactNumber = updatedUser.contactNumber;
                 existingJanitor.email = updatedUser.email;
-                existingJanitor.employee_id = updatedUser.employee_id;
+                existingJanitor.employeeId = updatedUser.employeeId;
                 existingJanitor.profileImage = updatedUser.profileImage;
                 existingJanitor.verified = updatedUser.verified;
 
@@ -96,8 +96,8 @@ userSchema.post('findOneAndUpdate', async function () {
                     username: updatedUser.username,
                     fullName: updatedUser.fullName,
                     password: updatedUser.password,
-                    employee_id: updatedUser.employee_id,
-                    contact_number: updatedUser.contact_number,
+                    employeeId: updatedUser.employeeId,
+                    contactNumber: updatedUser.contactNumber,
                     email: updatedUser.email,
                     role: updatedUser.role,
                     status: updatedUser.status,

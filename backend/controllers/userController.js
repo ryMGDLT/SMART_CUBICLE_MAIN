@@ -40,8 +40,8 @@ const createUser = async (req, res) => {
       fullName,
       password,
       confirmPassword,
-      employee_id,
-      contact_number,
+      employeeId,
+      contactNumber,
       email,
       role,
     } = req.body;
@@ -52,8 +52,8 @@ const createUser = async (req, res) => {
       !fullName ||
       !password ||
       !confirmPassword ||
-      !employee_id ||
-      !contact_number ||
+      !employeeId ||
+      !contactNumber ||
       !email ||
       !role
     ) {
@@ -112,8 +112,8 @@ const createUser = async (req, res) => {
       username,
       fullName,
       password: hashedPassword,
-      employee_id,
-      contact_number,
+      employeeId,
+      contactNumber,
       email,
       role,
       verificationToken,

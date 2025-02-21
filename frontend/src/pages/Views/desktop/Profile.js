@@ -78,7 +78,7 @@ export default function Profile() {
           const updatedData = {
             fullName: tempUserData.fullName,
             email: tempUserData.email,
-            employee_id: tempUserData.employee_id,
+            employeeId: tempUserData.employeeId,
             role: tempUserData.role,
           };
 
@@ -285,8 +285,8 @@ export default function Profile() {
                 </label>
                 <Input
                   type="text"
-                  name="employee_id"
-                  value={tempUserData.employee_id || ""}
+                  name="employeeId"
+                  value={tempUserData.employeeId || ""}
                   disabled={!editMode}
                   onChange={handleInputChange}
                   className={editMode ? "bg-white" : "bg-gray-100"}

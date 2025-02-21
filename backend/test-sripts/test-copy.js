@@ -1,4 +1,4 @@
-const copyJanitorsToNewTable = require('./utils/copyJanitors');
+const copyJanitorsToNewTable = require('../utils/copyJanitors');
 
 (async () => {
   await copyJanitorsToNewTable();

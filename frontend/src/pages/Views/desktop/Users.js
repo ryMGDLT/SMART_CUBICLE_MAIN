@@ -28,7 +28,7 @@ export default function Users() {
   const [usersData, setUsersData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const backendUrl = process.env.BACKEND_URL;
 
   useEffect(() => {
     const fetchData = async () => {
