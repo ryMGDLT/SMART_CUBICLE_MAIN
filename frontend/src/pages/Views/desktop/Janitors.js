@@ -1,8 +1,12 @@
+// React and Hooks
 import React, { useState, useMemo, useEffect } from "react";
-import { Printer } from "heroicons-react";
+
+// UI Components
+import { Printer } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { Card } from "../../../components/ui/card";
 import {
   Table,
   TableBody,
@@ -21,8 +25,8 @@ import {
   PaginationPrevious,
 } from "../../../components/ui/pagination";
 import { cn } from "../../../lib/utils";
-import { Card } from "../../../components/ui/card";
 
+// Data columns for the table
 import { basicColumns } from "../../../components/tables/janitor/basic-columns";
 import { scheduleColumns } from "../../../components/tables/janitor/schedule-columns";
 import { performanceTrackColumns } from "../../../components/tables/janitor/performance-column";
@@ -59,7 +63,7 @@ export default function Janitors() {
   useEffect(() => {
     const fetchJanitors = async () => {
       try {
-        const response = await fetch("http://192.168.8.168:5000/api/janitors");
+        const response = await fetch(`http://192.168.1.8:5000/api/janitors`); // Get the data from the API using the URL and the default port from the backend
         if (!response.ok) throw new Error("Failed to fetch janitors");
         const data = await response.json();
         setJanitorsData(data);
@@ -80,8 +84,6 @@ export default function Janitors() {
     return janitorsData.map((janitor) => ({
       _id: janitor._id,
       basicDetails: {
-        _id: janitor._id,
- jb_patch
         image: janitor.basicDetails?.image || DEFAULT_PROFILE_IMAGE,
         name: janitor.basicDetails?.name || "",
         employeeId: janitor.basicDetails?.employeeId || "",
@@ -89,7 +91,6 @@ export default function Janitors() {
         contact: janitor.basicDetails?.contact || "",
       },
       schedule: {
-        _id: janitor._id,
         image: janitor.schedule?.image || DEFAULT_PROFILE_IMAGE,
         name: janitor.schedule?.name || "",
         date: janitor.schedule?.date || "",
@@ -133,13 +134,6 @@ export default function Janitors() {
         beforePicture: janitor.logsReport?.beforePicture || "",
         afterPicture: janitor.logsReport?.afterPicture || "",
         status: janitor.logsReport?.status || "",
-
-        image: janitor.profileImage || DEFAULT_PROFILE_IMAGE,
-        name: janitor.fullName,
-        employeeId: janitor.employee_id,
-        email: janitor.email || "",
-        contact: janitor.contact_number,
- main
       },
     }));
   }, [janitorsData]);
@@ -252,7 +246,7 @@ export default function Janitors() {
   }
 
   return (
-    <Card className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg overflow-hidden">
+    <Card className="flex flex-col p-4 h-full bg-white shadow-md rounded-lg overflow-hidden">
       {/* Search and Buttons Row */}
       <div className="flex flex-row justify-between items-center shrink-0">
         <div className="relative w-96">
