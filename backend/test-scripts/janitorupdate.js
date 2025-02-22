@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Janitor = require('../models/janitor'); 
 
-// Connect to MongoDB
+
 mongoose.connect('mongodb://localhost:6969/Smart_Cubicle', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
