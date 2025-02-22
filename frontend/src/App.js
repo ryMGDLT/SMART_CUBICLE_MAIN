@@ -8,35 +8,35 @@ import {
   Route,
   Outlet,
 } from "react-router-dom";
-import PrivateRoute from "./pages/Auth/privateRoute";
-import PublicRoute from "./pages/Auth/publicRoute";
+import PrivateRoute from "./pages/auth/privateRoute";
+import PublicRoute from "./pages/auth/publicRoute";
 
 // Context Providers
 import { AuthProvider } from "./components/controller/authController";
 import ViewController from "./components/controller/viewController";
 
 // Authentication Pages
-import LoginDesktop from "./pages/Auth/desktop/logIn";
-import SignupDesktop from "./pages/Auth/desktop/signUp";
-import VerifyEmailPage from "./pages/Auth/verifyEmailPage";
-import LoginMobile from "./pages/Auth/mobile/logIn";
-import SignupMobile from "./pages/Auth/mobile/signup";
+import LoginDesktop from "./pages/auth/desktop/login";
+import SignupDesktop from "./pages/auth/desktop/signup";
+import VerifyEmailPage from "./pages/auth/verifyEmailPage";
+import LoginMobile from "./pages/auth/mobile/login";
+import SignupMobile from "./pages/auth/mobile/signup";
 
 // View Pages
-import DashboardDesktop from "./pages/Views/desktop/dashboard";
-import UsageMonitorDesktop from "./pages/Views/desktop/usageMonitor";
-import JanitorsDesktop from "./pages/Views/desktop/janitors";
-import ResourcesDesktop from "./pages/Views/desktop/resources";
-import SettingsDesktop from "./pages/Views/desktop/settings";
-import UsersDesktop from "./pages/Views/desktop/users";
-import ProfileDesktop from "./pages/Views/desktop/profile";
-import DashboardMobile from "./pages/Views/mobile/dashboard";
-import UsageMonitorMobile from "./pages/Views/mobile/usageMonitor";
-import JanitorsMobile from "./pages/Views/mobile/janitor";
-import ResourcesMobile from "./pages/Views/mobile/resources";
-import SettingsMobile from "./pages/Views/mobile/settings";
-import UsersMobile from "./pages/Views/mobile/users";
-import ProfileMobile from "./pages/Views/mobile/profile";
+import DashboardDesktop from "./pages/views/desktop/dashboard";
+import UsageMonitorDesktop from "./pages/views/desktop/usageMonitor";
+import JanitorsDesktop from "./pages/views/desktop/janitors";
+import ResourcesDesktop from "./pages/views/desktop/resources";
+import SettingsDesktop from "./pages/views/desktop/settings";
+import UsersDesktop from "./pages/views/desktop/users";
+import ProfileDesktop from "./pages/views/desktop/profile";
+import DashboardMobile from "./pages/views/mobile/dashboard";
+import UsageMonitorMobile from "./pages/views/mobile/usageMonitor";
+import JanitorsMobile from "./pages/views/mobile/janitor";
+import ResourcesMobile from "./pages/views/mobile/resources";
+import SettingsMobile from "./pages/views/mobile/settings";
+import UsersMobile from "./pages/views/mobile/users";
+import ProfileMobile from "./pages/views/mobile/profile";
 
 function App() {
   return (

@@ -16,7 +16,7 @@ import {
   chartOptions,
   resourcesChartOptions,
   trendsChartOptions,
-} from "../../data/ChartData";
+} from "../../data/chartData";
 
 // Resources Usage Chart Component
 export const ResourcesUsageChart = () => {
