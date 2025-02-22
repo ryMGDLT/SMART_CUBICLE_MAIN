@@ -1,6 +1,13 @@
+// janitor.js
 const mongoose = require('mongoose');
-//janitor from users
+//link to user collection id
 const janitorSchema = new mongoose.Schema({
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true, 
+    unique: true 
+  }, 
   basicDetails: {
     image: { type: String, default: "" },
     name: { type: String, required: true },
@@ -8,7 +15,6 @@ const janitorSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     contact: { type: String, required: true },
   },
-  //made an array to store multiple entry under one basicdetails
   schedule: [{
     image: { type: String },
     name: { type: String },
@@ -20,7 +26,6 @@ const janitorSchema = new mongoose.Schema({
     task: { type: String },
     status: { type: String },
   }],
-  //made an array to store multiple entry under one basicdetails
   performanceTrack: [{
     image: { type: String },
     name: { type: String },
@@ -33,7 +38,6 @@ const janitorSchema = new mongoose.Schema({
     status: { type: String },
     employeeId: { type: String },
   }],
-  //made an array to store multiple entry under one basicdetails
   resourceUsage: [{
     image: { type: String },
     name: { type: String },
@@ -44,7 +48,6 @@ const janitorSchema = new mongoose.Schema({
     note: { type: String },
     employeeId: { type: String },
   }],
-  //made an array to store multiple entry under one basicdetails
   logsReport: [{
     image: { type: String },
     name: { type: String },

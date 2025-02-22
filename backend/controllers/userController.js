@@ -389,29 +389,20 @@ const updateUser = async (req, res) => {
     // Sync with Janitor
     if (user.role === 'Janitor' && user.status === 'Accepted' && user.verified === true) {
       try {
-        const existingJanitor = await Janitor.findOne({ 'basicDetails.email': user.email });
+        const existingJanitor = await Janitor.findOne({ userId: user._id });
         if (existingJanitor) {
-          console.log("Existing Janitor before update:", existingJanitor);
-
-          // Update basicDetails
+          // Update existing Janitor
           existingJanitor.basicDetails.image = user.profileImage || existingJanitor.basicDetails.image;
           existingJanitor.basicDetails.name = user.fullName;
           existingJanitor.basicDetails.employeeId = user.employeeId;
           existingJanitor.basicDetails.email = user.email;
           existingJanitor.basicDetails.contact = user.contactNumber;
 
-          // Log array contents before update
-          console.log("Schedule before:", existingJanitor.schedule);
-          console.log("PerformanceTrack before:", existingJanitor.performanceTrack);
-          console.log("ResourceUsage before:", existingJanitor.resourceUsage);
-          console.log("LogsReport before:", existingJanitor.logsReport);
-
           // Update arrays
           if (existingJanitor.schedule && existingJanitor.schedule.length > 0) {
             existingJanitor.schedule.forEach((entry) => {
               entry.image = user.profileImage || entry.image;
               entry.name = user.fullName;
-              console.log("Updated schedule entry:", entry);
             });
           }
           if (existingJanitor.performanceTrack && existingJanitor.performanceTrack.length > 0) {
@@ -419,7 +410,6 @@ const updateUser = async (req, res) => {
               entry.image = user.profileImage || entry.image;
               entry.employeeId = user.employeeId;
               entry.name = user.fullName;
-              console.log("Updated performanceTrack entry:", entry);
             });
           }
           if (existingJanitor.resourceUsage && existingJanitor.resourceUsage.length > 0) {
@@ -427,28 +417,26 @@ const updateUser = async (req, res) => {
               entry.image = user.profileImage || entry.image;
               entry.employeeId = user.employeeId;
               entry.name = user.fullName;
-              console.log("Updated resourceUsage entry:", entry);
             });
           }
           if (existingJanitor.logsReport && existingJanitor.logsReport.length > 0) {
             existingJanitor.logsReport.forEach((entry) => {
               entry.image = user.profileImage || entry.image;
               entry.name = user.fullName;
-              console.log("Updated logsReport entry:", entry);
             });
           }
 
-          // Mark arrays as modified 
           existingJanitor.markModified('schedule');
           existingJanitor.markModified('performanceTrack');
           existingJanitor.markModified('resourceUsage');
           existingJanitor.markModified('logsReport');
 
           await existingJanitor.save();
-          console.log("Janitor after update:", await Janitor.findOne({ 'basicDetails.email': user.email }));
+          console.log("Janitor updated successfully:", await Janitor.findOne({ userId: user._id }));
         } else {
-          console.log(`No Janitor found for email ${user.email}, creating new entry`);
+          // Create new Janitor if it doesn’t exist
           const newJanitor = new Janitor({
+            userId: user._id,
             basicDetails: {
               image: user.profileImage || "",
               name: user.fullName,
@@ -462,6 +450,7 @@ const updateUser = async (req, res) => {
             logsReport: [],
           });
           await newJanitor.save();
+          console.log(`New janitor created for userId: ${user._id}`);
         }
       } catch (janitorError) {
         console.error("Error syncing Janitor model:", janitorError.message);
@@ -491,7 +480,7 @@ const uploadProfileImage = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const serverUrl = process.env.BACKEND_URL || "http://192.168.5.45:5000"; 
+    const serverUrl = process.env.BACKEND_URL || "http://192.168.5.45:5000";
     const profileImagePath = `${serverUrl}/uploads/profile-images/${req.file.filename}`;
     console.log("New profileImagePath:", profileImagePath);
 
@@ -503,61 +492,47 @@ const uploadProfileImage = async (req, res) => {
 
     console.log("Updated user profileImage:", updatedUser.profileImage);
 
-    // Sync with Janitor 
+    // Sync with Janitor
     if (updatedUser.role === 'Janitor' && updatedUser.status === 'Accepted' && updatedUser.verified === true) {
       try {
-        const existingJanitor = await Janitor.findOne({ 'basicDetails.email': updatedUser.email });
+        const existingJanitor = await Janitor.findOne({ userId: updatedUser._id });
         if (existingJanitor) {
-          console.log("Existing Janitor before update:", {
-            basicDetails: existingJanitor.basicDetails,
-            resourceUsage: existingJanitor.resourceUsage
-          });
-
-          // Update basicDetails
+          // Update existing Janitor
           existingJanitor.basicDetails.image = updatedUser.profileImage;
-          console.log("Set basicDetails.image to:", updatedUser.profileImage);
 
-          // Update resourceUsage 
-          if (existingJanitor.resourceUsage && existingJanitor.resourceUsage.length > 0) {
-            console.log("ResourceUsage before update:", existingJanitor.resourceUsage);
-            await Janitor.updateOne(
-              { 'basicDetails.email': updatedUser.email },
-              { $set: { 'resourceUsage.$[].image': updatedUser.profileImage } }
-            );
-            console.log("Applied $set to resourceUsage.image:", updatedUser.profileImage);
-          } else {
-            console.log("ResourceUsage is empty, no updates applied");
-          }
-
-          // Update other arrays 
+          // Update arrays
           if (existingJanitor.schedule && existingJanitor.schedule.length > 0) {
-            await Janitor.updateOne(
-              { 'basicDetails.email': updatedUser.email },
-              { $set: { 'schedule.$[].image': updatedUser.profileImage } }
-            );
+            existingJanitor.schedule.forEach((entry) => {
+              entry.image = updatedUser.profileImage;
+            });
           }
           if (existingJanitor.performanceTrack && existingJanitor.performanceTrack.length > 0) {
-            await Janitor.updateOne(
-              { 'basicDetails.email': updatedUser.email },
-              { $set: { 'performanceTrack.$[].image': updatedUser.profileImage } }
-            );
+            existingJanitor.performanceTrack.forEach((entry) => {
+              entry.image = updatedUser.profileImage;
+            });
+          }
+          if (existingJanitor.resourceUsage && existingJanitor.resourceUsage.length > 0) {
+            existingJanitor.resourceUsage.forEach((entry) => {
+              entry.image = updatedUser.profileImage;
+            });
           }
           if (existingJanitor.logsReport && existingJanitor.logsReport.length > 0) {
-            await Janitor.updateOne(
-              { 'basicDetails.email': updatedUser.email },
-              { $set: { 'logsReport.$[].image': updatedUser.profileImage } }
-            );
+            existingJanitor.logsReport.forEach((entry) => {
+              entry.image = updatedUser.profileImage;
+            });
           }
 
-          // save
-          const updatedJanitor = await Janitor.findOne({ 'basicDetails.email': updatedUser.email });
-          console.log("Janitor after update:", {
-            basicDetails: updatedJanitor.basicDetails,
-            resourceUsage: updatedJanitor.resourceUsage
-          });
+          existingJanitor.markModified('schedule');
+          existingJanitor.markModified('performanceTrack');
+          existingJanitor.markModified('resourceUsage');
+          existingJanitor.markModified('logsReport');
+
+          await existingJanitor.save();
+          console.log("Janitor updated with new profile image:", await Janitor.findOne({ userId: updatedUser._id }));
         } else {
-          console.log(`No Janitor found for email ${updatedUser.email}, creating new entry`);
+          // Create new Janitor if it doesn’t exist
           const newJanitor = new Janitor({
+            userId: updatedUser._id,
             basicDetails: {
               image: updatedUser.profileImage,
               name: updatedUser.fullName,
@@ -571,6 +546,7 @@ const uploadProfileImage = async (req, res) => {
             logsReport: [],
           });
           await newJanitor.save();
+          console.log(`New janitor created for userId: ${updatedUser._id}`);
         }
       } catch (janitorError) {
         console.error("Error syncing Janitor model:", janitorError.message, janitorError.stack);

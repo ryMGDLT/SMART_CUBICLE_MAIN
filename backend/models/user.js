@@ -38,9 +38,10 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 userSchema.post('save', async function (doc) {
   try {
     if (doc.role === 'Janitor' && doc.status === 'Accepted' && doc.verified === true) {
-      const existingJanitor = await Janitor.findOne({ 'basicDetails.email': doc.email });
+      const existingJanitor = await Janitor.findOne({ userId: doc._id });
       if (!existingJanitor) {
         const newJanitor = new Janitor({
+          userId: doc._id, // Link to User _id
           basicDetails: {
             image: doc.profileImage,
             name: doc.fullName,
@@ -54,19 +55,19 @@ userSchema.post('save', async function (doc) {
           logsReport: [],
         });
         await newJanitor.save();
-        console.log(`User ${doc.username} (email: ${doc.email}) copied to Janitors table.`);
+        console.log(`User ${doc.username} (userId: ${doc._id}) copied to Janitors table.`);
       } else {
-        console.log(`User ${doc.username} (email: ${doc.email}) already exists in Janitors table.`);
+        console.log(`User ${doc.username} (userId: ${doc._id}) already exists in Janitors table.`);
       }
     } else {
-      console.log(`User ${doc.username} (email: ${doc.email}) does not qualify: role=${doc.role}, status=${doc.status}, verified=${doc.verified}`);
+      console.log(`User ${doc.username} (userId: ${doc._id}) does not qualify: role=${doc.role}, status=${doc.status}, verified=${doc.verified}`);
     }
   } catch (error) {
     console.error(`Error copying user ${doc.username} to Janitors table:`, error.message);
   }
 });
-
 // update janitor basic details when user update details
+// user.js
 userSchema.post('findOneAndUpdate', async function () {
   try {
     const updatedUser = await this.model.findOne(this.getQuery());
@@ -75,44 +76,54 @@ userSchema.post('findOneAndUpdate', async function () {
       updatedUser.status === 'Accepted' &&
       updatedUser.verified === true
     ) {
-      const existingJanitor = await Janitor.findOne({ 'basicDetails.email': updatedUser.email });
+      const existingJanitor = await Janitor.findOne({ userId: updatedUser._id });
       if (existingJanitor) {
-        // Update basicDetails
-        existingJanitor.basicDetails.image = updatedUser.profileImage;
+        // Update existing Janitor
+        existingJanitor.basicDetails.image = updatedUser.profileImage || existingJanitor.basicDetails.image;
         existingJanitor.basicDetails.name = updatedUser.fullName;
         existingJanitor.basicDetails.employeeId = updatedUser.employeeId;
         existingJanitor.basicDetails.email = updatedUser.email;
         existingJanitor.basicDetails.contact = updatedUser.contactNumber;
 
-        // Update image schedule array
-        existingJanitor.schedule.forEach((entry) => {
-          if (entry.image) entry.image = updatedUser.profileImage;
-          // entry.employeeId = updatedUser.employeeId;
-        });
+        // Update arrays
+        if (existingJanitor.schedule && existingJanitor.schedule.length > 0) {
+          existingJanitor.schedule.forEach((entry) => {
+            entry.image = updatedUser.profileImage || entry.image;
+            entry.name = updatedUser.fullName;
+          });
+        }
+        if (existingJanitor.performanceTrack && existingJanitor.performanceTrack.length > 0) {
+          existingJanitor.performanceTrack.forEach((entry) => {
+            entry.image = updatedUser.profileImage || entry.image;
+            entry.employeeId = updatedUser.employeeId;
+            entry.name = updatedUser.fullName;
+          });
+        }
+        if (existingJanitor.resourceUsage && existingJanitor.resourceUsage.length > 0) {
+          existingJanitor.resourceUsage.forEach((entry) => {
+            entry.image = updatedUser.profileImage || entry.image;
+            entry.employeeId = updatedUser.employeeId;
+            entry.name = updatedUser.fullName;
+          });
+        }
+        if (existingJanitor.logsReport && existingJanitor.logsReport.length > 0) {
+          existingJanitor.logsReport.forEach((entry) => {
+            entry.image = updatedUser.profileImage || entry.image;
+            entry.name = updatedUser.fullName;
+          });
+        }
 
-        // Update image and employeeId in performanceTrack array
-        existingJanitor.performanceTrack.forEach((entry) => {
-          if (entry.image) entry.image = updatedUser.profileImage;
-          if (entry.employeeId) entry.employeeId = updatedUser.employeeId;
-        });
-
-        // Update image and employeeId in resourceUsage array
-        existingJanitor.resourceUsage.forEach((entry) => {
-          if (entry.image) entry.image = updatedUser.profileImage;
-          if (entry.employeeId) entry.employeeId = updatedUser.employeeId;
-        });
-
-        // Update image and employeeId in logsReport array
-        existingJanitor.logsReport.forEach((entry) => {
-          if (entry.image) entry.image = updatedUser.profileImage;
-          // entry.employeeId = updatedUser.employeeId;
-        });
+        existingJanitor.markModified('schedule');
+        existingJanitor.markModified('performanceTrack');
+        existingJanitor.markModified('resourceUsage');
+        existingJanitor.markModified('logsReport');
 
         await existingJanitor.save();
-        console.log(`Janitor ${updatedUser.username} (email: ${updatedUser.email}) updated in Janitors table, including arrays.`);
+        console.log(`Janitor with userId: ${updatedUser._id} updated in Janitors table.`);
       } else {
-        // If no existing janitor, create a new one
+        // Create new Janitor if it doesn’t exist
         const newJanitor = new Janitor({
+          userId: updatedUser._id,
           basicDetails: {
             image: updatedUser.profileImage,
             name: updatedUser.fullName,
@@ -126,10 +137,10 @@ userSchema.post('findOneAndUpdate', async function () {
           logsReport: [],
         });
         await newJanitor.save();
-        console.log(`New janitor ${updatedUser.username} (email: ${updatedUser.email}) added to Janitors table.`);
+        console.log(`New janitor with userId: ${updatedUser._id} added to Janitors table.`);
       }
     } else {
-      console.log(`Updated user ${updatedUser.username} (email: ${updatedUser.email}) does not qualify: role=${updatedUser.role}, status=${updatedUser.status}, verified=${updatedUser.verified}`);
+      console.log(`Updated user ${updatedUser.username} (userId: ${updatedUser._id}) does not qualify: role=${updatedUser.role}, status=${updatedUser.status}, verified=${updatedUser.verified}`);
     }
   } catch (error) {
     console.error('Error handling user update:', error.message);
