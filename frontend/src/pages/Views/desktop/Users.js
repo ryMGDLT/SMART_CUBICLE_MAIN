@@ -28,29 +28,31 @@ export default function Users() {
   const [usersData, setUsersData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const backendUrl = process.env.BACKEND_URL;
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await fetch(`${backendUrl}/users`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          const errorText = await response.text();
+          throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
         }
         const data = await response.json();
-        console.log("Fetched data:", data);
         setUsersData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        Swal.fire("Error", "Failed to fetch users data", "error");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [backendUrl]);
 

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { axiosInstance } from "../../components/controller/authController"; 
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function VerifyEmailPage() {
   const navigate = useNavigate();
-  const location = useLocation(); // Access the query parameters
+  const location = useLocation();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -22,11 +22,8 @@ export default function VerifyEmailPage() {
           return;
         }
 
-        // Send token to backend for verification
-        const response = await axios.post(
-          "http://192.168.8.168:5000/users/verify-email",
-          { token }
-        );
+        // Send token to backend for verification using axiosInstance
+        const response = await axiosInstance.post("/users/verify-email", { token });
 
         if (response.data && response.data.message) {
           setMessage(response.data.message || "Email verified successfully");

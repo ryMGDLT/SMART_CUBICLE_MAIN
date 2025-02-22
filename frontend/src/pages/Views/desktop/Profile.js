@@ -8,8 +8,8 @@ import {
 } from "../../../components/ui/avatar";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
-import { useAuth } from "../../../components/controller/AuthController";
-import { axiosInstance } from "../../../components/controller/AuthController";
+import { useAuth } from "../../../components/controller/authController";
+import { axiosInstance } from "../../../components/controller/authController";
 import Swal from "sweetalert2";
 
 export default function Profile() {

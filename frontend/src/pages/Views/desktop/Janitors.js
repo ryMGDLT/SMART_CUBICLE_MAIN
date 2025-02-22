@@ -39,7 +39,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
-import { useAuth } from "../../../components/controller/AuthController";
+import { useAuth } from "../../../components/controller/authController";
 
 const TABS = [
   "Basic Details",
@@ -64,7 +64,7 @@ export default function Janitors() {
   useEffect(() => {
     const fetchJanitors = async () => {
       try {
-        const response = await fetch(`http://192.168.1.8:5000/api/janitors`); // Get the data from the API using the URL and the default port from the backend
+        const response = await fetch(`http://192.168.5.45:5000/api/janitors`); 
         if (!response.ok) throw new Error("Failed to fetch janitors");
         const data = await response.json();
         setJanitorsData(data);
@@ -151,7 +151,7 @@ export default function Janitors() {
     console.log("Logged-in User Email:", user?.email);
 
     if (!mappedJanitorsData.length) {
-      console.log("🚨 No janitors data found!");
+      console.log("No janitors data found!");
       return [];
     }
 

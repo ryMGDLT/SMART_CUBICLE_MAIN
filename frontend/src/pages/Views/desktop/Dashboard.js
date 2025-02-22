@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card } from "../../../components/ui/card";
 import CustomCalendar from "../../../components/calendar/asideCalendar";
 import "../../../styles/Calendar.css";
-import SummarizedReport from "../../../components/reports/SummarizedCard";
+import SummarizedReport from "../../../components/reports/summarizedCard";
 import {
   ResourcesUsageChart,
   TrendsOverTimeChart,
@@ -10,7 +10,7 @@ import {
 } from "../../../components/charts/mainCharts";
 import { toggleMetric } from "../../../components/utils/metricUtils";
 import { handleReminderChange } from "../../../components/utils/reminderUtils";
-import Reminders from "../../../components/reminder/Reminder";
+import Reminders from "../../../components/reminder/reminder";
 import {
   Chart as ChartJS,
   CategoryScale,

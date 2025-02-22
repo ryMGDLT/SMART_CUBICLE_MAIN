@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card } from "../../../components/ui/card";
-import SummarizedReport from "../../../components/reports/SummarizedCard";
+import SummarizedReport from "../../../components/reports/summarizedCard";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -15,7 +15,7 @@ import {
 } from "../../../components/charts/mainCharts";
 import CustomCalendar from "../../../components/calendar/asideCalendar";
 import MobileCalendar from "../../../components/calendar/mobileCalendar";
-import Reminders from "../../../components/reminder/Reminder";
+import Reminders from "../../../components/reminder/reminder";
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;

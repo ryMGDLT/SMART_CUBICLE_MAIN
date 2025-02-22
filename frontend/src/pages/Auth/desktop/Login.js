@@ -1,9 +1,9 @@
 import React from "react";
-import { useAuth } from "../../../components/controller/AuthController";
+import { useAuth } from "../../../components/controller/authController";
 import { Link } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
-import axios from "axios";
+import { axiosInstance } from "../../../components/controller/authController";
 import Swal from "sweetalert2";
 
 export default function LoginPage() {
@@ -79,8 +79,8 @@ export default function LoginPage() {
   //};
   const handleResendVerificationEmail = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/users/resend-verification-email`,
+      const response = await axiosInstance.post(
+        "/users/resend-verification-email",
         { email }
       );
       Swal.fire({

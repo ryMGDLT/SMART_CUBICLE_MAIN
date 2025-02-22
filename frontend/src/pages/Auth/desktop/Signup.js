@@ -1,13 +1,13 @@
 import React from "react";
-import { useAuth } from "../../../components/controller/AuthController";
+import { useAuth } from "../../../components/controller/authController";
 import { Link } from "react-router-dom";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import Swal from "sweetalert2";
+import InputMask from "react-input-mask";
 
 export default function SignUpPage() {
   const [fullName, setFullName] = React.useState("");
-  //const [username, setUsername] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
@@ -17,17 +17,29 @@ export default function SignUpPage() {
   const [loading, setLoading] = React.useState(false);
   const { signup } = useAuth();
 
-  //validate Email
+  // Validate Email
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  //validate password strength
+  // Validate password strength
   const isStrongPassword = (password) => {
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return passwordRegex.test(password);
+  };
+
+  // Validate employeeId format TUPM-XXX-XXXX
+  const isValidEmployeeId = (employeeId) => {
+    const employeeIdRegex = /^TUPM-\d{2}-\d{4}$/;
+    return employeeIdRegex.test(employeeId);
+  };
+
+  // Handle Employee ID input
+  const handleEmployeeIdChange = (e) => {
+    const value = e.target.value;
+    setEmployeeId(value); // Update state with masked value
   };
 
   const handleSubmit = async (e) => {
@@ -37,6 +49,47 @@ export default function SignUpPage() {
     // Trim whitespace from both password fields
     const trimmedPassword = password.trim();
     const trimmedConfirmPassword = confirmPassword.trim();
+
+    // Validate fullName
+    if (!fullName || !fullName.trim()) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Full Name",
+        text: "Full Name is required!",
+      });
+      setLoading(false);
+      return;
+    }
+    const nameParts = fullName.trim().split(/\s+/);
+    if (nameParts.length < 2) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Full Name",
+        text: "Please enter both your First Name and Last Name separated by a space (e.g., John Doe)!",
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Validate employeeId
+    if (!employeeId || employeeId === "TUPM-" || employeeId === "") {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Employee ID",
+        text: "Employee ID is required!",
+      });
+      setLoading(false);
+      return;
+    }
+    if (!isValidEmployeeId(employeeId)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Employee ID",
+        text: "Employee ID must follow the format TUPM-XX-XXXX (e.g., TUPM-21-4567)!",
+      });
+      setLoading(false);
+      return;
+    }
 
     // Validate email
     if (!isValidEmail(email)) {
@@ -59,8 +112,6 @@ export default function SignUpPage() {
       setLoading(false);
       return;
     }
-
-    // Validate password strength
     if (!isStrongPassword(trimmedPassword)) {
       Swal.fire({
         icon: "error",
@@ -71,18 +122,30 @@ export default function SignUpPage() {
       return;
     }
 
+    // Validate contactNumber
+    if (!contactNumber || !contactNumber.trim()) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Contact Number",
+        text: "Contact Number is required!",
+      });
+      setLoading(false);
+      return;
+    }
+
     // Create the user data object
     const userData = {
       fullName,
       password: trimmedPassword,
       confirmPassword: trimmedConfirmPassword,
-      employeeId: employeeId,
-      contactNumber: contactNumber,
+      employeeId,
+      contactNumber,
       email,
       role: "User",
     };
 
     try {
+      console.log("Submitting userData:", userData);
       await signup(userData);
     } catch (error) {
       console.error("Signup error:", error);
@@ -95,6 +158,7 @@ export default function SignUpPage() {
       setLoading(false);
     }
   };
+
   return (
     <div className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">
       <img
@@ -113,7 +177,7 @@ export default function SignUpPage() {
           />
         </div>
         <form className="mt-2" onSubmit={handleSubmit}>
-          {/*full name*/}
+          {/* Full Name */}
           <div className="mb-4 flex space-x-4">
             <div className="w-1/2">
               <label className="block font-bold text-Icpetgreen text-sm mb-2">
@@ -121,29 +185,38 @@ export default function SignUpPage() {
               </label>
               <Input
                 type="text"
-                placeholder="Full Name"
+                placeholder="Firstname Lastname"
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
                 value={fullName}
                 required
                 onChange={(e) => setFullName(e.target.value)}
               />
             </div>
-            {/*Employee ID*/}
+            {/* Employee ID with Masking */}
             <div className="w-1/2">
               <label className="block font-bold text-Icpetgreen text-sm mb-2">
                 Employee ID
               </label>
-              <Input
-                type="text"
-                placeholder="TUPM-21-XXXX"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
+              <InputMask
+                mask="TUPM-99-9999"
                 value={employeeId}
-                required
-                onChange={(e) => setEmployeeId(e.target.value)}
-              />
+                onChange={handleEmployeeIdChange}
+                placeholder="TUPM-XX-XXXX"
+                maskChar="_"
+                alwaysShowMask={true}
+              >
+                {(inputProps) => (
+                  <Input
+                    {...inputProps}
+                    type="text"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
+                    required
+                  />
+                )}
+              </InputMask>
             </div>
           </div>
-          {/*username*/}
+          {/* Email */}
           <div className="mb-4 flex space-x-4">
             <div className="w-1/2">
               <label className="block font-bold text-Icpetgreen text-sm mb-2">
@@ -158,7 +231,7 @@ export default function SignUpPage() {
                 required
               />
             </div>
-            {/*number*/}
+            {/* Contact Number */}
             <div className="w-1/2">
               <label className="block font-bold text-Icpetgreen text-sm mb-2">
                 Contact Number
@@ -224,7 +297,7 @@ export default function SignUpPage() {
           </div>
 
           <div className="mb-4 flex space-x-4">
-            {/*Password*/}
+            {/* Password */}
             <div className="w-1/2">
               <div className="relative">
                 <label className="block font-bold text-Icpetgreen text-sm mb-2">
@@ -238,16 +311,6 @@ export default function SignUpPage() {
                   required
                   onChange={(e) => setPassword(e.target.value)}
                 />
-
-                {/* {password && ( 
-                  <button
-                    type="button"
-                    onClick={togglePassword}
-                    className="absolute inset-y-0 right-3 flex items-center"
-                  >
-                    <i className={`fa ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
-                  </button>
-                )} */}
                 <button
                   type="button"
                   className="absolute right-2 top-10 text-sm text-Icpetgreen hover:underline"
@@ -257,7 +320,7 @@ export default function SignUpPage() {
                 </button>
               </div>
             </div>
-            {/*confirm password*/}
+            {/* Confirm Password */}
             <div className="w-1/2">
               <div className="relative">
                 <label className="block font-bold text-Icpetgreen text-sm mb-2">
@@ -266,20 +329,11 @@ export default function SignUpPage() {
                 <Input
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white  "
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-Icpetgreen focus:outline-none bg-white"
                   value={confirmPassword}
                   required
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-                {/* {password && ( 
-                  <button
-                    type="button"
-                    onClick={togglePassword}
-                    className="absolute inset-y-0 right-3 flex items-center"
-                  >
-                    <i className={`fa ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
-                  </button>
-                )} */}
                 <button
                   type="button"
                   className="absolute right-2 top-10 text-sm text-Icpetgreen hover:underline"

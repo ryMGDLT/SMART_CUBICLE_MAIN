@@ -10,7 +10,7 @@ export const useAuth = () => useContext(AuthContext);
 export const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_BACKEND_URL || "http://localhost:5000",
 });
-
+console.log("Axios baseURL:", process.env.REACT_APP_BACKEND_URL);
 
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");

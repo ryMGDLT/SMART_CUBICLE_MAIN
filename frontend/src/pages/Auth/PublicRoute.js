@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../components/controller/AuthController";
+import { useAuth } from "../../components/controller/authController";
 
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();

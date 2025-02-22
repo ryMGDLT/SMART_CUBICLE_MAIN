@@ -8,9 +8,9 @@ import {
   MenuIcon,
   XIcon,
 } from "@heroicons/react/solid";
-import { useAuth } from "../controller/AuthController";
+import { useAuth } from "../controller/authController";
 import { DEFAULT_PROFILE_IMAGE } from "../../data/placeholderData";
-import { axiosInstance } from "../controller/AuthController";
+import { axiosInstance } from "../controller/authController";
 
 export default function Nav() {
   const location = useLocation();

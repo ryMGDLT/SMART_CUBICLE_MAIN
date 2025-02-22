@@ -17,6 +17,11 @@ const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
+// Validate employeeId format TUPM-XX-XXXX
+const isValidEmployeeId = (employeeId) => {
+  const employeeIdRegex = /^TUPM-\d{2}-\d{4}$/;
+  return employeeIdRegex.test(employeeId);
+};
 
 // Validate password strength
 const isStrongPassword = (password) => {
@@ -52,19 +57,23 @@ const createUser = async (req, res) => {
       !fullName ||
       !password ||
       !confirmPassword ||
-      !employeeId ||
+      !employeeId || !employeeId.trim() ||
       !contactNumber ||
       !email ||
       !role
     ) {
-      console.error("Missing required fields in signup request.");
+      console.error("Missing or invalid required fields in signup request.");
       return res.status(400).send("All fields are required");
     }
 
     // Extract the first word from the full name to use as the username
     const username = fullName.split(" ")[0];
     console.log("Extracted username:", username);
-
+    // validate format employeeid TUPM-xx-xxxx
+    if (!isValidEmployeeId(employeeId)) {
+      console.error("Invalid employeeId format:", employeeId);
+      return res.status(400).send("Employee ID must follow the format TUPM-XX-XXXX (e.g., TUPM-21-1234)");
+    }
     // Validate email
     if (!isValidEmail(email)) {
       console.error("Invalid email address:", email);
@@ -83,11 +92,11 @@ const createUser = async (req, res) => {
       return res.status(400).send("Password is not strong enough.");
     }
 
-    // Check if the email already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      console.error("Email already exists:", email);
-      return res.status(400).send("Email already exists");
+     // Check if the email or employeeId already exists
+     const existingUser = await User.findOne({ $or: [{ email }, { employeeId }] });
+     if (existingUser) {
+      console.error("Duplicate email or employeeId:", { email, employeeId });
+      return res.status(400).send("Email or Employee ID already exists");
     }
 
     // Hash the password
@@ -108,11 +117,12 @@ const createUser = async (req, res) => {
     console.log("Verification link generated:", verificationLink);
 
     // Create a new user
+   
     const newUser = new User({
       username,
       fullName,
       password: hashedPassword,
-      employeeId,
+      employeeId: employeeId.trim(),
       contactNumber,
       email,
       role,
@@ -137,6 +147,9 @@ const createUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error during user creation:", error.message);
+    if (error.code === 11000) {
+      return res.status(400).send("Email or Employee ID already exists");
+    }
     res.status(500).send(error.message);
   }
 };
