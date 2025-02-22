@@ -34,8 +34,8 @@ export const resourceUsageColumns = [
       return (
         <div className="flex items-center justify-center px-2">
           <Avatar>
-            <AvatarImage src={DEFAULT_PROFILE_IMAGE} alt={row.original.resourceUsage.name} />
-            <AvatarFallback>
+          <AvatarImage src={row.original.resourceUsage.image || DEFAULT_PROFILE_IMAGE} alt={row.original.resourceUsage.name} />
+          <AvatarFallback>
               <UserRoundIcon className="w-4 h-4" />
             </AvatarFallback>
           </Avatar>

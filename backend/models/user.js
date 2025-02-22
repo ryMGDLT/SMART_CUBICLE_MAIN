@@ -77,14 +77,41 @@ userSchema.post('findOneAndUpdate', async function () {
     ) {
       const existingJanitor = await Janitor.findOne({ 'basicDetails.email': updatedUser.email });
       if (existingJanitor) {
+        // Update basicDetails
         existingJanitor.basicDetails.image = updatedUser.profileImage;
         existingJanitor.basicDetails.name = updatedUser.fullName;
         existingJanitor.basicDetails.employeeId = updatedUser.employeeId;
         existingJanitor.basicDetails.email = updatedUser.email;
         existingJanitor.basicDetails.contact = updatedUser.contactNumber;
+
+        // Update image schedule array
+        existingJanitor.schedule.forEach((entry) => {
+          if (entry.image) entry.image = updatedUser.profileImage;
+          // entry.employeeId = updatedUser.employeeId;
+        });
+
+        // Update image and employeeId in performanceTrack array
+        existingJanitor.performanceTrack.forEach((entry) => {
+          if (entry.image) entry.image = updatedUser.profileImage;
+          if (entry.employeeId) entry.employeeId = updatedUser.employeeId;
+        });
+
+        // Update image and employeeId in resourceUsage array
+        existingJanitor.resourceUsage.forEach((entry) => {
+          if (entry.image) entry.image = updatedUser.profileImage;
+          if (entry.employeeId) entry.employeeId = updatedUser.employeeId;
+        });
+
+        // Update image and employeeId in logsReport array
+        existingJanitor.logsReport.forEach((entry) => {
+          if (entry.image) entry.image = updatedUser.profileImage;
+          // entry.employeeId = updatedUser.employeeId;
+        });
+
         await existingJanitor.save();
-        console.log(`Janitor ${updatedUser.username} (email: ${updatedUser.email}) updated in Janitors table.`);
+        console.log(`Janitor ${updatedUser.username} (email: ${updatedUser.email}) updated in Janitors table, including arrays.`);
       } else {
+        // If no existing janitor, create a new one
         const newJanitor = new Janitor({
           basicDetails: {
             image: updatedUser.profileImage,

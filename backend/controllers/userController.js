@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Janitor = require("../models/janitor");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../utils/emailService");
@@ -349,44 +350,239 @@ const getUserById = async (req, res) => {
 // Update a user by ID
 const updateUser = async (req, res) => {
   try {
-    const { password, ...updateData } = req.body;
-    if (password) {
-      updateData.password = await bcrypt.hash(password.trim(), 10);
+    const { password, fullName, employeeId, contactNumber, email, role, status, ...updateData } = req.body;
+
+    const updatedFields = { ...updateData };
+    if (password) updatedFields.password = await bcrypt.hash(password.trim(), 10);
+    if (fullName) updatedFields.fullName = fullName.trim();
+    if (employeeId) {
+      if (!isValidEmployeeId(employeeId)) {
+        console.error("Invalid employeeId format:", employeeId);
+        return res.status(400).send("Employee ID must follow the format TUPM-XX-XXXX (e.g., TUPM-21-1234)");
+      }
+      updatedFields.employeeId = employeeId.trim();
     }
-    const user = await User.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-    });
+    if (contactNumber) updatedFields.contactNumber = contactNumber.trim();
+    if (email) {
+      if (!isValidEmail(email)) {
+        console.error("Invalid email address:", email);
+        return res.status(400).send("Invalid email address");
+      }
+      updatedFields.email = email.toLowerCase();
+    }
+    if (role) updatedFields.role = role;
+    if (status) updatedFields.status = status;
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      updatedFields,
+      { new: true, runValidators: true }
+    ).select("-password");
+
     if (!user) {
+      console.error("User not found with _id:", req.params.id);
       return res.status(404).json({ message: "User not found" });
     }
+
+    console.log("User updated successfully:", user);
+
+    // Sync with Janitor
+    if (user.role === 'Janitor' && user.status === 'Accepted' && user.verified === true) {
+      try {
+        const existingJanitor = await Janitor.findOne({ 'basicDetails.email': user.email });
+        if (existingJanitor) {
+          console.log("Existing Janitor before update:", existingJanitor);
+
+          // Update basicDetails
+          existingJanitor.basicDetails.image = user.profileImage || existingJanitor.basicDetails.image;
+          existingJanitor.basicDetails.name = user.fullName;
+          existingJanitor.basicDetails.employeeId = user.employeeId;
+          existingJanitor.basicDetails.email = user.email;
+          existingJanitor.basicDetails.contact = user.contactNumber;
+
+          // Log array contents before update
+          console.log("Schedule before:", existingJanitor.schedule);
+          console.log("PerformanceTrack before:", existingJanitor.performanceTrack);
+          console.log("ResourceUsage before:", existingJanitor.resourceUsage);
+          console.log("LogsReport before:", existingJanitor.logsReport);
+
+          // Update arrays
+          if (existingJanitor.schedule && existingJanitor.schedule.length > 0) {
+            existingJanitor.schedule.forEach((entry) => {
+              entry.image = user.profileImage || entry.image;
+              entry.name = user.fullName;
+              console.log("Updated schedule entry:", entry);
+            });
+          }
+          if (existingJanitor.performanceTrack && existingJanitor.performanceTrack.length > 0) {
+            existingJanitor.performanceTrack.forEach((entry) => {
+              entry.image = user.profileImage || entry.image;
+              entry.employeeId = user.employeeId;
+              entry.name = user.fullName;
+              console.log("Updated performanceTrack entry:", entry);
+            });
+          }
+          if (existingJanitor.resourceUsage && existingJanitor.resourceUsage.length > 0) {
+            existingJanitor.resourceUsage.forEach((entry) => {
+              entry.image = user.profileImage || entry.image;
+              entry.employeeId = user.employeeId;
+              entry.name = user.fullName;
+              console.log("Updated resourceUsage entry:", entry);
+            });
+          }
+          if (existingJanitor.logsReport && existingJanitor.logsReport.length > 0) {
+            existingJanitor.logsReport.forEach((entry) => {
+              entry.image = user.profileImage || entry.image;
+              entry.name = user.fullName;
+              console.log("Updated logsReport entry:", entry);
+            });
+          }
+
+          // Mark arrays as modified 
+          existingJanitor.markModified('schedule');
+          existingJanitor.markModified('performanceTrack');
+          existingJanitor.markModified('resourceUsage');
+          existingJanitor.markModified('logsReport');
+
+          await existingJanitor.save();
+          console.log("Janitor after update:", await Janitor.findOne({ 'basicDetails.email': user.email }));
+        } else {
+          console.log(`No Janitor found for email ${user.email}, creating new entry`);
+          const newJanitor = new Janitor({
+            basicDetails: {
+              image: user.profileImage || "",
+              name: user.fullName,
+              employeeId: user.employeeId,
+              email: user.email,
+              contact: user.contactNumber,
+            },
+            schedule: [],
+            performanceTrack: [],
+            resourceUsage: [],
+            logsReport: [],
+          });
+          await newJanitor.save();
+        }
+      } catch (janitorError) {
+        console.error("Error syncing Janitor model:", janitorError.message);
+      }
+    }
+
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error updating user:", error.message, error.stack);
+    if (error.code === 11000) {
+      return res.status(400).send("Email or Employee ID already exists");
+    }
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
-
-// Upload profile image
+//update profile
 const uploadProfileImage = async (req, res) => {
   try {
+    if (!req.file) {
+      console.error("No file uploaded");
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
     const user = await User.findById(req.params.id);
     if (!user) {
+      console.error("User not found with _id:", req.params.id);
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Save the file path to the user's profileImage field
-    const serverUrl = process.env.BACKEND_URL || "http://localhost:5000";
-    user.profileImage = `${serverUrl}/uploads/profile-images/${req.file.filename}`;
-    await user.save();
+    const serverUrl = process.env.BACKEND_URL || "http://192.168.5.45:5000"; 
+    const profileImagePath = `${serverUrl}/uploads/profile-images/${req.file.filename}`;
+    console.log("New profileImagePath:", profileImagePath);
 
-    console.log("Updated user profileImage:", user.profileImage);
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { profileImage: profileImagePath },
+      { new: true, runValidators: true }
+    ).select("-password");
 
-    res.status(200).json({ profileImage: user.profileImage });
+    console.log("Updated user profileImage:", updatedUser.profileImage);
+
+    // Sync with Janitor 
+    if (updatedUser.role === 'Janitor' && updatedUser.status === 'Accepted' && updatedUser.verified === true) {
+      try {
+        const existingJanitor = await Janitor.findOne({ 'basicDetails.email': updatedUser.email });
+        if (existingJanitor) {
+          console.log("Existing Janitor before update:", {
+            basicDetails: existingJanitor.basicDetails,
+            resourceUsage: existingJanitor.resourceUsage
+          });
+
+          // Update basicDetails
+          existingJanitor.basicDetails.image = updatedUser.profileImage;
+          console.log("Set basicDetails.image to:", updatedUser.profileImage);
+
+          // Update resourceUsage 
+          if (existingJanitor.resourceUsage && existingJanitor.resourceUsage.length > 0) {
+            console.log("ResourceUsage before update:", existingJanitor.resourceUsage);
+            await Janitor.updateOne(
+              { 'basicDetails.email': updatedUser.email },
+              { $set: { 'resourceUsage.$[].image': updatedUser.profileImage } }
+            );
+            console.log("Applied $set to resourceUsage.image:", updatedUser.profileImage);
+          } else {
+            console.log("ResourceUsage is empty, no updates applied");
+          }
+
+          // Update other arrays 
+          if (existingJanitor.schedule && existingJanitor.schedule.length > 0) {
+            await Janitor.updateOne(
+              { 'basicDetails.email': updatedUser.email },
+              { $set: { 'schedule.$[].image': updatedUser.profileImage } }
+            );
+          }
+          if (existingJanitor.performanceTrack && existingJanitor.performanceTrack.length > 0) {
+            await Janitor.updateOne(
+              { 'basicDetails.email': updatedUser.email },
+              { $set: { 'performanceTrack.$[].image': updatedUser.profileImage } }
+            );
+          }
+          if (existingJanitor.logsReport && existingJanitor.logsReport.length > 0) {
+            await Janitor.updateOne(
+              { 'basicDetails.email': updatedUser.email },
+              { $set: { 'logsReport.$[].image': updatedUser.profileImage } }
+            );
+          }
+
+          // save
+          const updatedJanitor = await Janitor.findOne({ 'basicDetails.email': updatedUser.email });
+          console.log("Janitor after update:", {
+            basicDetails: updatedJanitor.basicDetails,
+            resourceUsage: updatedJanitor.resourceUsage
+          });
+        } else {
+          console.log(`No Janitor found for email ${updatedUser.email}, creating new entry`);
+          const newJanitor = new Janitor({
+            basicDetails: {
+              image: updatedUser.profileImage,
+              name: updatedUser.fullName,
+              employeeId: updatedUser.employeeId,
+              email: updatedUser.email,
+              contact: updatedUser.contactNumber,
+            },
+            schedule: [],
+            performanceTrack: [],
+            resourceUsage: [],
+            logsReport: [],
+          });
+          await newJanitor.save();
+        }
+      } catch (janitorError) {
+        console.error("Error syncing Janitor model:", janitorError.message, janitorError.stack);
+      }
+    }
+
+    res.status(200).json({ profileImage: updatedUser.profileImage });
   } catch (error) {
-    console.error("Error uploading profile image:", error.message);
-    res.status(500).json({ message: error.message });
+    console.error("Error uploading profile image:", error.message, error.stack);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
-
 // Delete a user by ID
 const deleteUser = async (req, res) => {
   try {

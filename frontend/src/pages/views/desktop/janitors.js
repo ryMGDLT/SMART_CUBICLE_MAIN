@@ -61,151 +61,153 @@ export default function Janitors() {
   const userRole = user?.role;
 
   // Call and fetch all the data in the janitors API database
-  useEffect(() => {
-    const fetchJanitors = async () => {
-      try {
-        const response = await fetch(`http://192.168.5.45:5000/janitors`); 
-        if (!response.ok) throw new Error("Failed to fetch janitors");
-        const data = await response.json();
-        setJanitorsData(data);
-        console.log("Fetched Janitors Data:", data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchJanitors = async () => {
+    try {
+      const response = await fetch(`http://192.168.5.45:5000/janitors`);
+      if (!response.ok) throw new Error("Failed to fetch janitors");
+      const data = await response.json();
+      setJanitorsData(data);
+      console.log("Fetched Janitors Data:", data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Fetch on mount
+  useEffect(() => {
     fetchJanitors();
   }, []);
 
   console.log("Logged-in User:", user);
 
-  // Mapping the janitors data to the table
-  const mappedJanitorsData = useMemo(() => {
-    return janitorsData.map((janitor) => ({
-      _id: janitor._id,
-      basicDetails: {
-        image: janitor.basicDetails?.image || DEFAULT_PROFILE_IMAGE,
-        name: janitor.basicDetails?.name || "",
-        employeeId: janitor.basicDetails?.employeeId || "",
-        email: janitor.basicDetails?.email || "",
-        contact: janitor.basicDetails?.contact || "",
-      },
-      schedule: {
-        image: janitor.schedule?.image || DEFAULT_PROFILE_IMAGE,
-        name: janitor.schedule?.name || "",
-        date: janitor.schedule?.date || "",
-        shift: janitor.schedule?.shift || "",
-        timeIn: janitor.schedule?.timeIn || "",
-        timeOut: janitor.schedule?.timeOut || "",
-        cleaningHour: janitor.schedule?.cleaningHour || "",
-        task: janitor.schedule?.task || "",
-        status: janitor.schedule?.status || "",
-      },
-      performanceTrack: {
-        image: janitor.performanceTrack?.image || DEFAULT_PROFILE_IMAGE,
-        name: janitor.performanceTrack?.name || "",
-        today: janitor.performanceTrack?.today || 0,
-        thisWeek: janitor.performanceTrack?.thisWeek || 0,
-        thisMonth: janitor.performanceTrack?.thisMonth || 0,
-        thisYear: janitor.performanceTrack?.thisYear || 0,
-        maxCleaningHour: janitor.performanceTrack?.maxCleaningHour || 0,
-        minCleaningHour: janitor.performanceTrack?.minCleaningHour || 0,
-        status: janitor.performanceTrack?.status || "",
-        employeeId: janitor.performanceTrack?.employeeId || "",
-      },
-      resourceUsage: {
-        image: janitor.resourceUsage?.image || DEFAULT_PROFILE_IMAGE,
-        name: janitor.resourceUsage?.name || "",
-        resource: janitor.resourceUsage?.resource || "",
-        amountUsed: janitor.resourceUsage?.amountUsed || "",
-        remaining: janitor.resourceUsage?.remaining || "",
-        restocked: janitor.resourceUsage?.restocked || "",
-        note: janitor.resourceUsage?.note || "",
-        employeeId: janitor.resourceUsage?.employeeId || "",
-      },
-      logsReport: {
-        image: janitor.logsReport?.image || DEFAULT_PROFILE_IMAGE,
-        name: janitor.logsReport?.name || "",
-        date: janitor.logsReport?.date || "",
-        startTime: janitor.logsReport?.startTime || "",
-        endTime: janitor.logsReport?.endTime || "",
-        duration: janitor.logsReport?.duration || 0,
-        task: janitor.logsReport?.task || "",
-        beforePicture: janitor.logsReport?.beforePicture || "",
-        afterPicture: janitor.logsReport?.afterPicture || "",
-        status: janitor.logsReport?.status || "",
-      },
-    }));
-  }, [janitorsData]);
+  //update the mapping to ensure when no entry in other tab janitor will not show
+// Mapping the janitors data to the table
+const mappedJanitorsData = useMemo(() => {
+  return janitorsData.map((janitor) => ({
+    _id: janitor._id,
+    basicDetails: {
+      image: janitor.basicDetails?.image || DEFAULT_PROFILE_IMAGE,
+      name: janitor.basicDetails?.name || "",
+      employeeId: janitor.basicDetails?.employeeId || "",
+      email: janitor.basicDetails?.email || "",
+      contact: janitor.basicDetails?.contact || "",
+    },
+    //make this data in this tab an array
+    schedule: janitor.schedule?.length > 0 ? janitor.schedule : [], 
+    performanceTrack: janitor.performanceTrack?.length > 0 ? janitor.performanceTrack : [], 
+    resourceUsage: janitor.resourceUsage?.length > 0 ? janitor.resourceUsage : [], 
+    logsReport: janitor.logsReport?.length > 0 ? janitor.logsReport : [], 
+  }));
+}, [janitorsData]);
 
   // Check if the janitor data is mapped
   console.log("Mapped Janitors Data:", mappedJanitorsData);
 
-  // Filter the janitors data based on the search term and the active tab
-  const filteredJanitors = useMemo(() => {
-    console.log("Debug: Checking filtering logic...");
-    console.log("Logged-in User Role:", userRole);
-    console.log("Logged-in User ID:", user?.id);
-    console.log("Logged-in User Email:", user?.email);
+  
+ // Filter the janitors data based on the search term and the active tab
+const filteredJanitors = useMemo(() => {
+  console.log("Debug: Checking filtering logic...");
+  console.log("Logged-in User Role:", userRole);
+  console.log("Logged-in User ID:", user?.id);
+  console.log("Logged-in User Email:", user?.email);
 
-    if (!mappedJanitorsData.length) {
-      console.log("No janitors data found!");
-      return [];
-    }
+  if (!mappedJanitorsData.length) {
+    console.log("No janitors data found!");
+    return [];
+  }
 
-    mappedJanitorsData.forEach((janitor) => {
-      console.log("Existing Janitor Email:", janitor.basicDetails.email);
-    });
+  mappedJanitorsData.forEach((janitor) => {
+    console.log("Existing Janitor Email:", janitor.basicDetails.email);
+  });
 
-    if (userRole === "Janitor") {
-      const filtered = mappedJanitorsData.filter(
-        (janitor) => janitor.basicDetails.email === user?.email
-      );
+  // Filter based on user role Janitor sees only their own data
+  let roleFilteredData = mappedJanitorsData;
+  if (userRole === "Janitor") {
+    roleFilteredData = mappedJanitorsData.filter(
+      (janitor) => janitor.basicDetails.email === user?.email
+    );
+    console.log("Filtered Janitor Data (Role-based):", roleFilteredData);
+  }
 
-      console.log("Filtered Janitor Data:", filtered);
-      return filtered;
-    }
+  // Filter based on active tab and ensure non-empty arrays
+  return roleFilteredData.filter((janitor) => {
+    const tabProperty = activeTab.toLowerCase().replace(/\s+/g, "");
+    const propertyKey =
+      {
+        basicdetails: "basicDetails",
+        logsandreport: "logsReport",
+        performancetrack: "performanceTrack",
+        resourceusage: "resourceUsage",
+        schedule: "schedule",
+      }[tabProperty] || tabProperty;
 
-    return mappedJanitorsData.filter((janitor) => {
-      const tabProperty = activeTab.toLowerCase().replace(/\s+/g, "");
-      const propertyKey =
-        {
-          basicdetails: "basicDetails",
-          logsandreport: "logsReport",
-          performancetrack: "performanceTrack",
-          resourceusage: "resourceUsage",
-          schedule: "schedule",
-        }[tabProperty] || tabProperty;
+    const data = janitor[propertyKey];
 
-      const data = janitor[propertyKey];
-      if (!data) return false;
-
-      const isMatch = Object.values(data)
+    // For Basic Details show all janitors regardless of array data
+    if (propertyKey === "basicDetails") {
+      return Object.values(data)
         .join(" ")
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
+    }
 
-      if (isMatch) console.log("Match found:", janitor.basicDetails.name);
+    // For other tabs, exclude janitors with empty arrays
+    if (!data || data.length === 0) {
+      return false;
+    }
 
-      return isMatch;
-    });
-  }, [
-    searchTerm,
-    activeTab,
-    mappedJanitorsData,
-    userRole,
-    user?.id,
-    user?.email,
-  ]);
+    // Search across all entries in the array
+    const isMatch = data.some((entry) =>
+      Object.values(entry)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
 
+    if (isMatch) console.log("Match found:", janitor.basicDetails.name);
 
-  const currentItems = useMemo(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    return filteredJanitors.slice(indexOfFirstItem, indexOfLastItem);
-  }, [currentPage, filteredJanitors]);
+    return isMatch;
+  });
+}, [
+  searchTerm,
+  activeTab,
+  mappedJanitorsData,
+  userRole,
+  user?.id,
+  user?.email,
+]);
+
+const currentItems = useMemo(() => {
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const paginatedItems = filteredJanitors.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Flatten arrays for the active tab and reverse to show newest items on top
+  return paginatedItems.flatMap((janitor) => {
+    const tabProperty = activeTab.toLowerCase().replace(/\s+/g, "");
+    const propertyKey =
+      {
+        basicdetails: "basicDetails",
+        logsandreport: "logsReport",
+        performancetrack: "performanceTrack",
+        resourceusage: "resourceUsage",
+        schedule: "schedule",
+      }[tabProperty] || tabProperty;
+
+    if (propertyKey === "basicDetails") {
+      return [janitor]; 
+    }
+
+    // Reverse the array to show newest entries first, then map
+    const reversedEntries = [...janitor[propertyKey]].reverse();
+    return reversedEntries.map((entry) => ({
+      ...janitor,
+      [propertyKey]: entry,
+    }));
+  });
+}, [currentPage, filteredJanitors, activeTab]);
 
   const totalPages = Math.ceil(filteredJanitors.length / itemsPerPage);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -250,7 +252,9 @@ export default function Janitors() {
   if (error) {
     return <div>Error: {error}</div>;
   }
-
+  const handleProfileUpdate = async () => {
+    await fetchJanitors(); 
+  };
   return (
     <Card className="flex flex-col p-4 h-full bg-white shadow-md rounded-lg overflow-hidden">
       {/* Search and Buttons Row */}
