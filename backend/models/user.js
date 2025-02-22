@@ -34,36 +34,39 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Post-save hook to copy users to the Janitor collection
+// get all users with janitor credentials
 userSchema.post('save', async function (doc) {
   try {
     if (doc.role === 'Janitor' && doc.status === 'Accepted' && doc.verified === true) {
-      const existingJanitor = await Janitor.findOne({ email: doc.email });
+      const existingJanitor = await Janitor.findOne({ 'basicDetails.email': doc.email });
       if (!existingJanitor) {
         const newJanitor = new Janitor({
-          username: doc.username,
-          fullName: doc.fullName,
-          password: doc.password,
-          employeeId: doc.employeeId,
-          contactNumber: doc.contactNumber,
-          email: doc.email,
-          role: doc.role,
-          status: doc.status,
-          profileImage: doc.profileImage,
-          verified: doc.verified,
+          basicDetails: {
+            image: doc.profileImage,
+            name: doc.fullName,
+            employeeId: doc.employeeId,
+            email: doc.email,
+            contact: doc.contactNumber,
+          },
+          schedule: [],
+          performanceTrack: [],
+          resourceUsage: [],
+          logsReport: [],
         });
         await newJanitor.save();
-        console.log(`User ${doc.username} copied to Janitors table.`);
+        console.log(`User ${doc.username} (email: ${doc.email}) copied to Janitors table.`);
       } else {
-        console.log(`User ${doc.username} already exists in the Janitors table.`);
+        console.log(`User ${doc.username} (email: ${doc.email}) already exists in Janitors table.`);
       }
+    } else {
+      console.log(`User ${doc.username} (email: ${doc.email}) does not qualify: role=${doc.role}, status=${doc.status}, verified=${doc.verified}`);
     }
   } catch (error) {
-    console.error('Error copying user to Janitors table:', error.message);
+    console.error(`Error copying user ${doc.username} to Janitors table:`, error.message);
   }
 });
 
-// Post-update hook to handle updates to eligible users
+// update janitor basic details when user update details
 userSchema.post('findOneAndUpdate', async function () {
   try {
     const updatedUser = await this.model.findOne(this.getQuery());
@@ -72,38 +75,106 @@ userSchema.post('findOneAndUpdate', async function () {
       updatedUser.status === 'Accepted' &&
       updatedUser.verified === true
     ) {
-      const existingJanitor = await Janitor.findOne({ email: updatedUser.email });
+      const existingJanitor = await Janitor.findOne({ 'basicDetails.email': updatedUser.email });
       if (existingJanitor) {
-        existingJanitor.username = updatedUser.username;
-        existingJanitor.fullName = updatedUser.fullName;
-        existingJanitor.contactNumber = updatedUser.contactNumber;
-        existingJanitor.email = updatedUser.email;
-        existingJanitor.employeeId = updatedUser.employeeId;
-        existingJanitor.profileImage = updatedUser.profileImage;
-        existingJanitor.verified = updatedUser.verified;
+        existingJanitor.basicDetails.image = updatedUser.profileImage;
+        existingJanitor.basicDetails.name = updatedUser.fullName;
+        existingJanitor.basicDetails.employeeId = updatedUser.employeeId;
+        existingJanitor.basicDetails.email = updatedUser.email;
+        existingJanitor.basicDetails.contact = updatedUser.contactNumber;
         await existingJanitor.save();
-        console.log(`Janitor ${updatedUser.username} updated in Janitors table.`);
+        console.log(`Janitor ${updatedUser.username} (email: ${updatedUser.email}) updated in Janitors table.`);
       } else {
         const newJanitor = new Janitor({
-          username: updatedUser.username,
-          fullName: updatedUser.fullName,
-          password: updatedUser.password,
-          employeeId: updatedUser.employeeId,
-          contactNumber: updatedUser.contactNumber,
-          email: updatedUser.email,
-          role: updatedUser.role,
-          status: updatedUser.status,
-          profileImage: updatedUser.profileImage,
-          verified: updatedUser.verified,
+          basicDetails: {
+            image: updatedUser.profileImage,
+            name: updatedUser.fullName,
+            employeeId: updatedUser.employeeId,
+            email: updatedUser.email,
+            contact: updatedUser.contactNumber,
+          },
+          schedule: [],
+          performanceTrack: [],
+          resourceUsage: [],
+          logsReport: [],
         });
         await newJanitor.save();
-        console.log(`New janitor ${updatedUser.username} added to Janitors table.`);
+        console.log(`New janitor ${updatedUser.username} (email: ${updatedUser.email}) added to Janitors table.`);
       }
+    } else {
+      console.log(`Updated user ${updatedUser.username} (email: ${updatedUser.email}) does not qualify: role=${updatedUser.role}, status=${updatedUser.status}, verified=${updatedUser.verified}`);
     }
   } catch (error) {
     console.error('Error handling user update:', error.message);
   }
 });
+
+// Updated syncAllJanitors function
+userSchema.statics.syncAllJanitors = async function () {
+  try {
+    const janitorUsers = await this.find({
+      role: 'Janitor',
+      status: 'Accepted',
+      verified: true,
+    });
+    console.log(`Found ${janitorUsers.length} qualifying janitors in User collection.`);
+
+    for (const user of janitorUsers) {
+      try {
+        const existingJanitor = await Janitor.findOne({ 'basicDetails.email': user.email });
+        if (!existingJanitor) {
+          const newJanitor = new Janitor({
+            basicDetails: {
+              image: user.profileImage,
+              name: user.fullName,
+              employeeId: user.employeeId,
+              email: user.email,
+              contact: user.contactNumber,
+            },
+            schedule: [],
+            performanceTrack: [],
+            resourceUsage: [],
+            logsReport: [],
+          });
+          await newJanitor.save();
+          console.log(`User ${user.username} (email: ${user.email}) copied to Janitors table via sync.`);
+        } else {
+          console.log(`User ${user.username} (email: ${user.email}) already exists in Janitors table.`);
+          let updated = false;
+          if (existingJanitor.basicDetails.image !== user.profileImage) {
+            existingJanitor.basicDetails.image = user.profileImage;
+            updated = true;
+          }
+          if (existingJanitor.basicDetails.name !== user.fullName) {
+            existingJanitor.basicDetails.name = user.fullName;
+            updated = true;
+          }
+          if (existingJanitor.basicDetails.employeeId !== user.employeeId) {
+            existingJanitor.basicDetails.employeeId = user.employeeId;
+            updated = true;
+          }
+          if (existingJanitor.basicDetails.email !== user.email) {
+            existingJanitor.basicDetails.email = user.email;
+            updated = true;
+          }
+          if (existingJanitor.basicDetails.contact !== user.contactNumber) {
+            existingJanitor.basicDetails.contact = user.contactNumber;
+            updated = true;
+          }
+          if (updated) {
+            await existingJanitor.save();
+            console.log(`Janitor ${user.username} (email: ${user.email}) updated in Janitors table via sync.`);
+          }
+        }
+      } catch (error) {
+        console.error(`Error syncing user ${user.username} (email: ${user.email}):`, error.message);
+      }
+    }
+    console.log('Janitor sync completed.');
+  } catch (error) {
+    console.error('Error in syncAllJanitors:', error.message);
+  }
+};
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

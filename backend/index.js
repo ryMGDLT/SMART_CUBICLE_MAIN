@@ -1,4 +1,4 @@
-const {getIPAddress, getPortBackend, getPortFrontend} = require("./utils/getIPPORT");
+const { getIPAddress, getPortBackend, getPortFrontend } = require("./utils/getIPPORT");
 
 require("dotenv").config();
 const express = require("express");
@@ -89,9 +89,10 @@ app.post(
     });
   }
 );
+
 // Routes
 app.use("/users", userRoutes);
-app.use("/api", janitorRoutes);
+app.use("/janitors", janitorRoutes); 
 
 // Start the server
 app.listen(portBack, "0.0.0.0", () => {
@@ -100,5 +101,3 @@ app.listen(portBack, "0.0.0.0", () => {
     `Backend server accessible on the network at http://${localIP}:${portBack}`
   );
 });
-
-

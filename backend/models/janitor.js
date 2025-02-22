@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
-
+//janitor from users
 const janitorSchema = new mongoose.Schema({
   basicDetails: {
-    image: { type: String },
-    name: { type: String, required: true, unique: true },
+    image: { type: String, default: "" },
+    name: { type: String, required: true },
     employeeId: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    contact: { type: String, required: true }
+    contact: { type: String, required: true },
   },
-  schedule: {
+  //made an array to store multiple entry under one basicdetails
+  schedule: [{
     image: { type: String },
     name: { type: String },
     date: { type: String },
@@ -17,9 +18,10 @@ const janitorSchema = new mongoose.Schema({
     timeOut: { type: String },
     cleaningHour: { type: String },
     task: { type: String },
-    status: { type: String }
-  },
-  performanceTrack: {
+    status: { type: String },
+  }],
+  //made an array to store multiple entry under one basicdetails
+  performanceTrack: [{
     image: { type: String },
     name: { type: String },
     today: { type: Number },
@@ -29,9 +31,10 @@ const janitorSchema = new mongoose.Schema({
     maxCleaningHour: { type: Number },
     minCleaningHour: { type: Number },
     status: { type: String },
-    employeeId: { type: String }
-  },
-  resourceUsage: {
+    employeeId: { type: String },
+  }],
+  //made an array to store multiple entry under one basicdetails
+  resourceUsage: [{
     image: { type: String },
     name: { type: String },
     resource: { type: String },
@@ -39,9 +42,10 @@ const janitorSchema = new mongoose.Schema({
     remaining: { type: String },
     restocked: { type: String },
     note: { type: String },
-    employeeId: { type: String }
-  },
-  logsReport: {
+    employeeId: { type: String },
+  }],
+  //made an array to store multiple entry under one basicdetails
+  logsReport: [{
     image: { type: String },
     name: { type: String },
     date: { type: String },
@@ -51,8 +55,8 @@ const janitorSchema = new mongoose.Schema({
     task: { type: String },
     beforePicture: { type: String },
     afterPicture: { type: String },
-    status: { type: String }
-  }
+    status: { type: String },
+  }],
 });
 
 const Janitor = mongoose.model('Janitor', janitorSchema);
