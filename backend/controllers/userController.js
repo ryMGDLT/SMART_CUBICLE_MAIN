@@ -1,125 +1,89 @@
-const User = require("../models/User");
-const Janitor = require("../models/janitor");
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../utils/emailService");
-const multer = require("multer");
-const path = require("path");
+const getUserModels = require("../models/User");
+const getJanitorModels = require("../models/Janitor");
+const getNotificationModels = require("../models/notification");
 
-// Generate JWT
 const generateToken = (user) => {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  console.log("Generating token for user:", user._id);
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
-// Validate email
 const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
-// Validate employeeId format TUPM-XX-XXXX
+
 const isValidEmployeeId = (employeeId) => {
   const employeeIdRegex = /^TUPM-\d{2}-\d{4}$/;
   return employeeIdRegex.test(employeeId);
 };
 
-// Validate password strength
 const isStrongPassword = (password) => {
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return passwordRegex.test(password);
 };
 
-// Generate verification token
 const generateVerificationToken = () => {
-  return (
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15)
-  );
+  const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  console.log("Generated verification token:", token);
+  return token;
 };
 
-// Create user
 const createUser = async (req, res) => {
   try {
-    const {
-      fullName,
-      password,
-      confirmPassword,
-      employeeId,
-      contactNumber,
-      email,
-      role,
-    } = req.body;
+    console.log("Received signup request:", req.body);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
 
-    console.log("Received signup request:", { fullName, email, role });
+    const { UserLocal, UserAtlas } = getUserModels();
+    const { NotificationLocal, NotificationAtlas } = getNotificationModels();
+    const { fullName, password, confirmPassword, employeeId, contactNumber, email, role } = req.body;
 
-    if (
-      !fullName ||
-      !password ||
-      !confirmPassword ||
-      !employeeId || !employeeId.trim() ||
-      !contactNumber ||
-      !email ||
-      !role
-    ) {
-      console.error("Missing or invalid required fields in signup request.");
+    if (!fullName || !password || !confirmPassword || !employeeId || !employeeId.trim() || !contactNumber || !email || !role) {
+      console.error("Missing required fields");
       return res.status(400).send("All fields are required");
     }
 
-    // Extract the first word from the full name to use as the username
     const username = fullName.split(" ")[0];
     console.log("Extracted username:", username);
-    // validate format employeeid TUPM-xx-xxxx
+
     if (!isValidEmployeeId(employeeId)) {
       console.error("Invalid employeeId format:", employeeId);
       return res.status(400).send("Employee ID must follow the format TUPM-XX-XXXX (e.g., TUPM-21-1234)");
     }
-    // Validate email
+
     if (!isValidEmail(email)) {
       console.error("Invalid email address:", email);
       return res.status(400).send("Invalid email address");
     }
 
-    // Check if passwords match
     if (password.trim() !== confirmPassword.trim()) {
-      console.error("Passwords do not match:", { password, confirmPassword });
+      console.error("Passwords do not match");
       return res.status(400).send("Passwords do not match");
     }
 
-    // Check if password is strong enough
     if (!isStrongPassword(password.trim())) {
-      console.error("Weak password provided:", password);
-      return res.status(400).send("Password is not strong enough.");
+      console.error("Weak password provided");
+      return res.status(400).send("Password is not strong enough");
     }
 
-     // Check if the email or employeeId already exists
-     const existingUser = await User.findOne({ $or: [{ email }, { employeeId }] });
-     if (existingUser) {
+    const existingLocal = await UserLocal.findOne({ $or: [{ email }, { employeeId }] });
+    const existingAtlas = await UserAtlas.findOne({ $or: [{ email }, { employeeId }] });
+    if (existingLocal || existingAtlas) {
       console.error("Duplicate email or employeeId:", { email, employeeId });
       return res.status(400).send("Email or Employee ID already exists");
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password.trim(), 10);
-    console.log("Hashed password:", hashedPassword);
-
-    // Generate verification token
     const verificationToken = generateVerificationToken();
-    const verificationTokenExpiresAt = new Date(
-      Date.now() + 24 * 60 * 60 * 1000
-    );
-    console.log("Generated verification token:", verificationToken);
-    console.log("Token expiry time:", verificationTokenExpiresAt);
+    const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const userId = new mongoose.Types.ObjectId();
+    console.log("Generated user _id:", userId.toString());
 
-    const frontendBaseUrl =
-      process.env.FRONTEND_BASE_URL || "http://localhost:3000";
-    const verificationLink = `${frontendBaseUrl}/verify-email?token=${verificationToken}`;
-    console.log("Verification link generated:", verificationLink);
-
-    // Create a new user
-   
-    const newUser = new User({
+    const newUserData = {
+      _id: userId,
       username,
       fullName,
       password: hashedPassword,
@@ -130,72 +94,95 @@ const createUser = async (req, res) => {
       verificationToken,
       verificationTokenExpiresAt,
       verified: false,
+      notificationsEnabled: true,
+    };
+
+    const newUserLocal = new UserLocal(newUserData);
+    const newUserAtlas = new UserAtlas(newUserData);
+
+    await Promise.all([newUserLocal.save(), newUserAtlas.save()]);
+    console.log("User saved - Local:", newUserLocal._id, "Atlas:", newUserAtlas._id);
+
+    const admins = await UserAtlas.find({ role: { $in: ["Admin", "Superadmin"] }, notificationsEnabled: true });
+    const notificationMessage = `New User ${email} signed up! Go to users page to assign role and accept the user`;
+    const notificationPromises = admins.map(async (admin) => {
+      const notificationId = new mongoose.Types.ObjectId();
+      const notificationData = {
+        _id: notificationId,
+        message: notificationMessage,
+        userId: newUserLocal._id,
+        recipientId: admin._id,
+        createdAt: new Date(),
+        read: false,
+      };
+
+      const existingNotificationLocal = await NotificationLocal.findOne({
+        message: notificationMessage,
+        userId: newUserLocal._id,
+        recipientId: admin._id,
+      });
+      const existingNotificationAtlas = await NotificationAtlas.findOne({
+        message: notificationMessage,
+        userId: newUserLocal._id,
+        recipientId: admin._id,
+      });
+
+      if (!existingNotificationLocal && !existingNotificationAtlas) {
+        const notificationLocal = new NotificationLocal(notificationData);
+        const notificationAtlas = new NotificationAtlas(notificationData);
+        return Promise.all([
+          notificationLocal.save().then(() => console.log(`Notification saved in Local with _id: ${notificationId}`)),
+          notificationAtlas.save().then(() => console.log(`Notification saved in Atlas with _id: ${notificationId}`)),
+        ]);
+      }
     });
 
-    console.log("User object before saving:", newUser);
-    await newUser.save();
-    console.log("User saved successfully:", newUser);
+    await Promise.all(notificationPromises.filter(Boolean));
+    console.log("Notifications created for eligible admins for user signup:", newUserLocal._id);
 
-    // Send verification email
+    const frontendBaseUrl = process.env.FRONTEND_BASE_URL || "http://localhost:3000";
+    const verificationLink = `${frontendBaseUrl}/verify-email?token=${verificationToken}`;
     const subject = "Verify Your Email";
     const text = `Hi ${fullName},\n\nPlease verify your email by clicking the following link: ${verificationLink}\n\nThis link will expire at: ${verificationTokenExpiresAt}\n\nBest regards,\nThe Team`;
     await sendEmail(email, subject, text);
     console.log("Verification email sent to:", email);
 
-    res.status(201).json({
-      message:
-        "User created successfully. Please check your email to verify your account.",
-    });
+    res.status(201).json({ message: "User created successfully. Please check your email to verify your account." });
   } catch (error) {
-    console.error("Error during user creation:", error.message);
-    if (error.code === 11000) {
-      return res.status(400).send("Email or Employee ID already exists");
-    }
+    console.error("Error during user creation:", error.message, error.stack);
+    if (error.code === 11000) return res.status(400).send("Email or Employee ID already exists");
     res.status(500).send(error.message);
   }
 };
-//login user
+
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    console.log("Received email:", email);
-    console.log("Received password:", JSON.stringify(password));
+    console.log("Received login request:", req.body);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
 
-    const user = await User.findOne({ email });
+    const { UserAtlas } = getUserModels();
+    const { email, password } = req.body;
+
+    const user = await UserAtlas.findOne({ email });
     if (!user) {
       console.log("User not found for email:", email);
       return res.status(404).send("User not found");
     }
-
-    console.log("User found:", user);
-    console.log("Provided password:", password.trim());
-    console.log("Stored hashed password:", user.password);
+    console.log("User found:", user._id);
 
     if (!user.verified) {
       console.log("User email not verified:", email);
-      return res
-        .status(403)
-        .send(
-          "Email not verified. Please verify your email before logging in."
-        );
+      return res.status(403).send("Email not verified. Please verify your email before logging in.");
     }
 
     if (user.status === "Pending") {
       console.log("User status is pending:", user.status);
-      return res
-        .status(403)
-        .send(
-          "Pending approval. Please contact your employer to approve your signup request."
-        );
+      return res.status(403).send("Pending approval. Please contact your employer to approve your signup request.");
     }
 
     if (user.status === "Declined") {
       console.log("User status is declined:", user.status);
-      return res
-        .status(403)
-        .send(
-          "Your account has been declined. Please contact support for further assistance."
-        );
+      return res.status(403).send("Your account has been declined. Please contact support for further assistance.");
     }
 
     if (user.status !== "Accepted") {
@@ -203,21 +190,14 @@ const loginUser = async (req, res) => {
       return res.status(403).send("Your account is not accepted yet.");
     }
 
-    const isMatch = await bcrypt.compare(
-      password.trim().replace(/\s+/g, ""),
-      user.password
-    );
-    console.log("Password match:", isMatch);
-
+    const isMatch = await bcrypt.compare(password.trim().replace(/\s+/g, ""), user.password);
     if (!isMatch) {
       console.log("Invalid password for email:", email);
       return res.status(401).send("Invalid credentials");
     }
 
-    // Generate JWT token
     const token = generateToken(user);
     console.log("Login successful for email:", email);
-
     res.status(200).json({
       message: "Login successful",
       token,
@@ -230,127 +210,137 @@ const loginUser = async (req, res) => {
         role: user.role,
         status: user.status,
         verified: user.verified,
+        notificationsEnabled: user.notificationsEnabled,
       },
     });
   } catch (error) {
-    console.error("Error during login:", error.message);
+    console.error("Error during login:", error.message, error.stack);
     res.status(500).send(error.message);
   }
 };
 
-//verify email
 const verifyEmail = async (req, res) => {
   try {
+    console.log("Received email verification request:", req.body);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserLocal, UserAtlas } = getUserModels();
     const { token } = req.body;
-    console.log("Received token for verification:", token);
+
     if (!token) {
-      console.error("No token provided for verification.");
+      console.error("No token provided");
       return res.status(400).send("Token is required");
     }
-    // Find and update the user atomically
-    const result = await User.findOneAndUpdate(
-      {
-        verificationToken: token,
-        verificationTokenExpiresAt: { $gt: new Date() },
-      },
-      {
-        $set: {
-          verified: true,
-          verificationToken: undefined,
-          verificationTokenExpiresAt: undefined,
-        },
-      },
-      { new: true }
-    );
-    if (!result) {
+
+    const [userLocal, userAtlas] = await Promise.all([
+      UserLocal.findOneAndUpdate(
+        { verificationToken: token, verificationTokenExpiresAt: { $gt: new Date() } },
+        { $set: { verified: true, verificationToken: undefined, verificationTokenExpiresAt: undefined } },
+        { new: true }
+      ),
+      UserAtlas.findOneAndUpdate(
+        { verificationToken: token, verificationTokenExpiresAt: { $gt: new Date() } },
+        { $set: { verified: true, verificationToken: undefined, verificationTokenExpiresAt: undefined } },
+        { new: true }
+      ),
+    ]);
+
+    if (!userLocal || !userAtlas) {
       console.error("Invalid or expired token:", token);
       return res.status(400).send("Invalid or expired token");
     }
-    console.log("User verified successfully:", result);
+
+    console.log("User verified successfully:", userAtlas._id);
     res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
-    console.error("Error verifying email:", error.message);
+    console.error("Error verifying email:", error.message, error.stack);
     res.status(500).send(error.message);
   }
 };
 
-// Resend verification email
 const resendVerificationEmail = async (req, res) => {
   try {
-    const { email } = req.body;
-    console.log("Received request to resend verification email for:", email);
+    console.log("Received resend verification email request:", req.body);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
 
-    const user = await User.findOne({ email });
-    if (!user) {
+    const { UserLocal, UserAtlas } = getUserModels();
+    const { email } = req.body;
+
+    const userAtlas = await UserAtlas.findOne({ email });
+    if (!userAtlas) {
       console.error("User not found for email:", email);
       return res.status(404).send("User not found");
     }
 
-    if (user.verified) {
-      console.error("Email is already verified for user:", email);
+    if (userAtlas.verified) {
+      console.error("Email already verified for user:", email);
       return res.status(400).send("Email is already verified.");
     }
 
     const verificationToken = generateVerificationToken();
-    const verificationTokenExpiresAt = new Date(
-      Date.now() + 24 * 60 * 60 * 1000
-    );
-    console.log("New verification token generated:", verificationToken);
-    console.log("Token expiry time:", verificationTokenExpiresAt);
+    const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    user.verificationToken = verificationToken;
-    user.verificationTokenExpiresAt = verificationTokenExpiresAt;
-    await user.save();
-    console.log("User updated with new verification token:", user);
+    await Promise.all([
+      UserLocal.updateOne({ email }, { verificationToken, verificationTokenExpiresAt }),
+      UserAtlas.updateOne({ email }, { verificationToken, verificationTokenExpiresAt }),
+    ]);
 
-    const frontendBaseUrl =
-      process.env.FRONTEND_BASE_URL || "http://localhost:3000";
+    const frontendBaseUrl = process.env.FRONTEND_BASE_URL || "http://localhost:3000";
     const verificationLink = `${frontendBaseUrl}/verify-email?token=${verificationToken}`;
-    console.log("Verification link generated:", verificationLink);
-
     const subject = "Verify Your Email";
-    const text = `Hi ${user.fullName},\n\nPlease verify your email by clicking the following link: ${verificationLink}\n\nBest regards,\nThe Team`;
+    const text = `Hi ${userAtlas.fullName},\n\nPlease verify your email by clicking the following link: ${verificationLink}\n\nBest regards,\nThe Team`;
     await sendEmail(email, subject, text);
     console.log("Verification email resent to:", email);
-    res
-      .status(200)
-      .json({ message: "Verification email resent successfully." });
+
+    res.status(200).json({ message: "Verification email resent successfully." });
   } catch (error) {
-    console.error("Error resending verification email:", error.message);
+    console.error("Error resending verification email:", error.message, error.stack);
     res.status(500).send(error.message);
   }
 };
 
-// Get all users
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password");
+    console.log("Fetching all users");
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserAtlas } = getUserModels();
+    const users = await UserAtlas.find().select("-password");
+    console.log("Users fetched:", users.map(u => u._id));
     res.status(200).json(users);
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to fetch users", error: error.message });
+    console.error("Error fetching users:", error.message, error.stack);
+    res.status(500).json({ message: "Failed to fetch users", error: error.message });
   }
 };
 
-// Get a user by ID
 const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
+    console.log("Fetching user with ID:", req.params.id);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserAtlas } = getUserModels();
+    const user = await UserAtlas.findById(req.params.id).select("-password");
     if (!user) {
+      console.error("User not found with _id:", req.params.id);
       return res.status(404).json({ message: "User not found" });
     }
+    console.log("User fetched:", user._id);
     res.status(200).json(user);
   } catch (error) {
+    console.error("Error fetching user:", error.message, error.stack);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Update a user by ID
 const updateUser = async (req, res) => {
   try {
-    const { password, fullName, employeeId, contactNumber, email, role, status, ...updateData } = req.body;
+    console.log("Received update request for user ID:", req.params.id, "with data:", req.body);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserLocal, UserAtlas } = getUserModels();
+    const { JanitorLocal, JanitorAtlas } = getJanitorModels();
+    const { password, fullName, employeeId, contactNumber, email, role, status, notificationsEnabled, ...updateData } = req.body;
 
     const updatedFields = { ...updateData };
     if (password) updatedFields.password = await bcrypt.hash(password.trim(), 10);
@@ -372,111 +362,121 @@ const updateUser = async (req, res) => {
     }
     if (role) updatedFields.role = role;
     if (status) updatedFields.status = status;
+    if (notificationsEnabled !== undefined) updatedFields.notificationsEnabled = notificationsEnabled;
 
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      updatedFields,
-      { new: true, runValidators: true }
-    ).select("-password");
+    const [userLocal, userAtlas] = await Promise.all([
+      UserLocal.findByIdAndUpdate(req.params.id, updatedFields, { new: true, runValidators: true }),
+      UserAtlas.findByIdAndUpdate(req.params.id, updatedFields, { new: true, runValidators: true }).select("-password"),
+    ]);
 
-    if (!user) {
+    if (!userLocal || !userAtlas) {
       console.error("User not found with _id:", req.params.id);
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("User updated successfully:", user);
+    console.log("User updated successfully:", userAtlas._id);
+    console.log("Checking janitor sync conditions - Role:", userAtlas.role, "Status:", userAtlas.status, "Verified:", userAtlas.verified);
 
-    // Sync with Janitor
-    if (user.role === 'Janitor' && user.status === 'Accepted' && user.verified === true) {
-      try {
-        const existingJanitor = await Janitor.findOne({ userId: user._id });
-        if (existingJanitor) {
-          // Update existing Janitor
-          existingJanitor.basicDetails.image = user.profileImage || existingJanitor.basicDetails.image;
-          existingJanitor.basicDetails.name = user.fullName;
-          existingJanitor.basicDetails.employeeId = user.employeeId;
-          existingJanitor.basicDetails.email = user.email;
-          existingJanitor.basicDetails.contact = user.contactNumber;
+    if (userAtlas.role === "Janitor" && userAtlas.status === "Accepted" && userAtlas.verified === true) {
+      console.log("Janitor sync conditions met for user:", userAtlas._id);
 
-          // Update arrays
-          if (existingJanitor.schedule && existingJanitor.schedule.length > 0) {
-            existingJanitor.schedule.forEach((entry) => {
-              entry.image = user.profileImage || entry.image;
-              entry.name = user.fullName;
-            });
-          }
-          if (existingJanitor.performanceTrack && existingJanitor.performanceTrack.length > 0) {
-            existingJanitor.performanceTrack.forEach((entry) => {
-              entry.image = user.profileImage || entry.image;
-              entry.employeeId = user.employeeId;
-              entry.name = user.fullName;
-            });
-          }
-          if (existingJanitor.resourceUsage && existingJanitor.resourceUsage.length > 0) {
-            existingJanitor.resourceUsage.forEach((entry) => {
-              entry.image = user.profileImage || entry.image;
-              entry.employeeId = user.employeeId;
-              entry.name = user.fullName;
-            });
-          }
-          if (existingJanitor.logsReport && existingJanitor.logsReport.length > 0) {
-            existingJanitor.logsReport.forEach((entry) => {
-              entry.image = user.profileImage || entry.image;
-              entry.name = user.fullName;
-            });
-          }
+      const janitorId = new mongoose.Types.ObjectId();
+      console.log("Generated janitor _id for sync:", janitorId.toString());
 
-          existingJanitor.markModified('schedule');
-          existingJanitor.markModified('performanceTrack');
-          existingJanitor.markModified('resourceUsage');
-          existingJanitor.markModified('logsReport');
+      const janitorData = {
+        _id: janitorId,
+        userId: userAtlas._id,
+        basicDetails: {
+          image: userAtlas.profileImage || "",
+          name: userAtlas.fullName,
+          employeeId: userAtlas.employeeId,
+          email: userAtlas.email,
+          contact: userAtlas.contactNumber,
+        },
+        schedule: [],
+        performanceTrack: [],
+        resourceUsage: [],
+        logsReport: [],
+      };
 
-          await existingJanitor.save();
-          console.log("Janitor updated successfully:", await Janitor.findOne({ userId: user._id }));
-        } else {
-          // Create new Janitor if it doesn’t exist
-          const newJanitor = new Janitor({
-            userId: user._id,
-            basicDetails: {
-              image: user.profileImage || "",
-              name: user.fullName,
-              employeeId: user.employeeId,
-              email: user.email,
-              contact: user.contactNumber,
-            },
-            schedule: [],
-            performanceTrack: [],
-            resourceUsage: [],
-            logsReport: [],
-          });
-          await newJanitor.save();
-          console.log(`New janitor created for userId: ${user._id}`);
-        }
-      } catch (janitorError) {
-        console.error("Error syncing Janitor model:", janitorError.message);
+      const existingJanitorLocal = await JanitorLocal.findOne({ userId: userAtlas._id });
+      const existingJanitorAtlas = await JanitorAtlas.findOne({ userId: userAtlas._id });
+
+      if (existingJanitorLocal && existingJanitorAtlas) {
+        console.log("Existing janitor found - Local:", existingJanitorLocal._id, "Atlas:", existingJanitorAtlas._id);
+        existingJanitorLocal.basicDetails = janitorData.basicDetails;
+        existingJanitorAtlas.basicDetails = janitorData.basicDetails;
+
+        console.log("Attempting to update janitor in Local...");
+        await existingJanitorLocal.save().catch(err => {
+          throw new Error(`Failed to update janitor in Local: ${err.message}`);
+        });
+        console.log("Janitor updated in Local:", existingJanitorLocal._id);
+
+        console.log("Attempting to update janitor in Atlas...");
+        await existingJanitorAtlas.save().catch(err => {
+          throw new Error(`Failed to update janitor in Atlas: ${err.message}`);
+        });
+        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id);
+      } else {
+        console.log("No existing janitor found, creating new janitor...");
+        console.log("Attempting to sync janitor to Local...");
+        const janitorLocal = new JanitorLocal(janitorData);
+        const newJanitorLocal = await janitorLocal.save().catch(err => {
+          throw new Error(`Failed to save janitor to Local: ${err.message}`);
+        });
+        console.log("Janitor synced to Local:", newJanitorLocal._id);
+
+        console.log("Attempting to sync janitor to Atlas...");
+        const janitorAtlas = new JanitorAtlas(janitorData);
+        const newJanitorAtlas = await janitorAtlas.save().catch(err => {
+          JanitorLocal.deleteOne({ _id: janitorId }).catch(() => {});
+          throw new Error(`Failed to save janitor to Atlas: ${err.message}`);
+        });
+        console.log("Janitor synced to Atlas:", newJanitorAtlas._id);
       }
+    } else {
+      console.log("Janitor sync conditions not met for user:", userAtlas._id);
     }
 
-    res.status(200).json(user);
+    res.status(200).json(userAtlas);
   } catch (error) {
     console.error("Error updating user:", error.message, error.stack);
-    if (error.code === 11000) {
-      return res.status(400).send("Email or Employee ID already exists");
-    }
+    if (error.code === 11000) return res.status(400).send("Email or Employee ID already exists");
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
-//update profile
+
 const uploadProfileImage = async (req, res) => {
   try {
+    console.log("Upload request received for user ID:", req.params.id, "Headers:", req.headers, "File:", req.file);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+    if (!global.dbConnections.local) throw new Error("Local database connection not initialized");
+    if (!global.dbConnections.atlas) throw new Error("Atlas database connection not initialized");
+
+    const { UserLocal, UserAtlas } = getUserModels();
+    const { JanitorLocal, JanitorAtlas } = getJanitorModels();
+
     if (!req.file) {
-      console.error("No file uploaded");
+      console.error("No file uploaded in request");
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      console.error("User not found with _id:", req.params.id);
+    console.log("File uploaded successfully:", req.file.filename);
+
+    const userAtlas = await UserAtlas.findById(req.params.id).catch(err => {
+      throw new Error(`Failed to fetch UserAtlas: ${err.message}`);
+    });
+    if (!userAtlas) {
+      console.error("User not found in Atlas with _id:", req.params.id);
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userLocal = await UserLocal.findById(req.params.id).catch(err => {
+      throw new Error(`Failed to fetch UserLocal: ${err.message}`);
+    });
+    if (!userLocal) {
+      console.error("User not found in Local with _id:", req.params.id);
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -484,153 +484,301 @@ const uploadProfileImage = async (req, res) => {
     const profileImagePath = `${serverUrl}/uploads/profile-images/${req.file.filename}`;
     console.log("New profileImagePath:", profileImagePath);
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { profileImage: profileImagePath },
-      { new: true, runValidators: true }
-    ).select("-password");
+    const [updatedUserLocal, updatedUserAtlas] = await Promise.all([
+      UserLocal.findByIdAndUpdate(req.params.id, { profileImage: profileImagePath }, { new: true, runValidators: true }),
+      UserAtlas.findByIdAndUpdate(req.params.id, { profileImage: profileImagePath }, { new: true, runValidators: true }).select("-password"),
+    ]);
 
-    console.log("Updated user profileImage:", updatedUser.profileImage);
-
-    // Sync with Janitor
-    if (updatedUser.role === 'Janitor' && updatedUser.status === 'Accepted' && updatedUser.verified === true) {
-      try {
-        const existingJanitor = await Janitor.findOne({ userId: updatedUser._id });
-        if (existingJanitor) {
-          // Update existing Janitor
-          existingJanitor.basicDetails.image = updatedUser.profileImage;
-
-          // Update arrays
-          if (existingJanitor.schedule && existingJanitor.schedule.length > 0) {
-            existingJanitor.schedule.forEach((entry) => {
-              entry.image = updatedUser.profileImage;
-            });
-          }
-          if (existingJanitor.performanceTrack && existingJanitor.performanceTrack.length > 0) {
-            existingJanitor.performanceTrack.forEach((entry) => {
-              entry.image = updatedUser.profileImage;
-            });
-          }
-          if (existingJanitor.resourceUsage && existingJanitor.resourceUsage.length > 0) {
-            existingJanitor.resourceUsage.forEach((entry) => {
-              entry.image = updatedUser.profileImage;
-            });
-          }
-          if (existingJanitor.logsReport && existingJanitor.logsReport.length > 0) {
-            existingJanitor.logsReport.forEach((entry) => {
-              entry.image = updatedUser.profileImage;
-            });
-          }
-
-          existingJanitor.markModified('schedule');
-          existingJanitor.markModified('performanceTrack');
-          existingJanitor.markModified('resourceUsage');
-          existingJanitor.markModified('logsReport');
-
-          await existingJanitor.save();
-          console.log("Janitor updated with new profile image:", await Janitor.findOne({ userId: updatedUser._id }));
-        } else {
-          // Create new Janitor if it doesn’t exist
-          const newJanitor = new Janitor({
-            userId: updatedUser._id,
-            basicDetails: {
-              image: updatedUser.profileImage,
-              name: updatedUser.fullName,
-              employeeId: updatedUser.employeeId,
-              email: updatedUser.email,
-              contact: updatedUser.contactNumber,
-            },
-            schedule: [],
-            performanceTrack: [],
-            resourceUsage: [],
-            logsReport: [],
-          });
-          await newJanitor.save();
-          console.log(`New janitor created for userId: ${updatedUser._id}`);
-        }
-      } catch (janitorError) {
-        console.error("Error syncing Janitor model:", janitorError.message, janitorError.stack);
-      }
+    if (!updatedUserLocal || !updatedUserAtlas) {
+      console.error("Update failed for user ID:", req.params.id);
+      return res.status(500).json({ message: "Failed to update user in one or both databases" });
     }
 
-    res.status(200).json({ profileImage: updatedUser.profileImage });
+    console.log("Updated user profileImage:", updatedUserAtlas.profileImage);
+    console.log("Checking janitor sync conditions - Role:", updatedUserAtlas.role, "Status:", updatedUserAtlas.status, "Verified:", updatedUserAtlas.verified);
+
+    if (updatedUserAtlas.role === "Janitor" && updatedUserAtlas.status === "Accepted" && updatedUserAtlas.verified === true) {
+      console.log("Janitor sync conditions met for user:", updatedUserAtlas._id);
+
+      const janitorId = new mongoose.Types.ObjectId();
+      console.log("Generated janitor _id for sync:", janitorId.toString());
+
+      const janitorData = {
+        _id: janitorId,
+        userId: updatedUserAtlas._id,
+        basicDetails: {
+          image: updatedUserAtlas.profileImage,
+          name: updatedUserAtlas.fullName,
+          employeeId: updatedUserAtlas.employeeId,
+          email: updatedUserAtlas.email,
+          contact: updatedUserAtlas.contactNumber,
+        },
+        schedule: [],
+        performanceTrack: [],
+        resourceUsage: [],
+        logsReport: [],
+      };
+
+      const existingJanitorLocal = await JanitorLocal.findOne({ userId: updatedUserAtlas._id });
+      const existingJanitorAtlas = await JanitorAtlas.findOne({ userId: updatedUserAtlas._id });
+
+      if (existingJanitorLocal && existingJanitorAtlas) {
+        console.log("Existing janitor found - Local:", existingJanitorLocal._id, "Atlas:", existingJanitorAtlas._id);
+        existingJanitorLocal.basicDetails = janitorData.basicDetails;
+        existingJanitorAtlas.basicDetails = janitorData.basicDetails;
+
+        console.log("Attempting to update janitor in Local...");
+        await existingJanitorLocal.save().catch(err => {
+          throw new Error(`Failed to update janitor in Local: ${err.message}`);
+        });
+        console.log("Janitor updated in Local:", existingJanitorLocal._id);
+
+        console.log("Attempting to update janitor in Atlas...");
+        await existingJanitorAtlas.save().catch(err => {
+          throw new Error(`Failed to update janitor in Atlas: ${err.message}`);
+        });
+        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id);
+      } else {
+        console.log("No existing janitor found, creating new janitor...");
+        console.log("Attempting to sync janitor to Local...");
+        const janitorLocal = new JanitorLocal(janitorData);
+        const newJanitorLocal = await janitorLocal.save().catch(err => {
+          throw new Error(`Failed to save janitor to Local: ${err.message}`);
+        });
+        console.log("Janitor synced to Local:", newJanitorLocal._id);
+
+        console.log("Attempting to sync janitor to Atlas...");
+        const janitorAtlas = new JanitorAtlas(janitorData);
+        const newJanitorAtlas = await janitorAtlas.save().catch(err => {
+          JanitorLocal.deleteOne({ _id: janitorId }).catch(() => {});
+          throw new Error(`Failed to save janitor to Atlas: ${err.message}`);
+        });
+        console.log("Janitor synced to Atlas:", newJanitorAtlas._id);
+      }
+    } else {
+      console.log("Janitor sync conditions not met for user:", updatedUserAtlas._id);
+    }
+
+    res.status(200).json({ profileImage: updatedUserAtlas.profileImage });
   } catch (error) {
     console.error("Error uploading profile image:", error.message, error.stack);
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
-// Delete a user by ID
+
 const deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) {
+    console.log("Received delete request for user ID:", req.params.id);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserLocal, UserAtlas } = getUserModels();
+    const { JanitorLocal, JanitorAtlas } = getJanitorModels();
+
+    const [userLocal, userAtlas] = await Promise.all([
+      UserLocal.findByIdAndDelete(req.params.id),
+      UserAtlas.findByIdAndDelete(req.params.id),
+    ]);
+
+    if (!userLocal || !userAtlas) {
+      console.error("User not found with _id:", req.params.id);
       return res.status(404).json({ message: "User not found" });
     }
+
+    await Promise.all([
+      JanitorLocal.deleteOne({ userId: req.params.id }),
+      JanitorAtlas.deleteOne({ userId: req.params.id }),
+    ]);
+
+    console.log("User deleted successfully:", req.params.id);
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
+    console.error("Error deleting user:", error.message, error.stack);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Accept user and update role/status
 const acceptUser = async (req, res) => {
-  const { id } = req.params;
-  const { role, status } = req.body;
-
-  console.log("Received request to accept user:", { id, role, status });
-
   try {
+    console.log("Received accept request:", req.params.id, req.body);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserLocal, UserAtlas } = getUserModels();
+    console.log("User models loaded successfully");
+
+    let JanitorLocal, JanitorAtlas;
+    try {
+      const janitorModels = getJanitorModels();
+      JanitorLocal = janitorModels.JanitorLocal;
+      JanitorAtlas = janitorModels.JanitorAtlas;
+      console.log("Janitor models loaded successfully");
+    } catch (error) {
+      console.error("Failed to load janitor models:", error.message);
+      throw error;
+    }
+
+    const { role, status } = req.body;
     if (!role || !status) {
-      console.error("Missing role or status in request body.");
+      console.error("Missing role or status");
       return res.status(400).json({ message: "Role and status are required." });
     }
 
-    const user = await User.findByIdAndUpdate(
-      id,
-      { role, status },
-      { new: true }
-    );
+    const [userLocal, userAtlas] = await Promise.all([
+      UserLocal.findByIdAndUpdate(req.params.id, { role, status }, { new: true, runValidators: true }),
+      UserAtlas.findByIdAndUpdate(req.params.id, { role, status }, { new: true, runValidators: true }),
+    ]);
 
-    if (!user) {
-      console.error("User not found with _id:", id);
+    if (!userLocal || !userAtlas) {
+      console.error("User not found with _id:", req.params.id);
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("User updated successfully:", user);
-    res.status(200).json(user);
+    console.log("User accepted successfully:", userAtlas._id);
+    console.log("Checking janitor sync conditions - Role:", userAtlas.role, "Status:", userAtlas.status, "Verified:", userAtlas.verified);
+
+    if (userAtlas.role === "Janitor" && userAtlas.status === "Accepted" && userAtlas.verified === true) {
+      console.log("Janitor sync conditions met for user:", userAtlas._id);
+
+      const janitorId = new mongoose.Types.ObjectId();
+      console.log("Generated janitor _id for sync:", janitorId.toString());
+
+      const janitorData = {
+        _id: janitorId,
+        userId: userAtlas._id,
+        basicDetails: {
+          image: userAtlas.profileImage || "",
+          name: userAtlas.fullName,
+          employeeId: userAtlas.employeeId,
+          email: userAtlas.email,
+          contact: userAtlas.contactNumber,
+        },
+        schedule: [],
+        performanceTrack: [],
+        resourceUsage: [],
+        logsReport: [],
+      };
+
+      const existingJanitorLocal = await JanitorLocal.findOne({ userId: userAtlas._id });
+      const existingJanitorAtlas = await JanitorAtlas.findOne({ userId: userAtlas._id });
+
+      if (existingJanitorLocal && existingJanitorAtlas) {
+        console.log("Existing janitor found - Local:", existingJanitorLocal._id, "Atlas:", existingJanitorAtlas._id);
+        existingJanitorLocal.basicDetails = janitorData.basicDetails;
+        existingJanitorAtlas.basicDetails = janitorData.basicDetails;
+
+        console.log("Attempting to update janitor in Local...");
+        await existingJanitorLocal.save().catch(err => {
+          throw new Error(`Failed to update janitor in Local: ${err.message}`);
+        });
+        console.log("Janitor updated in Local:", existingJanitorLocal._id);
+
+        console.log("Attempting to update janitor in Atlas...");
+        await existingJanitorAtlas.save().catch(err => {
+          throw new Error(`Failed to update janitor in Atlas: ${err.message}`);
+        });
+        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id);
+      } else {
+        console.log("No existing janitor found, creating new janitor...");
+        console.log("Attempting to sync janitor to Local...");
+        const janitorLocal = new JanitorLocal(janitorData);
+        const newJanitorLocal = await janitorLocal.save().catch(err => {
+          throw new Error(`Failed to save janitor to Local: ${err.message}`);
+        });
+        console.log("Janitor synced to Local:", newJanitorLocal._id);
+
+        console.log("Attempting to sync janitor to Atlas...");
+        const janitorAtlas = new JanitorAtlas(janitorData);
+        const newJanitorAtlas = await janitorAtlas.save().catch(err => {
+          JanitorLocal.deleteOne({ _id: janitorId }).catch(() => {});
+          throw new Error(`Failed to save janitor to Atlas: ${err.message}`);
+        });
+        console.log("Janitor synced to Atlas:", newJanitorAtlas._id);
+      }
+    } else {
+      console.log("Janitor sync conditions not met for user:", userAtlas._id);
+    }
+
+    res.status(200).json(userAtlas);
   } catch (error) {
-    console.error("Error updating user:", error.message);
+    console.error("Error handling user update:", error.message, error.stack);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Decline a user
 const declineUser = async (req, res) => {
-  const { id } = req.params;
-
-  console.log("Received request to decline user:", { id });
-
   try {
-    const user = await User.findByIdAndUpdate(
-      id,
-      { status: "Declined" },
-      { new: true }
-    );
+    console.log("Received decline request for user ID:", req.params.id);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
 
-    if (!user) {
-      console.error("User not found with _id:", id);
+    const { UserLocal, UserAtlas } = getUserModels();
+
+    const [userLocal, userAtlas] = await Promise.all([
+      UserLocal.findByIdAndUpdate(req.params.id, { status: "Declined" }, { new: true }),
+      UserAtlas.findByIdAndUpdate(req.params.id, { status: "Declined" }, { new: true }),
+    ]);
+
+    if (!userLocal || !userAtlas) {
+      console.error("User not found with _id:", req.params.id);
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("User declined successfully:", user);
-    res.status(200).json(user);
+    console.log("User declined successfully:", userAtlas._id);
+    res.status(200).json(userAtlas);
   } catch (error) {
-    console.error("Error declining user:", error.message);
+    console.error("Error declining user:", error.message, error.stack);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Export all functions
+const changePassword = async (req, res) => {
+  try {
+    console.log("Received change password request for user ID:", req.params.id);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserLocal, UserAtlas } = getUserModels();
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      console.error("Missing current or new password");
+      return res.status(400).send("Current password and new password are required");
+    }
+
+    const userAtlas = await UserAtlas.findById(req.params.id);
+    if (!userAtlas) {
+      console.error("User not found with _id:", req.params.id);
+      return res.status(404).send("User not found");
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword.trim(), userAtlas.password);
+    if (!isMatch) {
+      console.error("Incorrect current password for user:", req.params.id);
+      return res.status(401).send("Current password is incorrect");
+    }
+
+    if (!isStrongPassword(newPassword.trim())) {
+      console.error("Weak new password provided");
+      return res.status(400).send("New password must be at least 8 characters long and include uppercase, lowercase, number, and special character");
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword.trim(), 10);
+
+    const [updatedLocal, updatedAtlas] = await Promise.all([
+      UserLocal.findByIdAndUpdate(req.params.id, { password: hashedNewPassword }, { new: true }),
+      UserAtlas.findByIdAndUpdate(req.params.id, { password: hashedNewPassword }, { new: true }).select("-password"),
+    ]);
+
+    if (!updatedLocal || !updatedAtlas) {
+      console.error("Failed to update password for user ID:", req.params.id);
+      return res.status(500).send("Failed to update password");
+    }
+
+    console.log("Password changed successfully for user:", req.params.id);
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error.message, error.stack);
+    res.status(500).send(error.message);
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -643,4 +791,5 @@ module.exports = {
   uploadProfileImage,
   acceptUser,
   declineUser,
+  changePassword,
 };

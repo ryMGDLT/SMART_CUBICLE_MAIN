@@ -22,37 +22,41 @@ export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 10; // Set to show 10 items per page
+  const itemsPerPage = 10;
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [usersData, setUsersData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.8.181:5000";
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      console.log("Fetching users with token:", token ? "Present" : "Missing");
+      const response = await fetch(`${backendUrl}/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+      }
+      const data = await response.json();
+      console.log("Fetched users data:", data);
+      setUsersData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+      Swal.fire("Error", "Failed to fetch users data", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${backendUrl}/users`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-        }
-        const data = await response.json();
-        setUsersData(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        Swal.fire("Error", "Failed to fetch users data", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
     fetchData();
   }, [backendUrl]);
 
@@ -72,13 +76,9 @@ export default function Users() {
         return matchesTab && matchesSearch;
       })
       .sort((a, b) => {
-        if (a.status === "Pending" && b.status !== "Pending") {
-          return -1;
-        } else if (a.status !== "Pending" && b.status === "Pending") {
-          return 1;
-        } else {
-          return 0;
-        }
+        if (a.status === "Pending" && b.status !== "Pending") return -1;
+        if (a.status !== "Pending" && b.status === "Pending") return 1;
+        return 0;
       });
   }, [searchTerm, activeTab, usersData]);
 
@@ -101,30 +101,27 @@ export default function Users() {
   }, []);
 
   const handlePrevPage = useCallback(() => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
   }, [currentPage]);
 
   const handleNextPage = useCallback(() => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   }, [currentPage, totalPages]);
 
   const handleAccept = async (_id, currentRole, fullName) => {
-    if (!currentRole || currentRole === "User") {
+    console.log("Accepting user with ID:", _id, "Role:", currentRole, "Name:", fullName);
+    if (!currentRole || currentRole === "User" || currentRole === "Select Role") {
       Swal.fire({
         icon: "error",
         title: "Role Not Selected",
-        text: "Please select a valid role before accepting the user.",
+        text: "Please select a valid role (e.g., Janitor or Admin) before accepting the user.",
       });
       return;
     }
 
     const { isConfirmed } = await Swal.fire({
       title: "Confirm Acceptance",
-      html: `Are you sure you want to accept <strong>${fullName}</strong> and assign them the Position of <strong>${currentRole}</strong>?`,
+      html: `Are you sure you want to accept <strong>${fullName}</strong> as <strong>${currentRole}</strong>?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Yes, accept",
@@ -135,6 +132,8 @@ export default function Users() {
 
     if (isConfirmed) {
       const token = localStorage.getItem("token");
+      console.log("Using token:", token ? "Present" : "Missing");
+      console.log("Backend URL for accept:", `${backendUrl}/users/${_id}/accept`);
 
       try {
         const response = await fetch(`${backendUrl}/users/${_id}/accept`, {
@@ -146,31 +145,31 @@ export default function Users() {
           body: JSON.stringify({ role: currentRole, status: "Accepted" }),
         });
 
-        if (response.ok) {
-          setUsersData((prevData) =>
-            prevData.map((user) =>
-              user._id === _id
-                ? { ...user, role: currentRole, status: "Accepted" }
-                : user
-            )
-          );
-          Swal.fire("Accepted!", "The user has been accepted.", "success");
-        } else {
-          Swal.fire("Error", "Failed to update the user.", "error");
+        const responseText = await response.text();
+        console.log("Accept response:", response.status, responseText);
+
+        if (!response.ok) {
+          throw new Error(`Failed to accept user: ${response.status} - ${responseText}`);
         }
-      } catch (error) {
-        console.error("Error updating user:", error);
-        Swal.fire(
-          "Error",
-          "An error occurred while updating the user.",
-          "error"
+
+        const data = await JSON.parse(responseText);
+        setUsersData((prevData) =>
+          prevData.map((user) =>
+            user._id === _id ? { ...user, role: currentRole, status: "Accepted" } : user
+          )
         );
+        Swal.fire("Accepted!", "The user has been accepted.", "success");
+        fetchData();
+      } catch (error) {
+        console.error("Error updating user:", error.message);
+        Swal.fire("Error", `Failed to accept user: ${error.message}`, "error");
       }
     }
   };
 
   const handleDecline = useCallback(
     async (_id) => {
+      console.log("Declining user with ID:", _id);
       const { isConfirmed } = await Swal.fire({
         title: "Confirm Decline",
         text: "Are you sure you want to decline this user?",
@@ -190,23 +189,23 @@ export default function Users() {
             },
           });
 
-          if (response.ok) {
-            setUsersData((prevData) =>
-              prevData.map((user) =>
-                user._id === _id ? { ...user, status: "Declined" } : user
-              )
-            );
-            Swal.fire("Declined!", "The user has been declined.", "success");
-          } else {
-            Swal.fire("Error", "Failed to decline the user.", "error");
+          const responseText = await response.text();
+          console.log("Decline response:", response.status, responseText);
+
+          if (!response.ok) {
+            throw new Error(`Failed to decline user: ${response.status} - ${responseText}`);
           }
-        } catch (error) {
-          console.error("Error declining user:", error);
-          Swal.fire(
-            "Error",
-            "An error occurred while declining the user.",
-            "error"
+
+          setUsersData((prevData) =>
+            prevData.map((user) =>
+              user._id === _id ? { ...user, status: "Declined" } : user
+            )
           );
+          Swal.fire("Declined!", "The user has been declined.", "success");
+          fetchData();
+        } catch (error) {
+          console.error("Error declining user:", error.message);
+          Swal.fire("Error", `Failed to decline user: ${error.message}`, "error");
         }
       }
     },
@@ -219,16 +218,14 @@ export default function Users() {
         user._id === employeeId ? { ...user, role: newRole } : user
       )
     );
-    console.log(
-      `Role updated locally for employee ${employeeId} to ${newRole}`
-    );
+    console.log(`Role updated locally for user ${employeeId} to ${newRole}`); // Fixed: use employeeId
   }, []);
 
   const handleSelectAll = useCallback(
     (e) => {
       setSelectAll(e.target.checked);
       if (e.target.checked) {
-        const currentIds = currentItems.map((user) => user.employee_id);
+        const currentIds = currentItems.map((user) => user.employeeId);
         setSelectedItems(currentIds);
       } else {
         setSelectedItems([]);
@@ -280,9 +277,7 @@ export default function Users() {
 
   return (
     <Card className="flex flex-col h-full bg-white shadow-md p-1 rounded-lg overflow-hidden">
-      {/* Header Section */}
       <div className="flex flex-row justify-between items-center shrink-0">
-        {/* Tab Navigation */}
         <div>
           <div className="sm:hidden">
             <label htmlFor="userTab" className="sr-only">
@@ -300,13 +295,8 @@ export default function Users() {
               <option>Declined</option>
             </select>
           </div>
-
           <div className="hidden sm:block">
-            <Tabs
-              value={activeTab}
-              onValueChange={handleTabChange}
-              className="w-full"
-            >
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
               <TabsList className="bg-transparent gap-6 w-auto">
                 {["All", "Requests", "Accepted", "Declined"].map((tab) => (
                   <TabsTrigger
@@ -326,7 +316,6 @@ export default function Users() {
             </Tabs>
           </div>
         </div>
-        {/* Search Bar */}
         <div className="relative w-96">
           <Input
             type="text"
@@ -353,8 +342,6 @@ export default function Users() {
           </button>
         </div>
       </div>
-
-      {/* User Table Container */}
       <div className="mt-3 flex-1 flex flex-col h-full rounded-lg border border-gray-200 overflow-hidden">
         <div className="flex-1 overflow-y-auto relative">
           <DataTable
@@ -366,7 +353,6 @@ export default function Users() {
             className="min-h-full"
           />
         </div>
-        {/* Pagination Controls */}
         {shouldShowPagination && (
           <div className="border-t border-gray-200 bg-white p-2">
             <Pagination>
@@ -380,7 +366,6 @@ export default function Users() {
                     )}
                   />
                 </PaginationItem>
-
                 {pageNumbers.map((page) => (
                   <PaginationItem key={page}>
                     <PaginationLink
@@ -396,13 +381,11 @@ export default function Users() {
                     </PaginationLink>
                   </PaginationItem>
                 ))}
-
                 {totalPages > 7 && currentPage < totalPages - 3 && (
                   <PaginationItem>
                     <PaginationEllipsis />
                   </PaginationItem>
                 )}
-
                 <PaginationItem>
                   <PaginationNext
                     onClick={handleNextPage}

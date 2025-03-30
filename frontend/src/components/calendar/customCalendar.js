@@ -53,7 +53,7 @@ const CalendarComponent = ({ remindersChecked }) => {
     }
   }, []);
 
-  // Filter events based on reminder check state
+ 
   const filteredEvents = [
     {
       id: "1",

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
-  BellIcon,
   LogoutIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -11,6 +10,7 @@ import {
 import { useAuth } from "../controller/authController";
 import { DEFAULT_PROFILE_IMAGE } from "../../data/placeholderData";
 import { axiosInstance } from "../controller/authController";
+import NotificationDropdown from "./notificationDropdown";
 
 export default function Nav() {
   const location = useLocation();
@@ -33,37 +33,66 @@ export default function Nav() {
       window.innerWidth >= 768
     );
   });
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
   const { logout, user } = useAuth();
 
   const [profileImageUrl, setProfileImageUrl] = useState(DEFAULT_PROFILE_IMAGE);
 
   useEffect(() => {
-    const fetchProfileImage = async () => {
+    const fetchUserData = async () => {
       try {
-        if (!user || !user.token || !user.id) {
-          throw new Error("User is not authenticated.");
-        }
-
+        if (!user || !user.token || !user.id) return;
         const response = await axiosInstance.get(`/users/${user.id}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         });
-
-        if (response.data.profileImage) {
-          setProfileImageUrl(response.data.profileImage);
-        } else {
-          setProfileImageUrl(DEFAULT_PROFILE_IMAGE);
-        }
+        setProfileImageUrl(response.data.profileImage || DEFAULT_PROFILE_IMAGE);
       } catch (err) {
-        console.error("Error fetching profile image:", err.message);
+        console.error("Error fetching user data:", err.message);
         setProfileImageUrl(DEFAULT_PROFILE_IMAGE);
       }
     };
-
-    fetchProfileImage();
+    fetchUserData();
   }, [user]);
+
+  const fetchNotifications = async () => {
+    if (
+      !user ||
+      !user.token ||
+      (user.role !== "Admin" && user.role !== "Superadmin") ||
+      !user.notificationsEnabled
+    ) {
+      console.log("Notifications not fetched: disabled or invalid role/user");
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+    try {
+      const response = await axiosInstance.get(`/notifications`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = response.data;
+      console.log("Fetched notifications in Nav:", data);
+      setNotifications(data);
+      setUnreadCount(data.filter((notif) => !notif.read).length);
+    } catch (error) {
+      console.error("Error fetching notifications in Nav:", error.message);
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [user, user?.notificationsEnabled]); 
 
   useEffect(() => {
     const handleResize = () => {
@@ -110,7 +139,6 @@ export default function Nav() {
       setCollapsed(false);
     }
     setIsSidebarVisible((prev) => !prev);
-
     setTimeout(() => {
       document.body.style.overflow = "hidden";
       setTimeout(() => {
@@ -138,43 +166,42 @@ export default function Nav() {
     }
   }, [location.pathname]);
 
-  // Define sidebar navigation items
   const sidebarItems = [
     {
       name: "Dashboard",
       icon: "/images/dashboard.png",
       path: "/dashboard",
-      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+      roles: ["Admin", "Superadmin", "Janitor"],
     },
     {
       name: "Usage Monitor",
       icon: "/images/desktop windows.png",
       path: "/usage-monitor",
-      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+      roles: ["Admin", "Superadmin", "Janitor"],
     },
     {
       name: "Janitors",
       icon: "/images/supervised user_circle.png",
       path: "/janitors",
-      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+      roles: ["Admin", "Superadmin", "Janitor"],
     },
     {
       name: "Resources",
       icon: "/images/add shopping_cart.png",
       path: "/resources",
-      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+      roles: ["Admin", "Superadmin", "Janitor"],
     },
     {
       name: "Settings",
       icon: "/images/settings.png",
       path: "/settings",
-      roles: ["Admin", "Superadmin", "Janitor"], // Accessible to all roles
+      roles: ["Admin", "Superadmin", "Janitor"],
     },
     {
       name: "Users",
       icon: "/images/supervisor account.png",
       path: "/users",
-      roles: ["Admin", "Superadmin"], // Only accessible to admin and superadmin
+      roles: ["Admin", "Superadmin"],
     },
   ];
 
@@ -186,16 +213,11 @@ export default function Nav() {
           onClick={toggleSidebar}
         />
       )}
-
-      {/* Sidebar */}
       <aside
         className={`bg-grayish text-white flex flex-col p-4 fixed top-0 left-0 h-full z-50 transition-all duration-500 ease-in-out ${
           collapsed ? "w-20" : "w-64"
-        } ${
-          isSidebarVisible ? "translate-x-0" : "-translate-x-full"
-        } sidebar-mobile`}
+        } ${isSidebarVisible ? "translate-x-0" : "-translate-x-full"} sidebar-mobile`}
       >
-        {/* Close Button Mobile */}
         {window.innerWidth < 768 && (
           <button
             className="absolute top-4 right-4 p-1 text-white hover:text-gray-300 transition-colors duration-300"
@@ -204,8 +226,6 @@ export default function Nav() {
             <XIcon className="w-6 h-6" />
           </button>
         )}
-
-        {/* Collapse Expand Button web */}
         <button
           className={`absolute top-12 right-[-12px] p-1 bg-Icpetgreen text-white rounded-full hover:bg-red-700 transition-all duration-300 ease-in-out shadow-lg ${
             window.innerWidth < 768 ? "hidden" : ""
@@ -218,8 +238,6 @@ export default function Nav() {
             <ChevronLeftIcon className="w-5 h-5" />
           )}
         </button>
-
-        {/* Logo */}
         <div
           className={`flex items-center justify-center mb-2 mt-5 transition-all duration-500 ease-in-out`}
         >
@@ -231,8 +249,6 @@ export default function Nav() {
             }`}
           />
         </div>
-
-        {/* Sidebar Navigation */}
         <nav className="flex flex-col space-y-2">
           {sidebarItems
             .filter((item) => item.roles.includes(user?.role))
@@ -265,8 +281,6 @@ export default function Nav() {
               </Link>
             ))}
         </nav>
-
-        {/* Logout */}
         <button
           className="mt-auto flex items-center p-3 rounded-lg hover:bg-red-700 transition-all duration-500 ease-in-out transform hover:scale-105"
           onClick={logout}
@@ -285,8 +299,6 @@ export default function Nav() {
           </span>
         </button>
       </aside>
-
-      {/* Main Content */}
       <div
         className="flex-1 flex flex-col w-full transition-all duration-500 ease-in-out"
         style={{
@@ -298,84 +310,29 @@ export default function Nav() {
               : "0",
         }}
       >
-        {/* Navbar */}
         <header className="bg-fafbfe p-4 flex justify-between items-center w-full md:px-6 shadow-md relative z-10 mb-3">
-          {/* Menu Mobile */}
           <button
             className="md:hidden p-2 text-gray-600 hover:text-gray-800 transition-colors duration-300"
             onClick={toggleSidebar}
           >
             <MenuIcon className="w-6 h-6" />
           </button>
-
           <span className="text-lg font-semibold"></span>
-
-          {/* Notification*/}
           <div className="flex items-center space-x-4 ml-auto">
-            <div className="relative" ref={dropdownRef}>
-              <BellIcon
-                className="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800 transition-colors duration-300 hover:scale-110"
-                onClick={() => setIsDropdownVisible(!isDropdownVisible)}
-              />
-              {isDropdownVisible && (
-                <>
-                  <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-[999] md:hidden"
-                    onClick={() => setIsDropdownVisible(false)}
-                  />
-
-                  {/* Dropdown */}
-                  <div className="fixed top-16 left-1/2 transform -translate-x-1/2 w-[90vw] max-w-[280px] md:max-w-[410px] md:absolute md:top-full md:left-auto md:transform-none md:right-0 bg-white shadow-lg rounded-lg py-4 z-[1000] max-h-[500px] overflow-auto">
-                    {/*Header */}
-                    <div className="flex items-center justify-between px-4 mb-4">
-                      <p className="text-xs text-Icpetgreen cursor-pointer">
-                        Clear all
-                      </p>
-                      <p className="text-xs text-Icpetgreen cursor-pointer">
-                        Mark as read
-                      </p>
-                    </div>
-
-                    {/*notif content */}
-                    <ul className="divide-y">
-                      {["Yin", "Haper", "San", "Seeba"].map((name, index) => (
-                        <li
-                          key={index}
-                          className="p-4 flex items-center hover:bg-gray-50 cursor-pointer"
-                        >
-                          <img
-                            src={`https://readymadeui.com/team-${
-                              index + 2
-                            }.webp`}
-                            alt={`${name}'s Avatar`}
-                            className="w-10 h-10 rounded-full shrink-0"
-                          />
-                          <div className="ml-4 flex flex-col">
-                            <h3 className="text-sm text-[#333] font-semibold">
-                              New message from {name}
-                            </h3>
-                            <p className="text-xs text-gray-500 mt-1">
-                              Check this new item from the motion school.
-                            </p>
-                            <p className="text-xs text-Icpetgreen mt-1">
-                              {index * 10} min ago
-                            </p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/*Footer */}
-                    <p className="text-xs px-4 mt-6 mb-4 text-Icpetgreen cursor-pointer text-center">
-                      View all Notifications
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* User Profile */}
-            <div className="flex items-center ">
+            <NotificationDropdown
+              isDropdownVisible={isDropdownVisible}
+              setIsDropdownVisible={setIsDropdownVisible}
+              dropdownRef={dropdownRef}
+              userRole={user?.role}
+              token={user?.token}
+              notifications={notifications}
+              setNotifications={setNotifications}
+              unreadCount={unreadCount}
+              setUnreadCount={setUnreadCount}
+              setActive={setActive}
+              notificationsEnabled={user?.notificationsEnabled}
+            />
+            <div className="flex items-center">
               <Link
                 to="/user_profile"
                 className="flex items-center space-x-2 mr-4 hover:opacity-80 transition-opacity duration-300"
@@ -394,14 +351,11 @@ export default function Nav() {
                     marginRight: "8px",
                   }}
                 />
-                @{user?.username || "Guest"}{" "}
-                {/* Fallback to "Guest" if no username */}
+                @{user?.username || "Guest"}
               </Link>
             </div>
           </div>
         </header>
-
-        {/* Main Content Area */}
         <main className="p-4 md:p-6 bg-Canvas flex-1 overflow-y-auto">
           <Outlet />
         </main>

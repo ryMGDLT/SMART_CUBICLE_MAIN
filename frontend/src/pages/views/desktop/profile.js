@@ -22,7 +22,7 @@ export default function Profile() {
   const { user, setUser } = useAuth();
 
   const serverUrl =
-    process.env.REACT_APP_BACKEND_URL || "http://192.168.8.168:5000";
+    process.env.REACT_APP_BACKEND_URL || "http://192.168.5.45:5000";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -176,7 +176,7 @@ export default function Profile() {
       setSelectedImage(file);
 
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = () => {   
         console.log("File read successfully:", reader.result);
 
         setTempUserData((prev) => ({

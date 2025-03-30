@@ -7,6 +7,7 @@
     "datatables.net-dt": "^2.2.1",
     "lucide-react": "^0.474.0",
     "react-hot-toast": "^2.5.1",
+    "shadcn": "^2.4.0-canary.17",
     "sweetalert2": "^11.16.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7"

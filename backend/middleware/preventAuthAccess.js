@@ -13,7 +13,7 @@ const preventAuthAccess = (req, res, next) => {
             return next();
         }
 
-        // Redirect to the dashboard
+       
         return res.redirect('/dashboard');
     });
 };

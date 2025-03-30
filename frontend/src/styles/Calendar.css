@@ -157,6 +157,116 @@
   border: none !important;
 }
 
+.custom-calendar .calendar-container{
+  width: 100%;
+  min-width: 0;
+}
+.custom-calendar .fc {
+  width: 100% !important;
+}
+
+.custom-calendar .fc-daygrid-day-top {
+  font-size: 0.9rem;
+}
+
+.custom-calendar .fc-daygrid-body {
+  width: 100% !important;
+}
+@media (max-width: 768px) {
+  .custom-calendar .fc-daygrid-day {
+    min-width: 30px;
+  }
+
+  .custom-calendar .fc-daygrid-day-top {
+    font-size: 0.8rem;
+  }
+
+  .custom-calendar .fc-header-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .custom-calendar .fc-button-group {
+    margin-top: 5px;
+  }
+}
+.custom-calendar .custom-event {
+  padding: 2px 5px;
+  font-size: 0.85rem;
+}
+
+.custom-calendar .black-event-style {
+  background-color: #000;
+  color: #fff;
+}
+
+.custom-calendar .blue-event-style {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.custom-calendar .red-event-style {
+  background-color: #dc3545;
+  color: #fff;
+}
+.custom-calendar {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.calendar-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+}
+
+/* Ensure calendar maintains minimum width but stays responsive */
+.fc {
+  min-width: 280px;
+  width: 100%;
+}
+
+/* Responsive day headers */
+.fc .fc-col-header-cell-cushion {
+  padding: 2px;
+  font-size: clamp(0.7rem, 2vw, 1rem);
+}
+
+/* Responsive day cells */
+.fc .fc-daygrid-day-number {
+  font-size: clamp(0.7rem, 2vw, 1rem);
+  padding: 2px;
+}
+
+/* Adjust toolbar for smaller screens */
+.fc .fc-toolbar.fc-header-toolbar {
+  margin: 0.5em 0;
+}
+
+/* Media queries for different screen sizes */
+@media (max-width: 640px) {
+  .fc .fc-col-header-cell-cushion {
+    padding: 1px;
+  }
+  
+  .fc .fc-daygrid-day-frame {
+    min-height: 40px;
+  }
+  
+  .fc .fc-daygrid-day-number {
+    padding: 1px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fc .fc-toolbar-title {
+    font-size: 1rem !important;
+  }
+  
+  .fc .fc-button {
+    padding: 2px 4px;
+  }
+}
+
 .dboardCalendar .fc-button {
   padding: 6px 12px;
   color: black;

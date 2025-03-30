@@ -129,18 +129,18 @@ export const getColumns = (
                   disabled={(isAccepted && hasRole) || isDeclined}
                 >
                   <span>{user.role || "Select Role"}</span>
-                  <ChevronDown 
+                  <ChevronDown
                     className={cn(
                       "h-4 w-4 ml-2 transition-transform duration-200",
                       ((isAccepted && hasRole) || isDeclined) ? "opacity-50" : "opacity-75"
-                    )} 
+                    )}
                   />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
+              <DropdownMenuContent
                 className="w-32 p-1 bg-white border border-gray-200 rounded-md shadow-lg"
               >
-                {["User", "Janitor", "Admin"].map((roleOption) => (
+                {["Janitor", "Admin"].map((roleOption) => ( // Removed "User" as an option
                   <DropdownMenuItem
                     key={roleOption}
                     onClick={() => handleRoleChange(user._id, roleOption)}
@@ -193,6 +193,12 @@ export const getColumns = (
             header: () => <div className="text-center">Action</div>,
             cell: ({ row }) => {
               const user = row.original;
+              console.log("User details for actions:", {
+                _id: user._id,
+                role: user.role,
+                fullName: user.fullName,
+                status: user.status,
+              });
               return (
                 <div className="flex justify-center items-center gap-2">
                   {user.status === "Pending" && (

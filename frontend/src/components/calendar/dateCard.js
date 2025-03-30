@@ -6,6 +6,7 @@ export const DateCard = ({
   showDateCard,
   setShowDateCard,
   remindersChecked,
+  selectedDate,
 }) => {
   return (
     <Card
@@ -30,7 +31,10 @@ export const DateCard = ({
         </svg>
       </button>
       <div className="flex flex-col flex-grow mt-10 mb-5 mr-5 ml-5 dboardCalendar">
-        <CalendarComponent remindersChecked={remindersChecked} />
+        <CalendarComponent
+          remindersChecked={remindersChecked}
+          selectedDate={selectedDate}
+        />
       </div>
     </Card>
   );

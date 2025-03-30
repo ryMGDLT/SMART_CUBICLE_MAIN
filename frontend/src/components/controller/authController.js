@@ -27,9 +27,8 @@ export const AuthProvider = ({ children }) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
   const [loading, setLoading] = useState(false);
-  const inactivityTimerRef = useRef(null); 
+  const inactivityTimerRef = useRef(null);
 
-  // Manual logout function 
   const logout = useCallback(() => {
     Swal.fire({
       icon: "question",
@@ -52,9 +51,8 @@ export const AuthProvider = ({ children }) => {
     });
   }, [navigate]);
 
-  // Auto-logout function 
   const autoLogout = useCallback(() => {
-    if (user) { 
+    if (user) {
       clearUserSession();
       Swal.fire({
         icon: "warning",
@@ -65,7 +63,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, [navigate, user]);
 
-  // Clear user session 
   const clearUserSession = () => {
     setUser(null);
     localStorage.removeItem("user");
@@ -75,22 +72,18 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("sidebarVisible");
   };
 
-  // Reset the inactivity timer 
   const resetInactivityTimer = useCallback(() => {
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
     }
 
-   
     if (user) {
-      
       inactivityTimerRef.current = setTimeout(() => {
-        autoLogout(); 
+        autoLogout();
       }, 300000); // 5 minutes
     }
   }, [autoLogout, user]);
 
-  // Track user activity
   useEffect(() => {
     const activityEvents = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
     const handleActivity = () => resetInactivityTimer();
@@ -111,13 +104,12 @@ export const AuthProvider = ({ children }) => {
     };
   }, [resetInactivityTimer]);
 
-  // Login function
   const login = async (email, password) => {
     setLoading(true);
     try {
       const response = await axiosInstance.post("/users/login", { email, password });
       const { token, user } = response.data;
-  
+
       const userData = {
         id: user.id,
         fullName: user.fullName,
@@ -128,15 +120,15 @@ export const AuthProvider = ({ children }) => {
         role: user.role,
         status: user.status,
         verified: user.verified,
+        notificationsEnabled: user.notificationsEnabled,
       };
-  
+
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("token", token);
-  
-      console.log("Logged-in user:", userData); 
-  
-      // Redirect based on role
+
+      console.log("Logged-in user:", userData);
+
       if (user.role === "Admin" || user.role === "Superadmin") {
         navigate("/dashboard");
       } else if (user.role === "Janitor") {
@@ -145,14 +137,12 @@ export const AuthProvider = ({ children }) => {
         navigate("/profile");
       }
     } catch (error) {
-     
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Signup function
   const signup = async (userData) => {
     setLoading(true);
     try {
@@ -224,8 +214,52 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserSettings = async (settings) => {
+    setLoading(true);
+    try {
+      if (!user || !user.token || !user.id) {
+        throw new Error("User not authenticated");
+      }
+      const response = await axiosInstance.patch(`/users/${user.id}`, settings);
+      const updatedUser = {
+        ...user,
+        ...response.data,
+      };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      console.log("User settings updated:", updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error("Error updating user settings:", error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    setLoading(true);
+    try {
+      if (!user || !user.id) {
+        throw new Error("User not authenticated");
+      }
+      const response = await axiosInstance.post(`/users/${user.id}/change-password`, {
+        currentPassword,
+        newPassword,
+      });
+      console.log("Password changed successfully:", response.data);
+    } catch (error) {
+      console.error("Error changing password:", error.message, error.response?.data);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser, login, signup, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, signup, logout, loading, updateUserSettings, changePassword }}
+    >
       {children}
     </AuthContext.Provider>
   );
