@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LogoutIcon,
   ChevronLeftIcon,
@@ -14,6 +14,7 @@ import NotificationDropdown from "./notificationDropdown";
 
 export default function Nav() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [active, setActive] = useState(() => {
     const storedActive = localStorage.getItem("activeItem");
     return location.pathname === "/user_profile"
@@ -92,7 +93,7 @@ export default function Nav() {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, [user, user?.notificationsEnabled]); 
+  }, [user, user?.notificationsEnabled]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -113,7 +114,7 @@ export default function Nav() {
         setIsDropdownVisible(false);
       }
     };
-    if (isDropdownVisible) {
+    if (isDropdownVisible && window.innerWidth >= 768) { 
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -157,6 +158,16 @@ export default function Nav() {
   const handleSidebarItemClick = () => {
     if (window.innerWidth < 768) {
       setIsSidebarVisible(false);
+    }
+  };
+
+  const handleBellClick = () => {
+    if (window.innerWidth < 768) {
+      // For mobile, toggle full-page view without navigation
+      setIsDropdownVisible((prev) => !prev);
+    } else {
+      // For desktop, toggle dropdown
+      setIsDropdownVisible((prev) => !prev);
     }
   };
 
@@ -331,6 +342,7 @@ export default function Nav() {
               setUnreadCount={setUnreadCount}
               setActive={setActive}
               notificationsEnabled={user?.notificationsEnabled}
+              onBellClick={handleBellClick} // Pass the handler
             />
             <div className="flex items-center">
               <Link
