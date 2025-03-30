@@ -70,7 +70,7 @@ wss.on("connection", (ws, req) => {
       try {
         const newNotifications = await NotificationAtlas.find({
           recipientId: userId,
-          createdAt: { $gt: new Date(Date.now() - 60000) }, 
+          createdAt: { $gt: new Date(Date.now() - 60000) }, // Last 1 minute
         }).sort({ createdAt: -1 });
 
         if (newNotifications.length > 0) {
@@ -84,7 +84,7 @@ wss.on("connection", (ws, req) => {
     };
 
     sendNotification(); // Send initial notifications
-    const interval = setInterval(sendNotification, 5000); // Poll every 5 seconds 
+    const interval = setInterval(sendNotification, 5000); // Poll every 5 seconds (replace with change streams in production)
 
     ws.on("close", () => {
       clearInterval(interval);

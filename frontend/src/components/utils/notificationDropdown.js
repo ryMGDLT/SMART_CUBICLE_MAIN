@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { BellIcon, UserIcon } from "@heroicons/react/solid";
+import * as ToastPrimitives from "@radix-ui/react-toast";
+import { X } from "lucide-react";
+import { cn } from "../../lib/utils";
+
+// Singleton WebSocket instance
+let wsSingleton = null;
 
 const NotificationDropdown = ({
   isDropdownVisible,
@@ -17,10 +23,24 @@ const NotificationDropdown = ({
   onBellClick,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [notificationToasts, setNotificationToasts] = useState([]);
   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.5.45:5000";
   const navigate = useNavigate();
-  const isMobile = window.innerWidth < 768;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768); 
+  const processedIds = useRef(new Set()); 
 
+  // Update isMobile on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const newIsMobile = window.innerWidth < 768;
+      setIsMobile(newIsMobile);
+      console.log(`Screen size changed. Is mobile: ${newIsMobile}, Width: ${window.innerWidth}px`);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Fetch initial notifications
   const fetchInitialNotifications = async () => {
     if (!notificationsEnabled) {
       console.log("Notifications disabled, skipping fetch");
@@ -55,43 +75,84 @@ const NotificationDropdown = ({
     }
   }, [userRole, notificationsEnabled, token]);
 
+  // WebSocket setup with toast notifications
   useEffect(() => {
     if (!notificationsEnabled || (userRole !== "Admin" && userRole !== "Superadmin")) {
       setNotifications([]);
       setUnreadCount(0);
+      setNotificationToasts([]);
+      processedIds.current.clear();
+      if (wsSingleton) {
+        wsSingleton.close();
+        wsSingleton = null;
+      }
       return;
     }
 
-    // Setup WebSocket connection
-    const ws = new WebSocket(`ws://${backendUrl.split("://")[1]}?token=${token}`);
+    if (!wsSingleton) {
+      console.log("Initializing WebSocket connection");
+      wsSingleton = new WebSocket(`ws://${backendUrl.split("://")[1]}?token=${token}`);
 
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-    };
+      wsSingleton.onopen = () => {
+        console.log("WebSocket connected");
+      };
 
-    ws.onmessage = (event) => {
-      const newNotification = JSON.parse(event.data);
-      console.log("New notification received via WebSocket:", newNotification);
+      wsSingleton.onmessage = (event) => {
+        const newNotification = JSON.parse(event.data);
+        console.log("New notification received via WebSocket:", newNotification);
 
-      setNotifications((prev) => {
-        if (prev.some((n) => n._id === newNotification._id)) return prev;
-        const updatedNotifications = [newNotification, ...prev].slice(0, 10);
-        setUnreadCount(updatedNotifications.filter((n) => !n.read).length);
-        return updatedNotifications;
-      });
-    };
+        if (processedIds.current.has(newNotification._id)) {
+          console.log(`Duplicate notification skipped: ${newNotification._id}`);
+          return;
+        }
+        processedIds.current.add(newNotification._id);
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+        setNotifications((prev) => {
+          if (prev.some((n) => n._id === newNotification._id)) {
+            console.log(`Notification ${newNotification._id} already in list, skipping update`);
+            return prev;
+          }
+          const updatedNotifications = [newNotification, ...prev].slice(0, 10);
+          setUnreadCount(updatedNotifications.filter((n) => !n.read).length);
+          return updatedNotifications;
+        });
 
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
+        setNotificationToasts((prev) => {
+          if (prev.some((t) => t.id === newNotification._id)) {
+            console.log(`Toast for ${newNotification._id} already exists, skipping`);
+            return prev;
+          }
+          const toastId = newNotification._id;
+          const newToast = { id: toastId, message: newNotification.message, open: true };
+
+          console.log(`Adding toast for notification ${toastId}`);
+
+          setTimeout(() => {
+            setNotificationToasts((current) =>
+              current.map((t) => (t.id === toastId ? { ...t, open: false } : t))
+            );
+            setTimeout(() => {
+              setNotificationToasts((current) => current.filter((t) => t.id !== toastId));
+              console.log(`Toast ${toastId} removed`);
+            }, 300);
+          }, 2000);
+
+          return [...prev, newToast];
+        });
+      };
+
+      wsSingleton.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+
+      wsSingleton.onclose = () => {
+        console.log("WebSocket connection closed");
+        wsSingleton = null;
+      };
+    }
 
     return () => {
-      ws.close();
-      console.log("WebSocket connection closed on cleanup");
+    
     };
   }, [notificationsEnabled, userRole, token, backendUrl]);
 
@@ -126,6 +187,7 @@ const NotificationDropdown = ({
       if (!response.ok) throw new Error("Failed to clear notifications");
       setNotifications([]);
       setUnreadCount(0);
+      processedIds.current.clear();
     } catch (error) {
       console.error("Error clearing notifications:", error.message);
     }
@@ -167,6 +229,40 @@ const NotificationDropdown = ({
       console.error("Error in markNotificationAsRead:", error.message);
     }
   };
+
+  // Custom Notification Toast Component
+  const NotificationToast = ({ id, message, open, onOpenChange }) => (
+    <ToastPrimitives.Root
+      open={open}
+      onOpenChange={onOpenChange}
+      className={cn(
+        "pointer-events-auto relative flex w-full max-w-[380px] items-center justify-between space-x-2 overflow-hidden rounded-md border p-4 pr-6 shadow-lg transition-all",
+        "bg-[#23897D] text-white",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom", 
+        "data-[state=open]:duration-300"
+      )}
+    >
+      <div className="grid gap-1">
+        <ToastPrimitives.Title className="text-sm font-semibold">{message}</ToastPrimitives.Title>
+      </div>
+      <ToastPrimitives.Close className="absolute right-1 top-1 rounded-md p-1 text-white/50 hover:text-white focus:outline-none focus:ring-1 group-hover:opacity-100">
+        <X className="h-4 w-4" />
+      </ToastPrimitives.Close>
+    </ToastPrimitives.Root>
+  );
+
+  // Notification Toast Viewport 
+  const NotificationToastViewport = () => (
+    <ToastPrimitives.Viewport
+      className={cn(
+        "fixed z-[100] flex max-h-screen w-full max-w-[380px] flex-col p-4",
+        isMobile
+          ? "top-20 left-1/2 -translate-x-1/2 -translate-y-1/2" // Mobile
+          : "bottom-10 left-60 m-5" // Desktop
+      )}
+    />
+  );
 
   if (userRole !== "Admin" && userRole !== "Superadmin") {
     return (
@@ -237,70 +333,94 @@ const NotificationDropdown = ({
   }
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <div className="relative">
-        <BellIcon
-          className="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800 transition-colors duration-300 hover:scale-110"
-          onClick={onBellClick}
-        />
-        {unreadCount > 0 && notificationsEnabled && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-            {unreadCount}
-          </span>
+    <>
+      <div className="relative" ref={dropdownRef}>
+        <div className="relative">
+          <BellIcon
+            className="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800 transition-colors duration-300 hover:scale-110"
+            onClick={onBellClick}
+          />
+          {unreadCount > 0 && notificationsEnabled && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              {unreadCount}
+            </span>
+          )}
+        </div>
+        {isDropdownVisible && (
+          <>
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-[999] md:hidden"
+              onClick={() => setIsDropdownVisible(false)}
+            />
+            <div className="fixed top-16 left-1/2 transform -translate-x-1/2 w-[90vw] max-w-[280px] md:max-w-[410px] md:absolute md:top-full md:left-auto md:transform-none md:right-0 bg-white shadow-lg rounded-lg py-4 z-[1000] max-h-[500px] overflow-auto">
+              <div className="flex items-center justify-between px-4 mb-4">
+                <p className="text-xs text-Icpetgreen cursor-pointer" onClick={clearAll}>
+                  Clear all
+                </p>
+                <p className="text-xs text-Icpetgreen cursor-pointer" onClick={markAsRead}>
+                  Mark as read
+                </p>
+              </div>
+              <ul className="divide-y">
+                {loading ? (
+                  <li className="p-4 text-sm text-gray-500 text-center">Loading...</li>
+                ) : notificationsEnabled ? (
+                  notifications.length > 0 ? (
+                    notifications.map((notif, index) => (
+                      <li
+                        key={notif._id || index}
+                        className={`p-4 flex items-center cursor-pointer hover:bg-gray-300 transition-colors duration-200 ${
+                          notif.read ? "bg-white" : "bg-gray-200"
+                        }`}
+                        onClick={() => markNotificationAsRead(notif._id)}
+                      >
+                        <div className="flex-shrink-0 mr-4">
+                          <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                            <UserIcon className="w-5 h-5 text-gray-600" />
+                          </div>
+                        </div>
+                        <div className="flex flex-col">
+                          <h3 className="text-sm text-[#333] font-semibold">{notif.message}</h3>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(notif.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="p-4 text-sm text-gray-500 text-center">No notifications</li>
+                  )
+                ) : (
+                  <li className="p-4 text-sm text-gray-500 text-center">Notifications are disabled</li>
+                )}
+              </ul>
+            </div>
+          </>
         )}
       </div>
-      {isDropdownVisible && (
-        <>
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-[999] md:hidden"
-            onClick={() => setIsDropdownVisible(false)}
+
+      {/* Notification Toast Provider */}
+      <ToastPrimitives.Provider>
+        {notificationToasts.map(({ id, message, open }) => (
+          <NotificationToast
+            key={id}
+            id={id}
+            message={message}
+            open={open}
+            onOpenChange={(open) => {
+              setNotificationToasts((prev) => prev.map((t) => (t.id === id ? { ...t, open } : t)));
+              if (!open) {
+                setTimeout(() => {
+                  setNotificationToasts((prev) => prev.filter((t) => t.id !== id));
+                  console.log(`Toast ${id} manually closed and removed`);
+                }, 300);
+              }
+            }}
           />
-          <div className="fixed top-16 left-1/2 transform -translate-x-1/2 w-[90vw] max-w-[280px] md:max-w-[410px] md:absolute md:top-full md:left-auto md:transform-none md:right-0 bg-white shadow-lg rounded-lg py-4 z-[1000] max-h-[500px] overflow-auto">
-            <div className="flex items-center justify-between px-4 mb-4">
-              <p className="text-xs text-Icpetgreen cursor-pointer" onClick={clearAll}>
-                Clear all
-              </p>
-              <p className="text-xs text-Icpetgreen cursor-pointer" onClick={markAsRead}>
-                Mark as read
-              </p>
-            </div>
-            <ul className="divide-y">
-              {loading ? (
-                <li className="p-4 text-sm text-gray-500 text-center">Loading...</li>
-              ) : notificationsEnabled ? (
-                notifications.length > 0 ? (
-                  notifications.map((notif, index) => (
-                    <li
-                      key={notif._id || index}
-                      className={`p-4 flex items-center cursor-pointer hover:bg-gray-300 transition-colors duration-200 ${
-                        notif.read ? "bg-white" : "bg-gray-200"
-                      }`}
-                      onClick={() => markNotificationAsRead(notif._id)}
-                    >
-                      <div className="flex-shrink-0 mr-4">
-                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                          <UserIcon className="w-5 h-5 text-gray-600" />
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <h3 className="text-sm text-[#333] font-semibold">{notif.message}</h3>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {new Date(notif.createdAt).toLocaleString()}
-                        </p>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <li className="p-4 text-sm text-gray-500 text-center">No notifications</li>
-                )
-              ) : (
-                <li className="p-4 text-sm text-gray-500 text-center">Notifications are disabled</li>
-              )}
-            </ul>
-          </div>
-        </>
-      )}
-    </div>
+        ))}
+        <NotificationToastViewport />
+      </ToastPrimitives.Provider>
+    </>
   );
 };
 
