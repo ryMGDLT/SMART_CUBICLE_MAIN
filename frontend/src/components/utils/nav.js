@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LogoutIcon,
@@ -17,22 +17,14 @@ export default function Nav() {
   const navigate = useNavigate();
   const [active, setActive] = useState(() => {
     const storedActive = localStorage.getItem("activeItem");
-    return location.pathname === "/user_profile"
-      ? ""
-      : storedActive || "Dashboard";
+    return location.pathname === "/user_profile" ? "" : storedActive || "Dashboard";
   });
   const [collapsed, setCollapsed] = useState(() => {
-    return (
-      JSON.parse(localStorage.getItem("sidebarCollapsed")) ||
-      window.innerWidth < 768
-    );
+    return JSON.parse(localStorage.getItem("sidebarCollapsed")) || window.innerWidth < 768;
   });
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(() => {
-    return (
-      JSON.parse(localStorage.getItem("sidebarVisible")) ||
-      window.innerWidth >= 768
-    );
+    return JSON.parse(localStorage.getItem("sidebarVisible")) || window.innerWidth >= 768;
   });
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -59,42 +51,6 @@ export default function Nav() {
     fetchUserData();
   }, [user]);
 
-  const fetchNotifications = async () => {
-    if (
-      !user ||
-      !user.token ||
-      (user.role !== "Admin" && user.role !== "Superadmin") ||
-      !user.notificationsEnabled
-    ) {
-      console.log("Notifications not fetched: disabled or invalid role/user");
-      setNotifications([]);
-      setUnreadCount(0);
-      return;
-    }
-    try {
-      const response = await axiosInstance.get(`/notifications`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      const data = response.data;
-      console.log("Fetched notifications in Nav:", data);
-      setNotifications(data);
-      setUnreadCount(data.filter((notif) => !notif.read).length);
-    } catch (error) {
-      console.error("Error fetching notifications in Nav:", error.message);
-      setNotifications([]);
-      setUnreadCount(0);
-    }
-  };
-
-  useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, [user, user?.notificationsEnabled]);
-
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -114,7 +70,7 @@ export default function Nav() {
         setIsDropdownVisible(false);
       }
     };
-    if (isDropdownVisible && window.innerWidth >= 768) { 
+    if (isDropdownVisible && window.innerWidth >= 768) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -163,10 +119,8 @@ export default function Nav() {
 
   const handleBellClick = () => {
     if (window.innerWidth < 768) {
-      // For mobile, toggle full-page view without navigation
       setIsDropdownVisible((prev) => !prev);
     } else {
-      // For desktop, toggle dropdown
       setIsDropdownVisible((prev) => !prev);
     }
   };
@@ -178,51 +132,18 @@ export default function Nav() {
   }, [location.pathname]);
 
   const sidebarItems = [
-    {
-      name: "Dashboard",
-      icon: "/images/dashboard.png",
-      path: "/dashboard",
-      roles: ["Admin", "Superadmin", "Janitor"],
-    },
-    {
-      name: "Usage Monitor",
-      icon: "/images/desktop windows.png",
-      path: "/usage-monitor",
-      roles: ["Admin", "Superadmin", "Janitor"],
-    },
-    {
-      name: "Janitors",
-      icon: "/images/supervised user_circle.png",
-      path: "/janitors",
-      roles: ["Admin", "Superadmin", "Janitor"],
-    },
-    {
-      name: "Resources",
-      icon: "/images/add shopping_cart.png",
-      path: "/resources",
-      roles: ["Admin", "Superadmin", "Janitor"],
-    },
-    {
-      name: "Settings",
-      icon: "/images/settings.png",
-      path: "/settings",
-      roles: ["Admin", "Superadmin", "Janitor"],
-    },
-    {
-      name: "Users",
-      icon: "/images/supervisor account.png",
-      path: "/users",
-      roles: ["Admin", "Superadmin"],
-    },
+    { name: "Dashboard", icon: "/images/dashboard.png", path: "/dashboard", roles: ["Admin", "Superadmin", "Janitor"] },
+    { name: "Usage Monitor", icon: "/images/desktop windows.png", path: "/usage-monitor", roles: ["Admin", "Superadmin", "Janitor"] },
+    { name: "Janitors", icon: "/images/supervised user_circle.png", path: "/janitors", roles: ["Admin", "Superadmin", "Janitor"] },
+    { name: "Resources", icon: "/images/add shopping_cart.png", path: "/resources", roles: ["Admin", "Superadmin", "Janitor"] },
+    { name: "Settings", icon: "/images/settings.png", path: "/settings", roles: ["Admin", "Superadmin", "Janitor"] },
+    { name: "Users", icon: "/images/supervisor account.png", path: "/users", roles: ["Admin", "Superadmin"] },
   ];
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {isSidebarVisible && window.innerWidth < 768 && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={toggleSidebar}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={toggleSidebar} />
       )}
       <aside
         className={`bg-grayish text-white flex flex-col p-4 fixed top-0 left-0 h-full z-50 transition-all duration-500 ease-in-out ${
@@ -243,21 +164,13 @@ export default function Nav() {
           }`}
           onClick={handleSidebarCollapse}
         >
-          {collapsed ? (
-            <ChevronRightIcon className="w-5 h-5" />
-          ) : (
-            <ChevronLeftIcon className="w-5 h-5" />
-          )}
+          {collapsed ? <ChevronRightIcon className="w-5 h-5" /> : <ChevronLeftIcon className="w-5 h-5" />}
         </button>
-        <div
-          className={`flex items-center justify-center mb-2 mt-5 transition-all duration-500 ease-in-out`}
-        >
+        <div className={`flex items-center justify-center mb-2 mt-5 transition-all duration-500 ease-in-out`}>
           <img
             src="/images/ICPET.png"
             alt="Tupseal Logo"
-            className={`transition-all duration-500 ease-in-out ${
-              collapsed ? "w-12 h-12" : "w-40 h-40"
-            }`}
+            className={`transition-all duration-500 ease-in-out ${collapsed ? "w-12 h-12" : "w-40 h-40"}`}
           />
         </div>
         <nav className="flex flex-col space-y-2">
@@ -268,9 +181,7 @@ export default function Nav() {
                 to={item.path}
                 key={item.name}
                 className={`flex items-center p-3 rounded-lg transition-all duration-500 ease-in-out ${
-                  active === item.name
-                    ? "bg-Icpetgreen text-white"
-                    : "hover:bg-Icpetgreen1"
+                  active === item.name ? "bg-Icpetgreen text-white" : "hover:bg-Icpetgreen1"
                 } hover:scale-105 ${collapsed ? "justify-start" : ""}`}
                 onClick={() => {
                   setActive(item.name);
@@ -296,11 +207,7 @@ export default function Nav() {
           className="mt-auto flex items-center p-3 rounded-lg hover:bg-red-700 transition-all duration-500 ease-in-out transform hover:scale-105"
           onClick={logout}
         >
-          <LogoutIcon
-            className={`w-6 h-6 transition-all duration-500 ease-in-out ${
-              collapsed ? "mr-0" : "mr-3"
-            }`}
-          />
+          <LogoutIcon className={`w-6 h-6 transition-all duration-500 ease-in-out ${collapsed ? "mr-0" : "mr-3"}`} />
           <span
             className={`whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out ${
               collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
@@ -313,12 +220,7 @@ export default function Nav() {
       <div
         className="flex-1 flex flex-col w-full transition-all duration-500 ease-in-out"
         style={{
-          marginLeft:
-            isSidebarVisible && window.innerWidth >= 768
-              ? collapsed
-                ? "5rem"
-                : "16rem"
-              : "0",
+          marginLeft: isSidebarVisible && window.innerWidth >= 768 ? (collapsed ? "5rem" : "16rem") : "0",
         }}
       >
         <header className="bg-fafbfe p-4 flex justify-between items-center w-full md:px-6 shadow-md relative z-10 mb-3">
@@ -342,7 +244,7 @@ export default function Nav() {
               setUnreadCount={setUnreadCount}
               setActive={setActive}
               notificationsEnabled={user?.notificationsEnabled}
-              onBellClick={handleBellClick} // Pass the handler
+              onBellClick={handleBellClick}
             />
             <div className="flex items-center">
               <Link
@@ -356,12 +258,7 @@ export default function Nav() {
                   onError={(e) => {
                     e.target.src = DEFAULT_PROFILE_IMAGE;
                   }}
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    marginRight: "8px",
-                  }}
+                  style={{ width: "32px", height: "32px", borderRadius: "50%", marginRight: "8px" }}
                 />
                 @{user?.username || "Guest"}
               </Link>

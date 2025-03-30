@@ -21,7 +21,7 @@ const NotificationDropdown = ({
   const navigate = useNavigate();
   const isMobile = window.innerWidth < 768;
 
-  const fetchNotifications = async () => {
+  const fetchInitialNotifications = async () => {
     if (!notificationsEnabled) {
       console.log("Notifications disabled, skipping fetch");
       setNotifications([]);
@@ -41,7 +41,7 @@ const NotificationDropdown = ({
       setNotifications(data);
       setUnreadCount(data.filter((notif) => !notif.read).length);
     } catch (error) {
-      console.error("Error fetching notifications:", error.message);
+      console.error("Error fetching initial notifications:", error.message);
       setNotifications([]);
       setUnreadCount(0);
     } finally {
@@ -50,10 +50,50 @@ const NotificationDropdown = ({
   };
 
   useEffect(() => {
-    if (isDropdownVisible && (userRole === "Admin" || userRole === "Superadmin") && notificationsEnabled) {
-      fetchNotifications();
+    if (userRole === "Admin" || userRole === "Superadmin") {
+      fetchInitialNotifications();
     }
-  }, [isDropdownVisible, userRole, notificationsEnabled]);
+  }, [userRole, notificationsEnabled, token]);
+
+  useEffect(() => {
+    if (!notificationsEnabled || (userRole !== "Admin" && userRole !== "Superadmin")) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+
+    // Setup WebSocket connection
+    const ws = new WebSocket(`ws://${backendUrl.split("://")[1]}?token=${token}`);
+
+    ws.onopen = () => {
+      console.log("WebSocket connected");
+    };
+
+    ws.onmessage = (event) => {
+      const newNotification = JSON.parse(event.data);
+      console.log("New notification received via WebSocket:", newNotification);
+
+      setNotifications((prev) => {
+        if (prev.some((n) => n._id === newNotification._id)) return prev;
+        const updatedNotifications = [newNotification, ...prev].slice(0, 10);
+        setUnreadCount(updatedNotifications.filter((n) => !n.read).length);
+        return updatedNotifications;
+      });
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    return () => {
+      ws.close();
+      console.log("WebSocket connection closed on cleanup");
+    };
+  }, [notificationsEnabled, userRole, token, backendUrl]);
 
   const markAsRead = async () => {
     if (!notificationsEnabled) return;
@@ -100,10 +140,8 @@ const NotificationDropdown = ({
       if (notification.message.includes("New User")) {
         setActive("Users");
         navigate("/users");
-      
         setIsDropdownVisible(false);
       } else if (isMobile) {
-      
         setIsDropdownVisible(false);
       }
 
@@ -141,7 +179,6 @@ const NotificationDropdown = ({
     );
   }
 
-  // Full-page view for mobile
   if (isMobile && isDropdownVisible) {
     return (
       <div className="fixed inset-0 bg-white z-50 flex flex-col">
@@ -199,7 +236,6 @@ const NotificationDropdown = ({
     );
   }
 
-  // Dropdown view for desktop
   return (
     <div className="relative" ref={dropdownRef}>
       <div className="relative">

@@ -3,7 +3,6 @@ const router = express.Router();
 const getNotificationModels = require("../models/notification");
 const jwt = require("jsonwebtoken");
 
-
 const verifyTokenAndRole = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Unauthorized" });
@@ -18,23 +17,18 @@ const verifyTokenAndRole = (req, res, next) => {
   });
 };
 
-
+// Fetch notifications
 router.get("/", verifyTokenAndRole, async (req, res) => {
   const { NotificationLocal, NotificationAtlas } = getNotificationModels();
   try {
-    const userId = req.user.id; // From JWT token
+    const userId = req.user.id;
     console.log("Fetching notifications for userId:", userId);
 
     const [localNotifications, atlasNotifications] = await Promise.all([
-      NotificationLocal.find({ recipientId: userId })
-        .sort({ createdAt: -1 })
-        .limit(10),
-      NotificationAtlas.find({ recipientId: userId })
-        .sort({ createdAt: -1 })
-        .limit(10),
+      NotificationLocal.find({ recipientId: userId }).sort({ createdAt: -1 }).limit(10),
+      NotificationAtlas.find({ recipientId: userId }).sort({ createdAt: -1 }).limit(10),
     ]);
 
-    
     const notificationMap = new Map();
     [...localNotifications, ...atlasNotifications].forEach((notification) => {
       notificationMap.set(notification._id.toString(), notification);
@@ -49,20 +43,14 @@ router.get("/", verifyTokenAndRole, async (req, res) => {
   }
 });
 
-
+// Mark notifications as read
 router.post("/mark-read", verifyTokenAndRole, async (req, res) => {
   const { NotificationLocal, NotificationAtlas } = getNotificationModels();
   try {
     const userId = req.user.id;
     await Promise.all([
-      NotificationLocal.updateMany(
-        { recipientId: userId, read: false },
-        { read: true }
-      ),
-      NotificationAtlas.updateMany(
-        { recipientId: userId, read: false },
-        { read: true }
-      ),
+      NotificationLocal.updateMany({ recipientId: userId, read: false }, { read: true }),
+      NotificationAtlas.updateMany({ recipientId: userId, read: false }, { read: true }),
     ]);
     console.log(`Notifications marked as read for userId: ${userId}`);
     res.json({ message: "Notifications marked as read" });
@@ -72,7 +60,7 @@ router.post("/mark-read", verifyTokenAndRole, async (req, res) => {
   }
 });
 
-
+// Clear notifications
 router.delete("/clear", verifyTokenAndRole, async (req, res) => {
   const { NotificationLocal, NotificationAtlas } = getNotificationModels();
   try {
@@ -89,6 +77,7 @@ router.delete("/clear", verifyTokenAndRole, async (req, res) => {
   }
 });
 
+// Toggle read status for a single notification
 router.patch("/:id/toggle-read", verifyTokenAndRole, async (req, res) => {
   const { NotificationLocal, NotificationAtlas } = getNotificationModels();
   const { id } = req.params;

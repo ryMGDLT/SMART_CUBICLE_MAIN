@@ -3,10 +3,14 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
+const WebSocket = require("ws");
+const jwt = require("jsonwebtoken");
 const userRoutes = require("./routes/userRoutes");
 const janitorRoutes = require("./routes/janitorRoutes");
-const notificationRoutes = require("./routes/notificationRoutes"); 
+const notificationRoutes = require("./routes/notificationRoutes");
 const path = require("path");
+const getNotificationModels = require("./models/notification");
 
 const localIP = getIPAddress();
 const portBack = getPortBackend();
@@ -24,6 +28,8 @@ if (
 }
 
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
 // Middleware
 app.use(
@@ -34,6 +40,62 @@ app.use(
 );
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// WebSocket setup
+wss.on("connection", (ws, req) => {
+  const urlParams = new URLSearchParams(req.url.split("?")[1]);
+  const token = urlParams.get("token");
+
+  if (!token) {
+    ws.close(1008, "Unauthorized: No token provided");
+    return;
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      ws.close(1008, "Unauthorized: Invalid token");
+      return;
+    }
+    if (decoded.role !== "Admin" && decoded.role !== "Superadmin") {
+      ws.close(1008, "Forbidden: Insufficient role");
+      return;
+    }
+
+    const userId = decoded.id;
+    console.log("WebSocket connected for userId:", userId);
+
+    const { NotificationAtlas } = getNotificationModels();
+
+    const sendNotification = async () => {
+      try {
+        const newNotifications = await NotificationAtlas.find({
+          recipientId: userId,
+          createdAt: { $gt: new Date(Date.now() - 60000) }, 
+        }).sort({ createdAt: -1 });
+
+        if (newNotifications.length > 0) {
+          newNotifications.forEach((notification) => {
+            ws.send(JSON.stringify(notification));
+          });
+        }
+      } catch (error) {
+        console.error("Error streaming notifications:", error.message);
+      }
+    };
+
+    sendNotification(); // Send initial notifications
+    const interval = setInterval(sendNotification, 5000); // Poll every 5 seconds 
+
+    ws.on("close", () => {
+      clearInterval(interval);
+      console.log("WebSocket closed for userId:", userId);
+    });
+
+    ws.on("error", (error) => {
+      console.error("WebSocket error for userId:", userId, error);
+    });
+  });
+});
 
 // MongoDB Connections
 const connectToDatabases = async () => {
@@ -55,13 +117,13 @@ const connectToDatabases = async () => {
     };
     console.log("DB Connections initialized:", !!global.dbConnections.local, !!global.dbConnections.atlas);
 
-    // Routes 
+    // Routes
     app.use("/users", userRoutes);
     app.use("/janitors", janitorRoutes);
-    app.use("/notifications", notificationRoutes); 
+    app.use("/notifications", notificationRoutes);
 
-    // Start the server 
-    app.listen(portBack, "0.0.0.0", () => {
+    // Start the server
+    server.listen(portBack, "0.0.0.0", () => {
       console.log(`Backend server running at http://localhost:${portBack}`);
       console.log(
         `Backend server accessible on the network at http://${localIP}:${portBack}`
@@ -72,6 +134,5 @@ const connectToDatabases = async () => {
     process.exit(1);
   }
 };
-
 
 connectToDatabases();
