@@ -6,12 +6,10 @@ import { Input } from "../../../components/ui/input";
 import { axiosInstance } from "../../../components/controller/authController";
 import Swal from "sweetalert2";
 
-export default function LoginPage() {
+export default function LoginDesktop() {
   const [email, setEmail] = React.useState("");
-  //const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [showResendLink, setShowResendLink] = React.useState("");
-  //const [showPassword, setShowPassword] = React.useState(false);
+  const [showResendLink, setShowResendLink] = React.useState(false);
   const { login } = useAuth();
 
   const handleSubmit = (e) => {
@@ -21,7 +19,6 @@ export default function LoginPage() {
       .catch((error) => {
         if (error.response?.status === 403) {
           const errorMessage = error.response?.data;
-
           console.log("Error message from backend:", errorMessage);
 
           if (
@@ -74,15 +71,10 @@ export default function LoginPage() {
         }
       });
   };
-  // const togglePassword = () => {
-  // setShowPassword((prevState) => !prevState);
-  //};
+
   const handleResendVerificationEmail = async () => {
     try {
-      const response = await axiosInstance.post(
-        "/users/resend-verification-email",
-        { email }
-      );
+      const response = await axiosInstance.post("/users/resend-verification-email", { email });
       Swal.fire({
         icon: "success",
         title: "Success",
@@ -93,6 +85,35 @@ export default function LoginPage() {
         icon: "error",
         title: "Error",
         text: error.response?.data || "Failed to resend verification email.",
+      });
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      Swal.fire({
+        icon: "warning",
+        title: "Email Required",
+        text: "Please enter your email address to reset your password",
+      });
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post("/users/forgot-password", {
+        email: email.trim().toLowerCase(),
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Reset Link Sent",
+        text: "If an account exists with this email, a password reset link has been sent. Please check your inbox (and spam/junk folder).",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.message || "Failed to send password reset email. Please try again.",
       });
     }
   };
@@ -136,7 +157,6 @@ export default function LoginPage() {
             <div className="relative">
               <Input
                 id="password"
-                //type={showPassword ? "text" : "password"}
                 type="password"
                 name="password"
                 placeholder="Enter your password"
@@ -145,15 +165,6 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              {/* {password && ( 
-                <button
-                  type="button"
-                  onClick={togglePassword}
-                  className="absolute inset-y-0 right-3 flex items-center"
-                >
-                  <i className={`fa ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
-                </button>
-              )}*/}
             </div>
           </div>
           <div>
@@ -161,6 +172,7 @@ export default function LoginPage() {
               <p className="text-center mt-4 text-sm text-white">
                 Didn't receive a verification email?{" "}
                 <button
+                  type="button"
                   onClick={handleResendVerificationEmail}
                   className="text-Icpetgreen hover:underline font-medium"
                 >
@@ -170,9 +182,13 @@ export default function LoginPage() {
             )}
           </div>
           <div className="text-left mb-2">
-            <a href="" className="text-sm text-Icpetgreen hover:underline">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-sm text-Icpetgreen hover:underline"
+            >
               Forgot Password?
-            </a>
+            </button>
           </div>
 
           <Button

@@ -17,6 +17,8 @@ router.post("/login", authLimiter, preventAuthAccess, userController.loginUser);
 router.post("/signup", authLimiter, preventAuthAccess, userController.createUser);
 router.post("/verify-email", preventAuthAccess, userController.verifyEmail);
 router.post("/resend-verification-email", preventAuthAccess, userController.resendVerificationEmail);
+router.post("/forgot-password", authLimiter, preventAuthAccess, userController.forgotPassword);
+router.post("/reset-password", preventAuthAccess, userController.resetPassword);
 
 // Protected routes
 router.get("/", authMiddleware, userController.getAllUsers);

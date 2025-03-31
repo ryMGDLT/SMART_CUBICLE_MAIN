@@ -779,6 +779,114 @@ const changePassword = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    console.log("Received forgot password request:", req.body);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserLocal, UserAtlas } = getUserModels();
+    const { email } = req.body;
+
+    if (!email) {
+      console.error("Email not provided");
+      return res.status(400).send("Email is required");
+    }
+
+    const user = await UserAtlas.findOne({ email });
+    if (!user) {
+      console.log("User not found for email:", email);
+      // Return success to prevent email enumeration
+      return res.status(200).json({
+        message: "If an account exists with this email, a reset link has been sent.",
+      });
+    }
+
+    const resetToken = generateVerificationToken();
+    const resetTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await Promise.all([
+      UserLocal.findByIdAndUpdate(user._id, {
+        verificationToken: resetToken,
+        verificationTokenExpiresAt: resetTokenExpiresAt,
+      }),
+      UserAtlas.findByIdAndUpdate(user._id, {
+        verificationToken: resetToken,
+        verificationTokenExpiresAt: resetTokenExpiresAt,
+      }),
+    ]);
+
+    const frontendBaseUrl = process.env.FRONTEND_BASE_URL || "http://localhost:3000";
+    const resetLink = `${frontendBaseUrl}/reset-password?token=${resetToken}`;
+    const subject = "Password Reset Request";
+    const text = `Hi ${user.fullName},\n\nYou requested a password reset. Click the following link to reset your password: ${resetLink}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nThe Team`;
+
+    await sendEmail(email, subject, text);
+    console.log("Password reset email sent to:", email);
+
+    res.status(200).json({
+      message: "If an account exists with this email, a reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Error in forgot password:", error.message, error.stack);
+    res.status(500).send("Failed to process password reset request");
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    console.log("Received reset password request:", req.body);
+    if (!global.dbConnections) throw new Error("Database connections not initialized");
+
+    const { UserLocal, UserAtlas } = getUserModels();
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      console.error("Token or new password not provided");
+      return res.status(400).send("Token and new password are required");
+    }
+
+    if (!isStrongPassword(newPassword)) {
+      console.error("Weak password provided");
+      return res.status(400).send("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character");
+    }
+
+    const userLocal = await UserLocal.findOne({
+      verificationToken: token,
+      verificationTokenExpiresAt: { $gt: new Date() },
+    });
+    const userAtlas = await UserAtlas.findOne({
+      verificationToken: token,
+      verificationTokenExpiresAt: { $gt: new Date() },
+    });
+
+    if (!userLocal || !userAtlas) {
+      console.error("Invalid or expired token:", token);
+      return res.status(400).send("Invalid or expired reset token");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await Promise.all([
+      UserLocal.findByIdAndUpdate(userLocal._id, {
+        password: hashedPassword,
+        verificationToken: null,
+        verificationTokenExpiresAt: null,
+      }),
+      UserAtlas.findByIdAndUpdate(userAtlas._id, {
+        password: hashedPassword,
+        verificationToken: null,
+        verificationTokenExpiresAt: null,
+      }),
+    ]);
+
+    console.log("Password reset successfully for user:", userAtlas._id);
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Error resetting password:", error.message, error.stack);
+    res.status(500).send("Failed to reset password");
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -792,4 +900,6 @@ module.exports = {
   acceptUser,
   declineUser,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };

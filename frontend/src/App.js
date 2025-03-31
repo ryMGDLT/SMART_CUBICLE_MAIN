@@ -10,8 +10,8 @@ import {
 } from "react-router-dom";
 import PrivateRoute from "./pages/auth/privateRoute";
 import PublicRoute from "./pages/auth/publicRoute";
-import { ToastProvider } from "./components/ui/toast"; 
-import { Toaster } from "./components/ui/toaster"; 
+import { ToastProvider } from "./components/ui/toast";
+import { Toaster } from "./components/ui/toaster";
 
 // Context Providers
 import { AuthProvider } from "./components/controller/authController";
@@ -23,6 +23,8 @@ import SignupDesktop from "./pages/auth/desktop/signup";
 import VerifyEmailPage from "./pages/auth/verifyEmailPage";
 import LoginMobile from "./pages/auth/mobile/login";
 import SignupMobile from "./pages/auth/mobile/signup";
+import ResetPasswordDesktop from "./pages/auth/desktop/resetPassword"; 
+import ResetPasswordMobile from "./pages/auth/mobile/resetPassword";   
 
 // View Pages
 import DashboardDesktop from "./pages/views/desktop/dashboard";
@@ -44,7 +46,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ToastProvider> 
+        <ToastProvider>
           <div className="App">
             <Routes>
               {/* Redirect Root ("/") to Login if Not Authenticated */}
@@ -74,6 +76,18 @@ function App() {
                 }
               />
               <Route path="/verify-email" element={<VerifyEmailPage />} />
+              {/* Added Reset Password Route */}
+              <Route
+                path="/reset-password"
+                element={
+                  <PublicRoute>
+                    <ViewController
+                      desktopComponent={ResetPasswordDesktop}
+                      mobileComponent={ResetPasswordMobile}
+                    />
+                  </PublicRoute>
+                }
+              />
 
               {/* Private Routes */}
               <Route
@@ -168,7 +182,7 @@ function App() {
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </div>
-          <Toaster /> 
+          <Toaster />
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
@@ -184,4 +198,4 @@ function LayoutWithNav() {
   );
 }
 
-export default App; 
+export default App;
