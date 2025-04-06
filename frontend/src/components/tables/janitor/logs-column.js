@@ -24,7 +24,7 @@ const StatusCell = ({ status: initialStatus }) => {
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
-    // Here you can add API call to update the status in the backend
+    
   };
 
   return (

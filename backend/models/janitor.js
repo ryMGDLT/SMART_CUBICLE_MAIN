@@ -72,26 +72,20 @@ const janitorSchema = new mongoose.Schema({
   ],
 }, { timestamps: true, _id: false });
 
-// Function to get janitor models for both connections
+// Function to get janitor model for Atlas connection only
 const getJanitorModels = () => {
   if (!global.dbConnections) {
     throw new Error("Database connections not initialized");
-  }
-  if (!global.dbConnections.local) {
-    throw new Error("Local database connection not initialized");
   }
   if (!global.dbConnections.atlas) {
     throw new Error("Atlas database connection not initialized");
   }
 
-  const JanitorLocal =
-    global.dbConnections.local.models.Janitor ||
-    global.dbConnections.local.model("Janitor", janitorSchema);
   const JanitorAtlas =
     global.dbConnections.atlas.models.Janitor ||
     global.dbConnections.atlas.model("Janitor", janitorSchema);
 
-  return { JanitorLocal, JanitorAtlas };
+  return { JanitorAtlas };
 };
 
 module.exports = getJanitorModels;

@@ -70,7 +70,7 @@ wss.on("connection", (ws, req) => {
       try {
         const newNotifications = await NotificationAtlas.find({
           recipientId: userId,
-          createdAt: { $gt: new Date(Date.now() - 60000) }, // Last 1 minute
+          createdAt: { $gt: new Date(Date.now() - 60000) }, 
         }).sort({ createdAt: -1 });
 
         if (newNotifications.length > 0) {
@@ -83,9 +83,8 @@ wss.on("connection", (ws, req) => {
       }
     };
 
-    sendNotification(); // Send initial notifications
-    const interval = setInterval(sendNotification, 5000); // Poll every 5 seconds (replace with change streams in production)
-
+    sendNotification();
+    const interval = setInterval(sendNotification, 5000); 
     ws.on("close", () => {
       clearInterval(interval);
       console.log("WebSocket closed for userId:", userId);
@@ -97,13 +96,9 @@ wss.on("connection", (ws, req) => {
   });
 });
 
-// MongoDB Connections
-const connectToDatabases = async () => {
+// MongoDB Connection (Atlas only)
+const connectToDatabase = async () => {
   try {
-    const localUri = process.env.MONGO_URI || "mongodb://localhost:6969/Smart_Cubicle";
-    const localConnection = await mongoose.createConnection(localUri).asPromise();
-    console.log("Connected to Local MongoDB");
-
     const atlasUri = process.env.MONGO_ATLAS_URI;
     if (!atlasUri) {
       throw new Error("MONGO_ATLAS_URI is not defined in .env");
@@ -112,10 +107,9 @@ const connectToDatabases = async () => {
     console.log("Connected to MongoDB Atlas");
 
     global.dbConnections = {
-      local: localConnection,
       atlas: atlasConnection,
     };
-    console.log("DB Connections initialized:", !!global.dbConnections.local, !!global.dbConnections.atlas);
+    console.log("DB Connection initialized:", !!global.dbConnections.atlas);
 
     // Routes
     app.use("/users", userRoutes);
@@ -135,4 +129,4 @@ const connectToDatabases = async () => {
   }
 };
 
-connectToDatabases();
+connectToDatabase();

@@ -1,5 +1,5 @@
 const User = require('../models/User'); 
-const Janitor = require('../models/janitor'); 
+const Janitor = require('../models/Janitor'); 
 
 const copyJanitorsToNewTable = async () => {
   try {

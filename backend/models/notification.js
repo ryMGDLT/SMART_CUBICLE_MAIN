@@ -8,13 +8,20 @@ const notificationSchema = new mongoose.Schema({
   recipientId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
 });
 
+// Function to get notification model for Atlas connection only
 const getNotificationModels = () => {
   if (!global.dbConnections) {
     throw new Error("Database connections not initialized");
   }
-  const NotificationLocal = global.dbConnections.local.model("Notification", notificationSchema);
-  const NotificationAtlas = global.dbConnections.atlas.model("Notification", notificationSchema);
-  return { NotificationLocal, NotificationAtlas };
+  if (!global.dbConnections.atlas) {
+    throw new Error("Atlas database connection not initialized");
+  }
+
+  const NotificationAtlas =
+    global.dbConnections.atlas.models.Notification ||
+    global.dbConnections.atlas.model("Notification", notificationSchema);
+
+  return { NotificationAtlas };
 };
 
 module.exports = getNotificationModels;
