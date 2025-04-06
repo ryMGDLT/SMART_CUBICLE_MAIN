@@ -480,7 +480,7 @@ const uploadProfileImage = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const serverUrl = process.env.BACKEND_URL || "http://192.168.5.45:5000";
+    const serverUrl = process.env.BACKEND_URL || "http://192.168.8.181:5000";
     const profileImagePath = `${serverUrl}/uploads/profile-images/${req.file.filename}`;
     console.log("New profileImagePath:", profileImagePath);
 

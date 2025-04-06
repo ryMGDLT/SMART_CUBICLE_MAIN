@@ -39,7 +39,7 @@ export default function SignUpPage() {
   // Handle Employee ID input
   const handleEmployeeIdChange = (e) => {
     const value = e.target.value;
-    setEmployeeId(value); // Update state with masked value
+    setEmployeeId(value); 
   };
 
   const handleSubmit = async (e) => {

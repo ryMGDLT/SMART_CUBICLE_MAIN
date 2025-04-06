@@ -59,11 +59,12 @@ export default function Janitors() {
   const itemsPerPage = 10;
   const { user } = useAuth();
   const userRole = user?.role;
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.8.181:5000";
 
-  // Call and fetch all the data in the janitors API database
+  
   const fetchJanitors = async () => {
     try {
-      const response = await fetch(`http://192.168.5.45:5000/janitors`);
+      const response = await fetch(`${backendUrl}/janitors`);
       if (!response.ok) throw new Error("Failed to fetch janitors");
       const data = await response.json();
       setJanitorsData(data);
@@ -82,7 +83,6 @@ export default function Janitors() {
 
   console.log("Logged-in User:", user);
 
-  //update the mapping to ensure when no entry in other tab janitor will not show
 // Mapping the janitors data to the table
 const mappedJanitorsData = useMemo(() => {
   return janitorsData.map((janitor) => ({

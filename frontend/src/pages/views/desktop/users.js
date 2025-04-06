@@ -6,9 +6,9 @@ import { DataTable } from "../../../components/ui/data-table";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
+  PaginationEllipsis,
   PaginationNext,
   PaginationPrevious,
 } from "../../../components/ui/pagination";
@@ -22,7 +22,7 @@ export default function Users() {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemsPerPage = 10;
+  const itemsPerPage = 11; 
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [usersData, setUsersData] = useState([]);
@@ -218,7 +218,7 @@ export default function Users() {
         user._id === employeeId ? { ...user, role: newRole } : user
       )
     );
-    console.log(`Role updated locally for user ${employeeId} to ${newRole}`); // Fixed: use employeeId
+    console.log(`Role updated locally for user ${employeeId} to ${newRole}`);
   }, []);
 
   const handleSelectAll = useCallback(
@@ -342,19 +342,21 @@ export default function Users() {
           </button>
         </div>
       </div>
-      <div className="mt-3 flex-1 flex flex-col h-full rounded-lg border border-gray-200 overflow-hidden">
-        <div className="flex-1 overflow-y-auto relative">
+      <div className="mt-3 flex flex-col flex-1 rounded-lg border border-gray-200">
+        {/* Table container with fixed height for 12 rows + header */}
+        <div className="flex-1" style={{ height: "585px" /* 45px * 13 */ }}>
           <DataTable
             columns={columns}
             data={currentItems}
             pageCount={totalPages}
             currentPage={currentPage}
             onPageChange={handlePageChange}
-            className="min-h-full"
+            className="h-full"
           />
         </div>
         {shouldShowPagination && (
-          <div className="border-t border-gray-200 bg-white p-2">
+          <div className="border-t border-gray-200 bg-white p-2 pb-4 shrink-0">
+            {/* Added pb-4 for 16px padding-bottom */}
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
@@ -403,4 +405,4 @@ export default function Users() {
       </div>
     </Card>
   );
-}
+} 
