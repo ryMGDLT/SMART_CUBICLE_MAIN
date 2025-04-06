@@ -399,11 +399,13 @@ const updateUser = async (req, res) => {
         logsReport: [],
       };
 
+      console.log("janitorData before save:", JSON.stringify(janitorData, null, 2));
+
       const existingJanitorLocal = await JanitorLocal.findOne({ userId: userAtlas._id });
       const existingJanitorAtlas = await JanitorAtlas.findOne({ userId: userAtlas._id });
 
       if (existingJanitorLocal && existingJanitorAtlas) {
-        console.log("Existing janitor found - Local:", existingJanitorLocal._id, "Atlas:", existingJanitorAtlas._id);
+        console.log("Existing janitor found - Local:", existingJanitorLocal._id.toString(), "Atlas:", existingJanitorAtlas._id.toString());
         existingJanitorLocal.basicDetails = janitorData.basicDetails;
         existingJanitorAtlas.basicDetails = janitorData.basicDetails;
 
@@ -411,21 +413,21 @@ const updateUser = async (req, res) => {
         await existingJanitorLocal.save().catch(err => {
           throw new Error(`Failed to update janitor in Local: ${err.message}`);
         });
-        console.log("Janitor updated in Local:", existingJanitorLocal._id);
+        console.log("Janitor updated in Local:", existingJanitorLocal._id.toString());
 
         console.log("Attempting to update janitor in Atlas...");
         await existingJanitorAtlas.save().catch(err => {
           throw new Error(`Failed to update janitor in Atlas: ${err.message}`);
         });
-        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id);
+        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id.toString());
       } else {
-        console.log("No existing janitor found, creating new janitor...");
+        console.log("No existing janitor found, creating new janitor with consistent _id...");
         console.log("Attempting to sync janitor to Local...");
         const janitorLocal = new JanitorLocal(janitorData);
         const newJanitorLocal = await janitorLocal.save().catch(err => {
           throw new Error(`Failed to save janitor to Local: ${err.message}`);
         });
-        console.log("Janitor synced to Local:", newJanitorLocal._id);
+        console.log("Janitor synced to Local:", newJanitorLocal._id.toString());
 
         console.log("Attempting to sync janitor to Atlas...");
         const janitorAtlas = new JanitorAtlas(janitorData);
@@ -433,7 +435,7 @@ const updateUser = async (req, res) => {
           JanitorLocal.deleteOne({ _id: janitorId }).catch(() => {});
           throw new Error(`Failed to save janitor to Atlas: ${err.message}`);
         });
-        console.log("Janitor synced to Atlas:", newJanitorAtlas._id);
+        console.log("Janitor synced to Atlas:", newJanitorAtlas._id.toString());
       }
     } else {
       console.log("Janitor sync conditions not met for user:", userAtlas._id);
@@ -519,11 +521,13 @@ const uploadProfileImage = async (req, res) => {
         logsReport: [],
       };
 
+      console.log("janitorData before save:", JSON.stringify(janitorData, null, 2));
+
       const existingJanitorLocal = await JanitorLocal.findOne({ userId: updatedUserAtlas._id });
       const existingJanitorAtlas = await JanitorAtlas.findOne({ userId: updatedUserAtlas._id });
 
       if (existingJanitorLocal && existingJanitorAtlas) {
-        console.log("Existing janitor found - Local:", existingJanitorLocal._id, "Atlas:", existingJanitorAtlas._id);
+        console.log("Existing janitor found - Local:", existingJanitorLocal._id.toString(), "Atlas:", existingJanitorAtlas._id.toString());
         existingJanitorLocal.basicDetails = janitorData.basicDetails;
         existingJanitorAtlas.basicDetails = janitorData.basicDetails;
 
@@ -531,21 +535,21 @@ const uploadProfileImage = async (req, res) => {
         await existingJanitorLocal.save().catch(err => {
           throw new Error(`Failed to update janitor in Local: ${err.message}`);
         });
-        console.log("Janitor updated in Local:", existingJanitorLocal._id);
+        console.log("Janitor updated in Local:", existingJanitorLocal._id.toString());
 
         console.log("Attempting to update janitor in Atlas...");
         await existingJanitorAtlas.save().catch(err => {
           throw new Error(`Failed to update janitor in Atlas: ${err.message}`);
         });
-        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id);
+        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id.toString());
       } else {
-        console.log("No existing janitor found, creating new janitor...");
+        console.log("No existing janitor found, creating new janitor with consistent _id...");
         console.log("Attempting to sync janitor to Local...");
         const janitorLocal = new JanitorLocal(janitorData);
         const newJanitorLocal = await janitorLocal.save().catch(err => {
           throw new Error(`Failed to save janitor to Local: ${err.message}`);
         });
-        console.log("Janitor synced to Local:", newJanitorLocal._id);
+        console.log("Janitor synced to Local:", newJanitorLocal._id.toString());
 
         console.log("Attempting to sync janitor to Atlas...");
         const janitorAtlas = new JanitorAtlas(janitorData);
@@ -553,7 +557,7 @@ const uploadProfileImage = async (req, res) => {
           JanitorLocal.deleteOne({ _id: janitorId }).catch(() => {});
           throw new Error(`Failed to save janitor to Atlas: ${err.message}`);
         });
-        console.log("Janitor synced to Atlas:", newJanitorAtlas._id);
+        console.log("Janitor synced to Atlas:", newJanitorAtlas._id.toString());
       }
     } else {
       console.log("Janitor sync conditions not met for user:", updatedUserAtlas._id);
@@ -657,11 +661,13 @@ const acceptUser = async (req, res) => {
         logsReport: [],
       };
 
+      console.log("janitorData before save:", JSON.stringify(janitorData, null, 2));
+
       const existingJanitorLocal = await JanitorLocal.findOne({ userId: userAtlas._id });
       const existingJanitorAtlas = await JanitorAtlas.findOne({ userId: userAtlas._id });
 
       if (existingJanitorLocal && existingJanitorAtlas) {
-        console.log("Existing janitor found - Local:", existingJanitorLocal._id, "Atlas:", existingJanitorAtlas._id);
+        console.log("Existing janitor found - Local:", existingJanitorLocal._id.toString(), "Atlas:", existingJanitorAtlas._id.toString());
         existingJanitorLocal.basicDetails = janitorData.basicDetails;
         existingJanitorAtlas.basicDetails = janitorData.basicDetails;
 
@@ -669,21 +675,21 @@ const acceptUser = async (req, res) => {
         await existingJanitorLocal.save().catch(err => {
           throw new Error(`Failed to update janitor in Local: ${err.message}`);
         });
-        console.log("Janitor updated in Local:", existingJanitorLocal._id);
+        console.log("Janitor updated in Local:", existingJanitorLocal._id.toString());
 
         console.log("Attempting to update janitor in Atlas...");
         await existingJanitorAtlas.save().catch(err => {
           throw new Error(`Failed to update janitor in Atlas: ${err.message}`);
         });
-        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id);
+        console.log("Janitor updated in Atlas:", existingJanitorAtlas._id.toString());
       } else {
-        console.log("No existing janitor found, creating new janitor...");
+        console.log("No existing janitor found, creating new janitor with consistent _id...");
         console.log("Attempting to sync janitor to Local...");
         const janitorLocal = new JanitorLocal(janitorData);
         const newJanitorLocal = await janitorLocal.save().catch(err => {
           throw new Error(`Failed to save janitor to Local: ${err.message}`);
         });
-        console.log("Janitor synced to Local:", newJanitorLocal._id);
+        console.log("Janitor synced to Local:", newJanitorLocal._id.toString());
 
         console.log("Attempting to sync janitor to Atlas...");
         const janitorAtlas = new JanitorAtlas(janitorData);
@@ -691,7 +697,7 @@ const acceptUser = async (req, res) => {
           JanitorLocal.deleteOne({ _id: janitorId }).catch(() => {});
           throw new Error(`Failed to save janitor to Atlas: ${err.message}`);
         });
-        console.log("Janitor synced to Atlas:", newJanitorAtlas._id);
+        console.log("Janitor synced to Atlas:", newJanitorAtlas._id.toString());
       }
     } else {
       console.log("Janitor sync conditions not met for user:", userAtlas._id);
@@ -795,7 +801,6 @@ const forgotPassword = async (req, res) => {
     const user = await UserAtlas.findOne({ email });
     if (!user) {
       console.log("User not found for email:", email);
-      // Return success to prevent email enumeration
       return res.status(200).json({
         message: "If an account exists with this email, a reset link has been sent.",
       });
@@ -902,4 +907,4 @@ module.exports = {
   changePassword,
   forgotPassword,
   resetPassword,
-};
+}; 

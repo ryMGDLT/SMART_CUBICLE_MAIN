@@ -1,40 +1,81 @@
-import React, { useState, useMemo } from "react";
-import { Pencil, Trash, Printer } from "heroicons-react";
-import {
-  JANITORS_DATA,
-  DEFAULT_PROFILE_IMAGE,
-} from "../../../data/placeholderData";
+import React, { useState, useMemo, useEffect } from "react";
+import { Printer } from "heroicons-react";
+import { DEFAULT_PROFILE_IMAGE } from "../../../data/placeholderData";
 
 export default function Janitors() {
   const [activeTab, setActiveTab] = useState("Basic Details");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [janitorsData, setJanitorsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const itemsPerPage = 6;
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.8.181:5000";
 
-  // Filtering logic
+  const fetchJanitors = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/janitors`);
+      if (!response.ok) throw new Error("Failed to fetch janitors");
+      const data = await response.json();
+      setJanitorsData(data);
+      console.log("Fetched Janitors Data:", data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJanitors();
+  }, []);
+
+  // Filter
   const filteredJanitors = useMemo(() => {
-    return JANITORS_DATA.filter((janitor) => {
-      const hasRequiredProperties =
-        activeTab === "Basic Details"
-          ? janitor.basicDetails
-          : activeTab === "Schedule"
-          ? janitor.schedule
-          : activeTab === "Performance Track"
-          ? janitor.performanceTrack
-          : activeTab === "Resource Usage"
-          ? janitor.resourceUsage
-          : activeTab === "Logs and Report"
-          ? janitor.logsReport
-          : null;
+    if (!janitorsData.length) return [];
 
-      if (!hasRequiredProperties) return false;
+    return janitorsData
+      .map((janitor) => {
+        const tabProperty = activeTab.toLowerCase().replace(/\s+/g, "");
+        const propertyKey =
+          {
+            basicdetails: "basicDetails",
+            logsandreport: "logsReport",
+            performancetrack: "performanceTrack",
+            resourceusage: "resourceUsage",
+            schedule: "schedule",
+          }[tabProperty] || tabProperty;
 
-      return Object.values(hasRequiredProperties)
-        .join(" ")
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-    });
-  }, [searchTerm, activeTab]);
+        const data = janitor[propertyKey];
+
+        if (propertyKey === "basicDetails") {
+          return [
+            {
+              _id: janitor._id,
+              basicDetails: data,
+            },
+          ];
+        }
+
+        if (Array.isArray(data) && data.length > 0) {
+          return data.map((entry) => ({
+            _id: janitor._id,
+            basicDetails: janitor.basicDetails,
+            [propertyKey]: entry,
+          }));
+        }
+
+        return [];
+      })
+      .flat()
+      .filter((item) => {
+        const data = item[activeTab.toLowerCase().replace(/\s+/g, "")] || item.basicDetails;
+        return Object.values(data)
+          .join(" ")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+      });
+  }, [searchTerm, activeTab, janitorsData]);
 
   const currentItems = useMemo(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -52,7 +93,6 @@ export default function Janitors() {
     [totalPages]
   );
 
-  // Handlers
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
@@ -63,27 +103,18 @@ export default function Janitors() {
   const handleNextPage = () =>
     setCurrentPage((p) => Math.min(totalPages, p + 1));
 
-  const handleEdit = (id) => {
-    console.log("Edit janitor:", id);
-  };
-
-  const handleDelete = (id) => {
-    console.log("Delete janitor:", id);
-  };
-
-  const renderCard = (janitor, tab) => {
-    // Get the correct data object based on the tab
+  const renderCard = (item, tab) => {
     const data =
       tab === "Basic Details"
-        ? janitor.basicDetails
+        ? item.basicDetails
         : tab === "Schedule"
-        ? janitor.schedule
+        ? item.schedule
         : tab === "Performance Track"
-        ? janitor.performanceTrack
+        ? item.performanceTrack
         : tab === "Resource Usage"
-        ? janitor.resourceUsage
+        ? item.resourceUsage
         : tab === "Logs and Report"
-        ? janitor.logsReport
+        ? item.logsReport
         : null;
 
     if (!data) return null;
@@ -103,20 +134,6 @@ export default function Janitors() {
                   <h3 className="text-base font-medium">{data.name}</h3>
                   <p className="text-xs text-gray-500">{data.employeeId}</p>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleEdit(data.employeeId)}
-                  >
-                    <Pencil size={18} />
-                  </button>
-                  <button
-                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleDelete(data.employeeId)}
-                  >
-                    <Trash size={18} />
-                  </button>
-                </div>
               </div>
               <div className="mt-1 text-sm">
                 <p className="text-gray-600">{data.email}</p>
@@ -130,29 +147,15 @@ export default function Janitors() {
         return (
           <div className="flex gap-4">
             <img
-              src={data.image || DEFAULT_PROFILE_IMAGE}
-              alt={data.name}
+              src={item.basicDetails.image || DEFAULT_PROFILE_IMAGE}
+              alt={item.basicDetails.name}
               className="h-12 w-12 rounded-full object-cover"
             />
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <h3 className="text-base font-medium">{item.basicDetails.name}</h3>
                   <p className="text-xs text-gray-500">{data.date}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleEdit(data.employeeId)}
-                  >
-                    <Pencil size={18} />
-                  </button>
-                  <button
-                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleDelete(data.employeeId)}
-                  >
-                    <Trash size={18} />
-                  </button>
                 </div>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
@@ -193,14 +196,14 @@ export default function Janitors() {
         return (
           <div className="flex gap-4">
             <img
-              src={data.image || DEFAULT_PROFILE_IMAGE}
-              alt={data.name}
+              src={item.basicDetails.image || DEFAULT_PROFILE_IMAGE}
+              alt={item.basicDetails.name}
               className="h-12 w-12 rounded-full object-cover"
             />
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <h3 className="text-base font-medium">{item.basicDetails.name}</h3>
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${
                       data.status === "Excellent"
@@ -214,20 +217,6 @@ export default function Janitors() {
                   >
                     {data.status}
                   </span>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleEdit(data.employeeId)}
-                  >
-                    <Pencil size={18} />
-                  </button>
-                  <button
-                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleDelete(data.employeeId)}
-                  >
-                    <Trash size={18} />
-                  </button>
                 </div>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
@@ -256,29 +245,15 @@ export default function Janitors() {
         return (
           <div className="flex gap-4">
             <img
-              src={data.image || DEFAULT_PROFILE_IMAGE}
-              alt={data.name}
+              src={item.basicDetails.image || DEFAULT_PROFILE_IMAGE}
+              alt={item.basicDetails.name}
               className="h-12 w-12 rounded-full object-cover"
             />
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <h3 className="text-base font-medium">{item.basicDetails.name}</h3>
                   <p className="text-xs text-gray-500">{data.resource}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleEdit(data.employeeId)}
-                  >
-                    <Pencil size={18} />
-                  </button>
-                  <button
-                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleDelete(data.employeeId)}
-                  >
-                    <Trash size={18} />
-                  </button>
                 </div>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
@@ -294,12 +269,12 @@ export default function Janitors() {
                   <p className="text-gray-500">Restocked</p>
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${
-                      data.restocked === "Yes"
+                      data.restocked
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {data.restocked}
+                    {data.restocked ? "Yes" : "No"}
                   </span>
                 </div>
                 <div>
@@ -327,29 +302,15 @@ export default function Janitors() {
         return (
           <div className="flex gap-4">
             <img
-              src={data.image || DEFAULT_PROFILE_IMAGE}
-              alt={data.name}
+              src={item.basicDetails.image || DEFAULT_PROFILE_IMAGE}
+              alt={item.basicDetails.name}
               className="h-12 w-12 rounded-full object-cover"
             />
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-base font-medium">{data.name}</h3>
+                  <h3 className="text-base font-medium">{item.basicDetails.name}</h3>
                   <p className="text-xs text-gray-500">{data.date}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className="text-Icpetgreen p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleEdit(data.employeeId)}
-                  >
-                    <Pencil size={18} />
-                  </button>
-                  <button
-                    className="text-red-500 p-1 hover:bg-gray-100 rounded"
-                    onClick={() => handleDelete(data.employeeId)}
-                  >
-                    <Trash size={18} />
-                  </button>
                 </div>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
@@ -409,11 +370,17 @@ export default function Janitors() {
     }
   };
 
+  if (loading) {
+    return <div className="h-full flex items-center justify-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="h-full flex items-center justify-center">Error: {error}</div>;
+  }
+
   return (
     <div className="h-full flex flex-col">
-      {/* Fixed Header Section */}
       <div className="bg-gray-50 p-2">
-      {/* Search Bar */}
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold">Janitors</h2>
@@ -434,33 +401,32 @@ export default function Janitors() {
           </div>
 
           <div className="relative">
-        <input
-          type="text"
+            <input
+              type="text"
               placeholder="Search"
-          value={searchTerm}
+              value={searchTerm}
               onChange={handleSearch}
-          className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
-        />
-        <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
+              className="w-full rounded-lg border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm focus:border-Icpetgreen focus:ring-1 focus:ring-Icpetgreen"
+            />
+            <span className="absolute inset-y-0 end-0 grid w-10 place-content-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   strokeWidth="2"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-        </span>
+                />
+              </svg>
+            </span>
           </div>
-      </div>
+        </div>
 
-      {/* Tab Navigation */}
         <div className="mt-2">
           <select
             value={activeTab}
@@ -476,16 +442,15 @@ export default function Janitors() {
         </div>
       </div>
 
-      {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-2">
         <div className="flex flex-col gap-3 pb-16">
           {currentItems.length > 0 ? (
-            currentItems.map((janitor, index) => (
+            currentItems.map((item, index) => (
               <div
-                key={`${activeTab}-${index}`}
+                key={`${activeTab}-${item._id}-${index}`}
                 className="bg-white p-4 rounded-lg shadow-sm"
               >
-                {renderCard(janitor, activeTab)}
+                {renderCard(item, activeTab)}
               </div>
             ))
           ) : (
@@ -493,10 +458,9 @@ export default function Janitors() {
               No results found. Please try a different search term.
             </div>
           )}
-          </div>
+        </div>
       </div>
 
-      {/* Fixed Pagination */}
       <div className="shrink-0 bg-white border-t border-gray-200 px-4 py-2">
         <ol className="flex justify-center gap-1 text-xs font-medium">
           <li>

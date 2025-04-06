@@ -7,20 +7,35 @@ import { UserRoundIcon } from "lucide-react";
 const NoteCell = ({ note }) => {
   const getTextColorClass = (note) => {
     const lowerNote = note.toLowerCase();
-    if (lowerNote.includes('normal')) {
-      return 'text-green-600';
-    } else if (lowerNote.includes('higher') || ('higher')) {
-      return 'text-amber-600';
-    } else if (lowerNote.includes('excessive')) {
-      return 'text-red-600';
+    if (lowerNote.includes("normal")) {
+      return "text-green-600";
+    } else if (lowerNote.includes("higher")) {
+      return "text-amber-600";
+    } else if (lowerNote.includes("excessive")) {
+      return "text-red-600";
     }
-    return 'text-gray-600';
+    return "text-gray-600";
   };
 
   return (
     <div className="flex items-center justify-center">
       <span className={`px-2 font-medium text-sm ${getTextColorClass(note)}`}>
         {note}
+      </span>
+    </div>
+  );
+};
+
+
+const RestockedCell = ({ restocked }) => {
+  return (
+    <div className="flex items-center justify-center">
+      <span
+        className={`px-2 font-medium text-sm ${
+          restocked ? "text-green-600" : "text-red-600"
+        }`}
+      >
+        {restocked ? "Yes" : "No"}
       </span>
     </div>
   );
@@ -34,8 +49,11 @@ export const resourceUsageColumns = [
       return (
         <div className="flex items-center justify-center px-2">
           <Avatar>
-          <AvatarImage src={row.original.resourceUsage.image || DEFAULT_PROFILE_IMAGE} alt={row.original.resourceUsage.name} />
-          <AvatarFallback>
+            <AvatarImage
+              src={row.original.resourceUsage.image || DEFAULT_PROFILE_IMAGE}
+              alt={row.original.resourceUsage.name}
+            />
+            <AvatarFallback>
               <UserRoundIcon className="w-4 h-4" />
             </AvatarFallback>
           </Avatar>
@@ -60,15 +78,19 @@ export const resourceUsageColumns = [
     accessorKey: "resourceUsage.resource",
     header: () => <div className="text-center">Resource</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">{row.original.resourceUsage.resource}</div>
+      <div className="truncate text-center">
+        {row.original.resourceUsage.resource}
+      </div>
     ),
-    size: 0.2,
+    size: 0.15, 
   },
   {
     accessorKey: "resourceUsage.amountUsed",
     header: () => <div className="text-center">Amount Used</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">{row.original.resourceUsage.amountUsed}</div>
+      <div className="truncate text-center">
+        {row.original.resourceUsage.amountUsed}
+      </div>
     ),
     size: 0.15,
   },
@@ -76,16 +98,22 @@ export const resourceUsageColumns = [
     accessorKey: "resourceUsage.remaining",
     header: () => <div className="text-center">Remaining</div>,
     cell: ({ row }) => (
-      <div className="truncate text-center">{row.original.resourceUsage.remaining}</div>
+      <div className="truncate text-center">
+        {row.original.resourceUsage.remaining}
+      </div>
     ),
     size: 0.15,
   },
   {
+    accessorKey: "resourceUsage.restocked",
+    header: () => <div className="text-center">Restocked</div>,
+    cell: ({ row }) => <RestockedCell restocked={row.original.resourceUsage.restocked} />,
+    size: 0.1, 
+  },
+  {
     accessorKey: "resourceUsage.note",
     header: () => <div className="text-center">Note</div>,
-    cell: ({ row }) => (
-      <NoteCell note={row.original.resourceUsage.note} />
-    ),
-    size: 0.25,
+    cell: ({ row }) => <NoteCell note={row.original.resourceUsage.note} />,
+    size: 0.2, 
   },
 ];

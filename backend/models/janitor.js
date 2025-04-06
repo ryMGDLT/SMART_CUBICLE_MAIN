@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const janitorSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -15,35 +19,58 @@ const janitorSchema = new mongoose.Schema({
   },
   schedule: [
     {
-      date: { type: Date },
-      status: { type: String, enum: ["Early", "On Time", "Over Time"] },
       image: { type: String },
+      name: { type: String },
+      date: { type: String }, 
+      shift: { type: String },
+      timeIn: { type: String },
+      timeOut: { type: String },
+      cleaningHour: { type: String }, 
+      task: { type: String },
+      status: { type: String, enum: ["Early", "On Time", "Over Time"] },
     },
   ],
   performanceTrack: [
     {
-      date: { type: Date },
-      metric: { type: String },
-      value: { type: Number },
       image: { type: String },
+      name: { type: String },
+      today: { type: Number },
+      thisWeek: { type: Number },
+      thisMonth: { type: Number },
+      thisYear: { type: Number },
+      maxCleaningHour: { type: Number },
+      minCleaningHour: { type: Number },
+      status: { type: String },
+      employeeId: { type: String },
     },
   ],
   resourceUsage: [
     {
-      date: { type: Date },
-      resource: { type: String },
-      quantity: { type: Number },
       image: { type: String },
+      name: { type: String },
+      resource: { type: String },
+      amountUsed: { type: String },
+      remaining: { type: String },
+      restocked: { type: Boolean }, 
+      note: { type: String },
+      employeeId: { type: String },
     },
   ],
   logsReport: [
     {
-      date: { type: Date },
-      log: { type: String },
       image: { type: String },
+      name: { type: String },
+      date: { type: String }, 
+      startTime: { type: String },
+      endTime: { type: String },
+      duration: { type: Number },
+      task: { type: String },
+      beforePicture: { type: String },
+      afterPicture: { type: String },
+      status: { type: String },
     },
   ],
-}, { timestamps: true });
+}, { timestamps: true, _id: false });
 
 // Function to get janitor models for both connections
 const getJanitorModels = () => {
@@ -57,11 +84,12 @@ const getJanitorModels = () => {
     throw new Error("Atlas database connection not initialized");
   }
 
-  // Register the schema with each connection if not already registered
-  const JanitorLocal = global.dbConnections.local.models.Janitor || 
-                       global.dbConnections.local.model("Janitor", janitorSchema);
-  const JanitorAtlas = global.dbConnections.atlas.models.Janitor || 
-                       global.dbConnections.atlas.model("Janitor", janitorSchema);
+  const JanitorLocal =
+    global.dbConnections.local.models.Janitor ||
+    global.dbConnections.local.model("Janitor", janitorSchema);
+  const JanitorAtlas =
+    global.dbConnections.atlas.models.Janitor ||
+    global.dbConnections.atlas.model("Janitor", janitorSchema);
 
   return { JanitorLocal, JanitorAtlas };
 };
