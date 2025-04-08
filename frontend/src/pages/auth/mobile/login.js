@@ -1,15 +1,119 @@
 import React from "react";
 import { useAuth } from "../../../components/controller/authController";
 import { Link } from "react-router-dom";
+import { axiosInstance } from "../../../components/controller/authController";
+import Swal from "sweetalert2";
 
 function Login() {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [showResendLink, setShowResendLink] = React.useState(false);
   const { login } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(username, password);
+    login(username.trim().toLowerCase(), password.trim())
+      .then((response) => {})
+      .catch((error) => {
+        if (error.response?.status === 403) {
+          const errorMessage = error.response?.data;
+          console.log("Error message from backend:", errorMessage);
+
+          if (
+            errorMessage ===
+            "Pending approval. Please contact your employer to approve your signup request."
+          ) {
+            Swal.fire({
+              icon: "warning",
+              title: "Pending Approval",
+              text: errorMessage,
+            });
+          } else if (
+            errorMessage ===
+            "Your account has been declined. Please contact support for further assistance."
+          ) {
+            Swal.fire({
+              icon: "error",
+              title: "Account Declined",
+              text: errorMessage,
+            });
+          } else if (
+            errorMessage ===
+            "Email not verified. Please verify your email before logging in."
+          ) {
+            setShowResendLink(true);
+            Swal.fire({
+              icon: "warning",
+              title: "Email Not Verified",
+              text: errorMessage,
+            });
+          } else if (errorMessage === "Your account is not accepted yet.") {
+            Swal.fire({
+              icon: "warning",
+              title: "Account Not Accepted",
+              text: errorMessage,
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Login Failed",
+              text: errorMessage || "An unexpected error occurred.",
+            });
+          }
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Login Failed",
+            text: error.response?.data || "An unexpected error occurred.",
+          });
+        }
+      });
+  };
+
+  const handleResendVerificationEmail = async () => {
+    try {
+      const response = await axiosInstance.post("/users/resend-verification-email", { email: username });
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: response.data.message,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data || "Failed to resend verification email.",
+      });
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!username) {
+      Swal.fire({
+        icon: "warning",
+        title: "Email Required",
+        text: "Please enter your email address to reset your password",
+      });
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post("/users/forgot-password", {
+        email: username.trim().toLowerCase(),
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Reset Link Sent",
+        text: "If an account exists with this email, a password reset link has been sent. Please check your inbox (and spam/junk folder).",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.message || "Failed to send password reset email. Please try again.",
+      });
+    }
   };
 
   return (
@@ -59,10 +163,29 @@ function Login() {
             </div>
           </div>
 
+          <div>
+            {showResendLink && (
+              <p className="text-center mt-4 text-sm text-white">
+                Didn't receive a verification email?{" "}
+                <button
+                  type="button"
+                  onClick={handleResendVerificationEmail}
+                  className="text-Icpetgreen hover:underline font-medium"
+                >
+                  Resend verification email
+                </button>
+              </p>
+            )}
+          </div>
+
           <div className="text-left mb-2">
-            <a href="" className="text-sm text-Icpetgreen hover:underline">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-sm text-Icpetgreen hover:underline"
+            >
               Forgot Password?
-            </a>
+            </button>
           </div>
 
           <button
