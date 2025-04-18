@@ -24,10 +24,10 @@ const NotificationDropdown = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [notificationToasts, setNotificationToasts] = useState([]);
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.5.45:5000";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://smart-cubicle-backend.onrender.com"; // Updated default to production URL
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768); 
-  const processedIds = useRef(new Set()); 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const processedIds = useRef(new Set());
 
   // Update isMobile on window resize
   useEffect(() => {
@@ -91,7 +91,9 @@ const NotificationDropdown = ({
 
     if (!wsSingleton) {
       console.log("Initializing WebSocket connection");
-      wsSingleton = new WebSocket(`ws://${backendUrl.split("://")[1]}?token=${token}`);
+      const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://"; // Dynamic protocol
+      const wsUrl = `${wsProtocol}${backendUrl.split("://")[1]}?token=${token}`;
+      wsSingleton = new WebSocket(wsUrl);
 
       wsSingleton.onopen = () => {
         console.log("WebSocket connected");
@@ -152,7 +154,7 @@ const NotificationDropdown = ({
     }
 
     return () => {
-    
+      // Cleanup moved to component unmount only if needed
     };
   }, [notificationsEnabled, userRole, token, backendUrl]);
 
@@ -239,7 +241,7 @@ const NotificationDropdown = ({
         "pointer-events-auto relative flex w-full max-w-[380px] items-center justify-between space-x-2 overflow-hidden rounded-md border p-4 pr-6 shadow-lg transition-all",
         "bg-[#23897D] text-white",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
-        "data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom", 
+        "data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom",
         "data-[state=open]:duration-300"
       )}
     >
@@ -252,7 +254,7 @@ const NotificationDropdown = ({
     </ToastPrimitives.Root>
   );
 
-  // Notification Toast Viewport 
+  // Notification Toast Viewport
   const NotificationToastViewport = () => (
     <ToastPrimitives.Viewport
       className={cn(

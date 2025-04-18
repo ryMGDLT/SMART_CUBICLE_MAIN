@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const { janitorSchema } = require("./Janitor");
+const { janitorSchema } = require("./janitor");
 
 const userSchema = new mongoose.Schema({
   username: { type: String, unique: true, trim: true },

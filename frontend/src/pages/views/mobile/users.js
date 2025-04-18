@@ -36,7 +36,7 @@ const ActionsCell = ({ user, setUsersData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(user.role || "Select Role");
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.8.181:5000";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://smart-cubicle-backend.onrender.com";
 
   
   useEffect(() => {
@@ -246,7 +246,7 @@ export default function Users() {
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 6;
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.8.181:5000";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://smart-cubicle-backend.onrender.com";
 
  
   const fetchData = async () => {

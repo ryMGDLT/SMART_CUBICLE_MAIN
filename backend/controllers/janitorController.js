@@ -1,4 +1,4 @@
-const getJanitorModels = require("../models/Janitor");
+const getJanitorModels = require("../models/janitor");
 const mongoose = require("mongoose");
 
 // GET all janitors

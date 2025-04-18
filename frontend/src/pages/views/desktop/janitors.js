@@ -59,7 +59,7 @@ export default function Janitors() {
   const itemsPerPage = 10;
   const { user } = useAuth();
   const userRole = user?.role;
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://192.168.8.181:5000";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://smart-cubicle-backend.onrender.com";
 
   
   const fetchJanitors = async () => {

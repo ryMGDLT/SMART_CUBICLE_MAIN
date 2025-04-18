@@ -8,7 +8,7 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL || "http://localhost:5000",
+  baseURL: process.env.REACT_APP_BACKEND_URL || "https://smart-cubicle-backend.onrender.com",
 });
 console.log("Axios baseURL:", process.env.REACT_APP_BACKEND_URL);
 

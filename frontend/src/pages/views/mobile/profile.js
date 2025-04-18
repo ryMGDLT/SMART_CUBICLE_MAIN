@@ -26,7 +26,7 @@ export default function Profile() {
   const profileData = PROFILE_DATA[0]; 
 
   const serverUrl =
-    process.env.REACT_APP_BACKEND_URL || "http://192.168.8.181:5000";
+    process.env.REACT_APP_BACKEND_URL || "https://smart-cubicle-backend.onrender.com";
 
   useEffect(() => {
     const fetchUserData = async () => {

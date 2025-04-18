@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../utils/emailService");
-const getUserModels = require("../models/User");
-const getJanitorModels = require("../models/Janitor");
+const getUserModels = require("../models/user");
+const getJanitorModels = require("../models/janitor");
 const getNotificationModels = require("../models/notification");
 
 const generateToken = (user) => {
