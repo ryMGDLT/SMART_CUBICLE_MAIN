@@ -106,19 +106,21 @@ Content-Type: application/json
 ### Environment Variables
 ```env
 # Database Configuration
-MONGO_ATLAS_URI=mongodb+srv://username:password@cluster.mongodb.net/database
+MONGO_ATLAS_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
 
 # Authentication
-JWT_SECRET=your_jwt_secret_key
+JWT_SECRET=your_jwt_secret_key_here
 
 # Email Service
-SENDGRID_API_KEY=SG.your_sendgrid_api_key
+SENDGRID_API_KEY=SG.your_sendgrid_api_key_here
 FROM_EMAIL=noreply@smartrestroom.com
 
 # Server Configuration
 FRONTEND_BASE_URL=http://localhost:3000
 NODE_ENV=development|production
 ```
+
+⚠️ **SECURITY WARNING**: Never commit actual credentials to version control. Always use placeholder values in documentation and store real credentials in environment variables or secure configuration files that are excluded from git.
 
 ### CORS Configuration
 ```javascript
@@ -809,6 +811,60 @@ X-RateLimit-Reset: 1703127056
 - **Allowed Origins**: Specified domains only
 - **Credentials**: Enabled for authentication
 - **Methods**: Limited to required HTTP methods
+
+### Credential Management Best Practices
+
+#### Environment Variables Security
+```bash
+# Create .env file (NEVER commit to git)
+MONGO_ATLAS_URI=mongodb+srv://actual_username:actual_password@actual_cluster.mongodb.net/actual_database
+JWT_SECRET=actual_jwt_secret_key_256_bits_minimum
+SENDGRID_API_KEY=SG.actual_sendgrid_api_key
+```
+
+#### Git Security Configuration
+```bash
+# Add to .gitignore (ensure this is committed)
+.env
+.env.local
+.env.production
+config/secrets.js
+*.pem
+*.key
+```
+
+#### Production Deployment Security
+```bash
+# Use secure environment variable injection
+heroku config:set MONGO_ATLAS_URI=mongodb+srv://...
+heroku config:set JWT_SECRET=...
+heroku config:set SENDGRID_API_KEY=...
+```
+
+#### MongoDB Atlas Security Checklist
+- ✅ Enable IP Whitelist restrictions
+- ✅ Use strong database passwords (20+ characters)
+- ✅ Enable database encryption at rest
+- ✅ Regular credential rotation (monthly)
+- ✅ Monitor access logs for suspicious activity
+- ✅ Use role-based database access control
+
+#### Security Incident Response
+1. **Immediate Actions** (if credentials are exposed):
+   - Rotate all exposed credentials immediately
+   - Review access logs for unauthorized usage
+   - Update all deployment environments
+   - Force logout all active user sessions
+
+2. **Documentation Updates**:
+   - Use placeholder values in all documentation
+   - Add security warnings in README files
+   - Create secure configuration templates
+
+3. **Prevention Measures**:
+   - Enable pre-commit hooks for credential scanning
+   - Regular security audits of repository history
+   - Team training on secure development practices
 
 ---
 

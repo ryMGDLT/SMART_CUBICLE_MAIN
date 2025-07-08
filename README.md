@@ -138,6 +138,41 @@ The Smart Restroom Preventive Maintenance System addresses inefficiencies in tra
 - **Reliability**: 4.88/5.0
 - **Maintainability**: 4.87/5.0
 
+## 🔒 Security & Credential Management
+
+### ⚠️ CRITICAL SECURITY WARNING
+**NEVER commit actual credentials to version control**. This repository uses placeholder values in all documentation and configuration examples.
+
+### Security Best Practices
+- **Environment Variables**: Store all sensitive data in `.env` files (excluded from git)
+- **Credential Rotation**: Regularly update passwords, API keys, and JWT secrets
+- **Access Control**: Use role-based permissions and principle of least privilege
+- **Monitoring**: Enable logging for authentication attempts and API access
+
+### Required Environment Variables
+```bash
+# Database (MongoDB Atlas)
+MONGO_ATLAS_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
+
+# Authentication
+JWT_SECRET=<your_256_bit_secret_key>
+
+# Email Service (SendGrid)
+SENDGRID_API_KEY=<your_sendgrid_api_key>
+
+# Server Configuration
+NODE_ENV=development|production
+FRONTEND_BASE_URL=http://localhost:3000
+```
+
+### Security Checklist Before Deployment
+- ✅ Verify `.env` files are in `.gitignore`
+- ✅ Use strong passwords (20+ characters)
+- ✅ Enable MongoDB IP whitelist restrictions
+- ✅ Configure CORS for production domains only
+- ✅ Enable rate limiting on API endpoints
+- ✅ Set up SSL/TLS certificates for production
+
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
