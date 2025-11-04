@@ -9,10 +9,10 @@
 
 ### 👥 Research Team
 - **Santos, Rafaella** - Lead Developer & ML Engineer
-- **Infante, Charlin** - Hardware Integration Specialist  
-- **Magdalita, Ryan Rey** - Backend Developer & Database Administrator
-- **Mission, Joey Boy** - Frontend Developer & UI/UX Designer
-- **Pontanos, John Michael** - System Architect & Quality Assurance
+- **Infante, Charlin** - UI/UX Designer 
+- **Magdalita, Ryan Rey** - Fullstach Developer & Database Administrator
+- **Mission, Joey Boy** - Hardware Integration Specialist & System Architect
+- **Pontanos, John Michael** - Frontend Developer & Hardware Integration Specialist
 
 ## 📋 Abstract
 
